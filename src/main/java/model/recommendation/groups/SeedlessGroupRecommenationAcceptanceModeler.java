@@ -67,7 +67,7 @@ public class SeedlessGroupRecommenationAcceptanceModeler<V> implements
 			results.add(metric.evaluate(recommendationsToIdeals, unusedRecommendations,
 					unusedIdeals));
 		}
-		
+
 		return results;
 
 	}

@@ -25,4 +25,10 @@ public abstract class GroupDataSet extends DataSet {
 
 	public abstract Collection<Set<Integer>> getMaximalCliques(int account);
 
+	public abstract File getPredictedGroupsFolder(String predictionType, int account);
+	
+	public abstract void writeGroupPredictions(String predictionType, int account, Collection<Set<Integer>> predictions);
+
+	public abstract File getSeedlessMetricsFile();
+
 }

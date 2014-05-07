@@ -20,4 +20,9 @@ public class AddsAndDeletesGroupDistance<V> implements GroupDistanceMetric<V>{
 		return distance/Math.min(group1.size(), group2.size());
 	}
 
+	@Override
+	public String getDistanceName() {
+		return "adds and deletes";
+	}
+
 }

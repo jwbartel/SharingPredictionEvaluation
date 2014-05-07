@@ -1,7 +1,5 @@
 package model.recommendation.groups;
 
-import groups.seedless.SeedlessGroupRecommender;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,22 +9,22 @@ import java.util.Set;
 
 import metrics.MetricResult;
 import metrics.groups.GroupMetric;
-import metrics.groups.similarity.GroupSimilarityMetric;
+import metrics.groups.distance.GroupDistanceMetric;
 
 public class SeedlessGroupRecommenationAcceptanceModeler<V> implements
 		GroupRecommendationAcceptanceModeler {
 
-	GroupSimilarityMetric<V> similarityMetric;
+	GroupDistanceMetric<V> distanceMetric;
 
-	SeedlessGroupRecommender<V> recommender;
+	Collection<Set<V>> recommendations;
 	Collection<Set<V>> idealGroups;
 	Collection<GroupMetric<V>> metrics;
 
-	public SeedlessGroupRecommenationAcceptanceModeler(GroupSimilarityMetric<V> similarityMetric,
-			SeedlessGroupRecommender<V> recommender, Collection<Set<V>> idealGroups,
+	public SeedlessGroupRecommenationAcceptanceModeler(GroupDistanceMetric<V> distanceMetric,
+			Collection<Set<V>> recommendations, Collection<Set<V>> idealGroups,
 			Collection<GroupMetric<V>> metrics) {
-		this.similarityMetric = similarityMetric;
-		this.recommender = recommender;
+		this.distanceMetric = distanceMetric;
+		this.recommendations = recommendations;
 		this.idealGroups = idealGroups;
 		this.metrics = metrics;
 	}
@@ -36,20 +34,18 @@ public class SeedlessGroupRecommenationAcceptanceModeler<V> implements
 
 		Map<Set<V>, Set<V>> recommendationsToIdeals = new HashMap<>();
 		Collection<Set<V>> unusedIdeals = new HashSet<>(idealGroups);
-
-		Collection<Set<V>> recommendations = recommender.getRecommendations();
 		Collection<Set<V>> unusedRecommendations = new HashSet<Set<V>>(recommendations);
 
 		for (Set<V> recommendation : recommendations) {
 
-			double maxSimilarity = 0.0;
+			double minDistance = Double.MAX_VALUE;
 			Set<V> bestIdeal = null;
 
 			for (Set<V> ideal : idealGroups) {
 				if (unusedIdeals.contains(ideal)) {
-					double similarity = similarityMetric.similarity(recommendation, ideal);
-					if (similarity > maxSimilarity) {
-						maxSimilarity = similarity;
+					Double distance = distanceMetric.distance(recommendation, ideal);
+					if (distance != null && distance < minDistance) {
+						minDistance = distance;
 						bestIdeal = ideal;
 					}
 				}

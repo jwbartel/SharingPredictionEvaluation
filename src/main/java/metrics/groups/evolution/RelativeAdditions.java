@@ -14,11 +14,11 @@ import metrics.MetricResult;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-public class RelativeChangeDeletions<V> extends GroupEvolutionMetric<V> {
+public class RelativeAdditions<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "avg-change deletions,stdev-change deletions";
+		return "avg-additions,stdev-additions";
 	}
 
 	@Override
@@ -32,7 +32,12 @@ public class RelativeChangeDeletions<V> extends GroupEvolutionMetric<V> {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 		for (Entry<RecommendedGroupChangeEvolution<V>, Set<V>> entry : groupChangeToIdeal
 				.entrySet()) {
-			stats.addValue(requiredRelativeDeletions(entry.getKey().getMerging(), entry.getValue()));
+			stats.addValue(requiredRelativeAdditions(entry.getKey().getMerging(), entry.getValue()));
+		}
+		for (Entry<RecommendedGroupCreationEvolution<V>, Set<V>> entry : groupCreationToIdeal
+				.entrySet()) {
+			stats.addValue(requiredRelativeAdditions(entry.getKey().getRecommenderEngineResult(),
+					entry.getValue()));
 		}
 
 		return new DoubleResult(((double) unusedIdeals.size()) / newlyCreatedIdealGroups.size());

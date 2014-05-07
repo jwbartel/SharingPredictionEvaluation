@@ -1,6 +1,5 @@
 package testbed;
 
-import groups.seedless.SeedlessGroupRecommender;
 import groups.seedless.SeedlessGroupRecommenderFactory;
 import groups.seedless.fellows.FellowsRecommenderFactory;
 import groups.seedless.kelli.HybridRecommenderFactory;
@@ -12,7 +11,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import metrics.Metric;
-import metrics.MetricResult;
 import metrics.MetricResultCollection;
 import metrics.groups.distance.AddsAndDeletesGroupDistance;
 import metrics.groups.distance.GoodnessGroupDistance;
@@ -25,11 +23,12 @@ import metrics.groups.evolution.PercentMissedIdeals;
 import metrics.groups.evolution.PercentUnusedChangeRecommendations;
 import metrics.groups.evolution.PercentUnusedCreationRecommendations;
 import metrics.groups.evolution.PercentUnusedRecommendations;
+import metrics.groups.evolution.RelativeAdditions;
 import metrics.groups.evolution.RelativeChangeAdditions;
 import metrics.groups.evolution.RelativeChangeDeletions;
 import metrics.groups.evolution.RelativeCreationAdditions;
 import metrics.groups.evolution.RelativeCreationDeletions;
-import model.recommendation.groups.SeedlessGroupRecommenationAcceptanceModeler;
+import metrics.groups.evolution.RelativeDeletions;
 
 import org.apache.commons.io.FileUtils;
 import org.jgrapht.UndirectedGraph;
@@ -68,6 +67,8 @@ public class GroupEvolutionRecommendationTestBed {
 		metrics.add(new PercentUnusedRecommendations<Integer>());
 		metrics.add(new PercentUnusedChangeRecommendations<Integer>());
 		metrics.add(new PercentUnusedCreationRecommendations<Integer>());
+		metrics.add(new RelativeAdditions<Integer>());
+		metrics.add(new RelativeDeletions<Integer>());
 		metrics.add(new RelativeChangeAdditions<Integer>());
 		metrics.add(new RelativeChangeDeletions<Integer>());
 		metrics.add(new RelativeCreationAdditions<Integer>());

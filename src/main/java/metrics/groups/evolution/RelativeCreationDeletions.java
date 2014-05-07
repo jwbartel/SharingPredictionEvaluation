@@ -18,7 +18,7 @@ public class RelativeCreationDeletions<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "avg-creation additions,stdev-creation additions";
+		return "avg-creation deletions,stdev-creation deletions";
 	}
 
 	@Override

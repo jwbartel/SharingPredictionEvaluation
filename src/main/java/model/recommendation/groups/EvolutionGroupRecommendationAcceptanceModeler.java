@@ -1,8 +1,9 @@
 package model.recommendation.groups;
 
-import groups.evolution.RecommendedEvolution;
+import groups.evolution.recommendations.RecommendedEvolution;
+import groups.evolution.recommendations.RecommendedGroupChangeEvolution;
+import groups.evolution.recommendations.RecommendedGroupCreationEvolution;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,12 +19,13 @@ public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 
 	GroupDistanceMetric<V> distanceMetric;
 	Collection<RecommendedEvolution<V>> recommendations;
-	Map<Set<V>,Set<V>> oldToNewIdealGroups;
+	Map<Set<V>,Collection<Set<V>>> oldToNewIdealGroups;
 	Collection<Set<V>> newlyCreatedIdealGroups;
 	Collection<GroupMetric<V>> metrics;
 
 	public EvolutionGroupRecommendationAcceptanceModeler(GroupDistanceMetric<V> distanceMetric,
-			Collection<RecommendedEvolution<V>> recommendations, Map<Set<V>,Set<V>> oldToNewIdealGroups,
+			Collection<RecommendedEvolution<V>> recommendations,
+			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,	Collection<GroupMetric<V>> metrics) {
 		this.distanceMetric = distanceMetric;
 		this.recommendations = recommendations;
@@ -31,13 +33,68 @@ public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 		this.newlyCreatedIdealGroups = newlyCreatedIdealGroups;
 		this.metrics = metrics;
 	}
+	
+	private Set<V> findClosestIdeal(Collection<Set<V>> candidateIdeals, Set<V> recommendedGroup) {
+		double minDistance = Double.MAX_VALUE;
+		Set<V> bestIdeal = null;
+		
+		for (Set<V> ideal : candidateIdeals) {
+			Double distance = distanceMetric.distance(recommendedGroup, ideal);
+			if (distance != null && distance < minDistance) {
+				minDistance = distance;
+				bestIdeal = ideal;
+			}
+		}
+		
+		return bestIdeal;
+	}
 
 	@Override
 	public Collection<MetricResult> modelRecommendationAcceptance() {
 
-		//TODO : evaluate costs of changing existing groups
-		//TODO : evaluate costs of creating new groups
+		Collection<Set<V>> unusedIdealGroups = new HashSet<>(newlyCreatedIdealGroups);
+		for (Collection<Set<V>> evolvedIdeals : oldToNewIdealGroups.values()) {
+			unusedIdealGroups.addAll(evolvedIdeals);
+		}
+
+		Collection<RecommendedEvolution<V>> unusedRecommendations = new HashSet<RecommendedEvolution<V>>(recommendations);
+		Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal = new HashMap<>();
+		Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal = new HashMap<>();
 		
+		for(RecommendedEvolution<V> recommendation : recommendations) {
+			if (recommendation instanceof RecommendedGroupCreationEvolution) {
+				// If we are recommending the creation of a new group
+				
+				Set<V> recommendedGroup = recommendation.getRecommenderEngineResult();
+				Set<V> closestIdeal = findClosestIdeal(unusedIdealGroups, recommendedGroup);
+				
+				if (closestIdeal != null) {
+					groupCreationToIdeal.put((RecommendedGroupCreationEvolution<V>) recommendation,
+							closestIdeal);
+					unusedRecommendations.remove(recommendation);
+					unusedIdealGroups.remove(closestIdeal);
+				}
+				
+			} else if (recommendation instanceof RecommendedGroupChangeEvolution) {
+				// If we are recommending the evolution of an existing group
+				
+				Collection<Set<V>> candidateIdeals = oldToNewIdealGroups
+						.get(((RecommendedGroupChangeEvolution<V>) recommendation).getOldGroup());
+				Set<V> recommendedGroup = ((RecommendedGroupChangeEvolution<V>) recommendation)
+						.getMerging();
+				
+				Set<V> closestIdeal = findClosestIdeal(candidateIdeals, recommendedGroup);
+
+				if (closestIdeal != null) {
+					groupChangeToIdeal.put((RecommendedGroupChangeEvolution<V>) recommendation,
+							closestIdeal);
+					unusedRecommendations.remove(recommendation);
+					unusedIdealGroups.remove(closestIdeal);
+				}
+			}
+		}
+
+
 		return null;
 
 	}

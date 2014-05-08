@@ -5,18 +5,19 @@ import groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import groups.evolution.recommendations.RecommendedGroupCreationEvolution;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import metrics.DoubleResult;
 import metrics.MetricResult;
+import metrics.StatisticsResult;
 
-public class PercentUnusedRecommendations<V> extends GroupEvolutionMetric<V> {
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+public class MissedIdealSizes<V> extends GroupEvolutionMetric<V> {
+	
 	@Override
 	public String getHeader() {
-		return "percent unused recommendations";
+		return "avg-missed ideal size,stdev-missed ideal size";
 	}
 
 	@Override
@@ -27,9 +28,12 @@ public class PercentUnusedRecommendations<V> extends GroupEvolutionMetric<V> {
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
 
-		int usedRecommendations = groupChangeToIdeal.size() + groupCreationToIdeal.size() + unusedRecommendations.size();
-
-		return new DoubleResult(((double) unusedRecommendations.size()) / usedRecommendations);
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		for (Set<V> unusedIdeal : unusedIdeals) {
+			stats.addValue(unusedIdeal.size());
+		}
+		
+		return new StatisticsResult(stats);
 	}
 
 }

@@ -1,13 +1,19 @@
 package testbed.dataset;
 
+import groups.evolution.MembershipChangeFinder;
 import groups.evolution.snap.SnapIOFunctions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+
+import bus.tools.io.CollectionIOAssist;
+import bus.tools.io.IntegerValueParser;
 
 public class SnapGroupDataSet extends GroupDataSet {
 
@@ -86,5 +92,43 @@ public class SnapGroupDataSet extends GroupDataSet {
 	public File getSeedlessMetricsFile() {
 		return new File(getMetricsFolder(), "seedless results.csv");
 	}
+	
+	private File getNewMembersFolder() {
+		return new File(getRootFolder(), "New Membership");
+	}
+	
+	@Override
+	public File getNewMembersFile(int account, double growthRate, int test) {
+		File growthRateFolder = new File(getNewMembersFolder(), ""+growthRate);
+		return new File(growthRateFolder, "participant"+account+"_test"+test+".txt");
+	}
+
+	@Override
+	public Set<Integer> getNewMembers(int account, double growthRate, int test) {
+		try {
+			File newMembersFile = getNewMembersFile(account, growthRate, test);
+			if (!newMembersFile.exists()) {
+				MembershipChangeFinder<Integer> changeFinder = new MembershipChangeFinder<>();
+				Set<Integer> newMembers = changeFinder
+						.getPseudoRandomNewIndividuals(getGraph(account)
+								.vertexSet(), growthRate);
+				CollectionIOAssist.writeCollection(newMembersFile, newMembers);
+			}
+			Set<Integer> newMembers = new HashSet<>(
+					CollectionIOAssist.readCollection(newMembersFile,
+							new IntegerValueParser()));
+			return newMembers;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@Override
+	public File getEvolutionMetricsFile() {
+		return new File(getMetricsFolder(), "evolution results.csv");
+	}
+	
+	
 
 }

@@ -30,5 +30,11 @@ public abstract class GroupDataSet extends DataSet {
 	public abstract void writeGroupPredictions(String predictionType, int account, Collection<Set<Integer>> predictions);
 
 	public abstract File getSeedlessMetricsFile();
+	
+	public abstract File getNewMembersFile(int account, double growthRate, int test);
+	
+	public abstract Set<Integer> getNewMembers(int account, double growthRate, int test);
+	
+	public abstract File getEvolutionMetricsFile();
 
 }

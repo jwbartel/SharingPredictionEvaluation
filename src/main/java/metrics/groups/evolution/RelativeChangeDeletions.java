@@ -11,6 +11,7 @@ import java.util.Set;
 
 import metrics.DoubleResult;
 import metrics.MetricResult;
+import metrics.StatisticsResult;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -35,7 +36,7 @@ public class RelativeChangeDeletions<V> extends GroupEvolutionMetric<V> {
 			stats.addValue(requiredRelativeDeletions(entry.getKey().getMerging(), entry.getValue()));
 		}
 
-		return new DoubleResult(((double) unusedIdeals.size()) / newlyCreatedIdealGroups.size());
+		return new StatisticsResult(stats);
 	}
 
 }

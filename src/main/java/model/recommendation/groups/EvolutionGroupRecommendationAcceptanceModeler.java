@@ -4,6 +4,7 @@ import groups.evolution.recommendations.RecommendedEvolution;
 import groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import groups.evolution.recommendations.RecommendedGroupCreationEvolution;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 import metrics.MetricResult;
 import metrics.groups.GroupMetric;
 import metrics.groups.distance.GroupDistanceMetric;
+import metrics.groups.evolution.GroupEvolutionMetric;
 
 public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 		GroupRecommendationAcceptanceModeler {
@@ -21,12 +23,12 @@ public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 	Collection<RecommendedEvolution<V>> recommendations;
 	Map<Set<V>,Collection<Set<V>>> oldToNewIdealGroups;
 	Collection<Set<V>> newlyCreatedIdealGroups;
-	Collection<GroupMetric<V>> metrics;
+	Collection<GroupEvolutionMetric<V>> metrics;
 
 	public EvolutionGroupRecommendationAcceptanceModeler(GroupDistanceMetric<V> distanceMetric,
 			Collection<RecommendedEvolution<V>> recommendations,
 			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
-			Collection<Set<V>> newlyCreatedIdealGroups,	Collection<GroupMetric<V>> metrics) {
+			Collection<Set<V>> newlyCreatedIdealGroups,	Collection<GroupEvolutionMetric<V>> metrics) {
 		this.distanceMetric = distanceMetric;
 		this.recommendations = recommendations;
 		this.oldToNewIdealGroups = oldToNewIdealGroups;
@@ -94,9 +96,14 @@ public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 			}
 		}
 
+		Collection<MetricResult> results = new ArrayList<MetricResult>();
+		for (GroupEvolutionMetric<V> metric : metrics) {
+			results.add(metric.evaluate(oldToNewIdealGroups, unusedIdealGroups,
+					groupChangeToIdeal, groupCreationToIdeal,
+					unusedRecommendations, unusedIdealGroups));
+		}
 
-		return null;
-
+		return results;
 	}
 
 }

@@ -70,7 +70,7 @@ public class SeedlessGroupRecommendationTestBed {
 	public static void main(String[] args) throws IOException {
 		
 		for (GroupDataSet dataset : dataSets) {
-			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(new ArrayList<Metric>(metrics));
+			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>("type,account", new ArrayList<Metric>(metrics));
 			for (int accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Integer, DefaultEdge> graph = dataset.getGraph(accountId);

@@ -7,10 +7,12 @@ import java.util.Map.Entry;
 
 public class MetricResultCollection<V> {
 
+	private final String headerPrefix;
 	private final Collection<Metric> metrics;
 	private final Map<String, Map<V, Collection<MetricResult>>> typeToAccountToResult = new HashMap<String, Map<V, Collection<MetricResult>>>();
 	
-	public MetricResultCollection(Collection<Metric> metrics) {
+	public MetricResultCollection(String headerPrefix, Collection<Metric> metrics) {
+		this.headerPrefix = headerPrefix;
 		this.metrics = metrics;
 	}
 	
@@ -24,7 +26,7 @@ public class MetricResultCollection<V> {
 	}
 	
 	public String toString() {
-		String header = "type,account";
+		String header = headerPrefix;
 		for (Metric metric : metrics) {
 			header += "," + metric.getHeader();
 		}

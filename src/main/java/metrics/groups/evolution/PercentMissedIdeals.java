@@ -16,7 +16,7 @@ public class PercentMissedIdeals<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "percent missed creations";
+		return "percent missed ideals";
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class PercentMissedIdeals<V> extends GroupEvolutionMetric<V> {
 			ideals.addAll(mappedNewIdeals);
 		}
 
-		return new DoubleResult(((double) unusedIdeals.size()) / newlyCreatedIdealGroups.size());
+		return new DoubleResult(((double) unusedIdeals.size()) / ideals.size());
 	}
 
 }

@@ -1,19 +1,19 @@
 package testbed.dataset;
 
-import groups.evolution.snap.SnapIOFunctions;
-import groups.evolution.synthetic.MembershipChangeFinder;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import model.tools.evolution.MembershipChangeFinder;
+
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import bus.tools.io.CollectionIOAssist;
 import bus.tools.io.IntegerValueParser;
+import bus.tools.io.SnapIOFunctions;
 
 public class SnapGroupDataSet extends GroupDataSet {
 

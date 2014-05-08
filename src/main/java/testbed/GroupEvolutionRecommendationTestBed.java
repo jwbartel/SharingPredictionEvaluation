@@ -5,7 +5,6 @@ import groups.evolution.GroupEvolutionRecommenderFactory;
 import groups.evolution.composed.ComposedGroupEvolutionRecommenderFactory;
 import groups.evolution.fullrecommendation.FullRecommendationGroupEvolutionRecommenderFactory;
 import groups.evolution.recommendations.RecommendedEvolution;
-import groups.evolution.synthetic.MembershipChangeFinder;
 import groups.seedless.SeedlessGroupRecommender;
 import groups.seedless.SeedlessGroupRecommenderFactory;
 import groups.seedless.fellows.FellowsRecommenderFactory;
@@ -41,6 +40,7 @@ import metrics.groups.evolution.RelativeCreationAdditions;
 import metrics.groups.evolution.RelativeCreationDeletions;
 import metrics.groups.evolution.RelativeDeletions;
 import model.recommendation.groups.EvolutionGroupRecommendationAcceptanceModeler;
+import model.tools.evolution.MembershipChangeFinder;
 
 import org.apache.commons.io.FileUtils;
 import org.jgrapht.UndirectedGraph;

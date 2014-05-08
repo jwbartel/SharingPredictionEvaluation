@@ -8,7 +8,7 @@ import groups.evolution.recommendations.RecommendedEvolution;
 import groups.seedless.SeedlessGroupRecommender;
 import groups.seedless.SeedlessGroupRecommenderFactory;
 import groups.seedless.fellows.FellowsRecommenderFactory;
-import groups.seedless.kelli.HybridRecommenderFactory;
+import groups.seedless.hybrid.HybridRecommenderFactory;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package testbed.dataset;
 
-import groups.evolution.MembershipChangeFinder;
 import groups.evolution.snap.SnapIOFunctions;
+import groups.evolution.synthetic.MembershipChangeFinder;
 
 import java.io.File;
 import java.io.IOException;

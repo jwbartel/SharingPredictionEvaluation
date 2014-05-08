@@ -1,11 +1,11 @@
 package testbed;
 
-import groups.evolution.ComposedGroupEvolutionRecommenderFactory;
 import groups.evolution.GroupEvolutionRecommender;
 import groups.evolution.GroupEvolutionRecommenderFactory;
-import groups.evolution.MembershipChangeFinder;
+import groups.evolution.composed.ComposedGroupEvolutionRecommenderFactory;
 import groups.evolution.fullrecommendation.FullRecommendationGroupEvolutionRecommenderFactory;
 import groups.evolution.recommendations.RecommendedEvolution;
+import groups.evolution.synthetic.MembershipChangeFinder;
 import groups.seedless.SeedlessGroupRecommender;
 import groups.seedless.SeedlessGroupRecommenderFactory;
 import groups.seedless.fellows.FellowsRecommenderFactory;

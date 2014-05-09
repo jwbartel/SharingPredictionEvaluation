@@ -1,5 +1,8 @@
 package testbed.dataset.messages;
 
+import general.actionbased.messages.MessageThread;
+import general.actionbased.messages.SingleMessage;
+
 import java.io.File;
 import java.util.Collection;
 

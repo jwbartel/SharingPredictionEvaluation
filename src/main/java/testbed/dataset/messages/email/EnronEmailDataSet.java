@@ -15,6 +15,33 @@ import bus.data.structures.AddressLists;
 
 public class EnronEmailDataSet extends EmailDataSet<String, String> {
 
+	public static final String[] DEFAULT_ACCOUNTS = { "allen-p", "arnold-j",
+			"arora-h", "badeer-r", "bailey-s", "baughman-d", "beck-s",
+			"blair-l", "buy-r", "campbell-l", "carson-m", "cash-m",
+			"causholli-m", "corman-s", "cuilla-m", "davis-d", "dean-c",
+			"delainey-d", "derrick-j", "dickson-s", "donoho-l", "donohoe-t",
+			"dorland-c", "ermis-f", "fischer-m", "forney-j", "fossum-d",
+			"gang-l", "gay-r", "geaccone-t", "germany-c", "giron-d",
+			"griffith-j", "grigsby-m", "guzman-m", "haedicke-m", "hain-m",
+			"harris-s", "heard-m", "hernandez-j", "hodge-j", "holst-k",
+			"hyatt-k", "hyvl-d", "keavey-p", "keiser-k", "king-j",
+			"kuykendall-t", "lavorato-j", "lay-k", "lenhart-m", "lewis-a",
+			"linder-e", "lokay-m", "lokey-t", "love-p", "lucci-p", "maggi-m",
+			"mann-k", "martin-t", "may-l", "mccarty-d", "mckay-b", "mckay-j",
+			"mclaughlin-e", "merriss-s", "meyers-a", "motley-m", "neal-s",
+			"panus-s", "parks-j", "pereira-s", "perlingiere-d", "pimenov-v",
+			"platter-p", "presto-k", "quenet-j", "quigley-d", "rapp-b",
+			"reitmeyer-j", "richey-c", "ring-a", "ring-r", "rodrique-r",
+			"rogers-b", "ruscitti-k", "sager-e", "saibi-e", "salisbury-h",
+			"sanchez-m", "sanders-r", "scholtes-d", "schoolcraft-d",
+			"schwieger-j", "semperger-c", "shankman-j", "shapiro-r",
+			"shively-h", "slinger-r", "solberg-g", "south-s", "staab-t",
+			"stclair-c", "steffes-j", "stepenovitch-j", "stokley-c",
+			"storey-g", "sturm-f", "swerzbin-m", "symes-k", "tholt-j",
+			"townsend-j", "tycholiz-b", "ward-k", "watson-k", "white-s",
+			"whitt-m", "williams-w3", "wolfe-j", "ybarbo-p", "zipper-a",
+			"zufferli-j" };
+
 	private final String messageListName;
 	private String currentAccountMessages = null;
 	private Collection<EmailMessage<String>> currentMessages;
@@ -55,15 +82,16 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 		Date date = new Date(Long.parseLong(dateStr));
 		return date;
 	}
-	
+
 	private AddressLists getAddressLists(File messageFile) throws IOException {
-		File addrFile = new File(messageFile.getAbsoluteFile()+"_ADDRESSES.TXT");
+		File addrFile = new File(messageFile.getAbsoluteFile()
+				+ "_ADDRESSES.TXT");
 		AddressLists addrLists = new AddressLists(addrFile);
 		return addrLists;
 	}
 
 	private EmailMessage<String> getEmailMessage(File messageFile, String id) {
-		
+
 		try {
 			Date date = getMessageDate(messageFile);
 			AddressLists addressLists = getAddressLists(messageFile);
@@ -71,8 +99,9 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			ArrayList<String> to = addressLists.getTo();
 			ArrayList<String> cc = addressLists.getCC();
 			ArrayList<String> bcc = addressLists.getBCC();
-			
-			return new EmailMessage<String>(id, null, date, from, to, cc, bcc, null, null);
+
+			return new EmailMessage<String>(id, null, date, from, to, cc, bcc,
+					null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

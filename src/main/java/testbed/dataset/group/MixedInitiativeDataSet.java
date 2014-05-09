@@ -6,6 +6,9 @@ import java.util.Set;
 
 public class MixedInitiativeDataSet extends GroupDataSet<Integer> {
 
+	public static final Integer[] DEFAULT_ACCOUNT_SET = { 1, 2, 5, 8, 9, 10,
+			12, 13, 16, 17, 19, 21, 22, 23, 24, 25 };
+	
 	public MixedInitiativeDataSet(String name, Integer[] accountIds,
 			File rootFolder) {
 		super(name, accountIds, rootFolder, Integer.class);

@@ -45,11 +45,10 @@ public class SeedlessGroupRecommendationTestBed {
 	static {
 		
 		//Add data sets
-		Integer[] snapAccounts = { 0, 348, 414, 686, 698, 1684, 3437, 3980 };
+		Integer[] snapAccounts = SnapGroupDataSet.DEFAULT_ACCOUNT_SET;
 		dataSets.add(new SnapGroupDataSet("snap_facebook", snapAccounts,
 				new File("data/Stanford_snap/facebook")));
-		Integer[] mixedInitiativeAccounts = { 1, 2, 5, 8, 9, 10, 12, 13, 16,
-				17, 19, 21, 22, 23, 24, 25 };
+		Integer[] mixedInitiativeAccounts = MixedInitiativeDataSet.DEFAULT_ACCOUNT_SET;
 		dataSets.add(new MixedInitiativeDataSet("mixed_initiative",
 				mixedInitiativeAccounts, new File("data/kelli")));
 		

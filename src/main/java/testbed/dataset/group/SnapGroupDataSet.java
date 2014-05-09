@@ -5,6 +5,9 @@ import java.io.File;
 import bus.tools.io.SnapIOFunctions;
 
 public class SnapGroupDataSet extends GroupDataSet<Integer> {
+	
+	public static final Integer[] DEFAULT_ACCOUNT_SET = { 0, 348, 414, 686,
+			698, 1684, 3437, 3980 };
 
 	public SnapGroupDataSet(String name, Integer[] accountIds, File rootFolder) {
 		super(name, accountIds, rootFolder, Integer.class);

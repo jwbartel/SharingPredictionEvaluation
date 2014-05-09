@@ -1,4 +1,4 @@
-package testbed.dataset;
+package testbed.dataset.group;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import bus.tools.io.SnapIOFunctions;
 
 public class SnapGroupDataSet extends GroupDataSet {
 
-	public SnapGroupDataSet(String name, int[] accountIds, File rootFolder) {
+	public SnapGroupDataSet(String name, Integer[] accountIds, File rootFolder) {
 		super(name, accountIds, rootFolder);
 		ioHelp = new SnapIOFunctions<Integer>(Integer.class);
 		ioHelp.setStoreSubSteps(false);

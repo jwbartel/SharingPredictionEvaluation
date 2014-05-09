@@ -1,4 +1,4 @@
-package testbed.dataset;
+package testbed.dataset.group;
 
 import java.io.File;
 import java.util.Collection;
@@ -7,10 +7,12 @@ import java.util.Set;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-public abstract class GroupDataSet extends DataSet {
+import testbed.dataset.DataSet;
 
-	public GroupDataSet(String name, int[] accountIds, File rootFolder) {
-		super(name, accountIds, rootFolder);
+public abstract class GroupDataSet extends DataSet<Integer> {
+
+	public GroupDataSet(String name, Integer[] accountIds, File rootFolder) {
+		super(name, accountIds, rootFolder, Integer.class);
 	}
 
 	public abstract File getGraphFile(int account);

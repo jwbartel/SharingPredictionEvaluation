@@ -32,8 +32,8 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import bus.thunderbird.FileIO;
-import testbed.dataset.GroupDataSet;
-import testbed.dataset.SnapGroupDataSet;
+import testbed.dataset.group.GroupDataSet;
+import testbed.dataset.group.SnapGroupDataSet;
 
 public class SeedlessGroupRecommendationTestBed {
 
@@ -46,7 +46,7 @@ public class SeedlessGroupRecommendationTestBed {
 	static {
 		
 		//Add data sets
-		int[] snapAccounts = {0, 348, 414, 686, 698, 1684, 3437, 3980};
+		Integer[] snapAccounts = {0, 348, 414, 686, 698, 1684, 3437, 3980};
 		dataSets.add(new SnapGroupDataSet("snap_facebook", snapAccounts, new File("data/Stanford_snap/facebook")));
 		
 		//Add similarity metrics

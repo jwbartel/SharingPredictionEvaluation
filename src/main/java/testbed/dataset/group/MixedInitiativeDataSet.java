@@ -4,83 +4,94 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
-import org.jgrapht.UndirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
+public class MixedInitiativeDataSet extends GroupDataSet<Integer> {
 
-public class MixedInitiativeDataSet extends GroupDataSet<Integer>{
+	public MixedInitiativeDataSet(String name, Integer[] accountIds,
+			File rootFolder) {
+		super(name, accountIds, rootFolder, Integer.class);
+	}
 
-	@Override
-	public File getGraphFile(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+	private File getGraphFolder() {
+		return new File(getRootFolder(), "Friend Graphs");
+	}
+	
+	private File getIdNamesFile(Integer account) {
+		return new File(getGraphFolder(), account + "_People.txt");
 	}
 
 	@Override
-	public UndirectedGraph<Integer, DefaultEdge> getGraph(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+	public File getGraphFile(Integer account) {
+		return new File(getGraphFolder(), account + "_MutualFriends.txt");
+	}
+
+	private File getIdealGroupsFolder() {
+		return new File(getRootFolder(), "ideal");
 	}
 
 	@Override
 	public File getIdealGroupsFile(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+		return new File(getIdealGroupsFolder(), account + "_ideal.txt");
 	}
-
+	
 	@Override
 	public Collection<Set<Integer>> getIdealGroups(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+		ioHelp.fillNamesAndIDs(getIdNamesFile(account).getAbsolutePath());
+		return super.getIdealGroups(account);
 	}
 
+	private File getSubstepsFolder() {
+		return new File(getRootFolder(), "substeps");
+	}
+	
 	@Override
 	public File getSubstepsFolder(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+		return new File(getSubstepsFolder(), ""+account);
+	}
+	
+	private File getPredictedGroupsFolder() {
+		return new File(getRootFolder(), "Predicted groups");
 	}
 
 	@Override
-	public Collection<Set<Integer>> getMaximalCliques(Integer account) {
-		// TODO Auto-generated method stub
-		return null;
+	public File getPredictedGroupsFile(String predictionType, Integer account) {
+		File folder = new File(getPredictedGroupsFolder(), predictionType);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+		return new File(folder, account+".predictions");
 	}
-
-	@Override
-	public File getPredictedGroupsFolder(String predictionType, Integer account) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void writeGroupPredictions(String predictionType, Integer account,
-			Collection<Set<Integer>> predictions) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public File getSeedlessMetricsFile() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private File getNewMembersFolder() {
+		return new File(getRootFolder(), "New Membership");
 	}
 
 	@Override
 	public File getNewMembersFile(Integer account, double growthRate, int test) {
-		// TODO Auto-generated method stub
-		return null;
+		File growthRateFolder = new File(getNewMembersFolder(), ""+growthRate);
+		return new File(growthRateFolder, "participant"+account+"_test"+test+".txt");
+	}
+	
+	private File getMetricsFolder() {
+		return new File(getRootFolder(), "metric statistics");
 	}
 
 	@Override
-	public Set<Integer> getNewMembers(Integer account, double growthRate,
-			int test) {
-		// TODO Auto-generated method stub
-		return null;
+	public File getSeedlessMetricsFile() {
+		return new File(getMetricsFolder(), "seedless results.csv");
 	}
-
+	
 	@Override
 	public File getEvolutionMetricsFile() {
-		// TODO Auto-generated method stub
-		return null;
+		return new File(getMetricsFolder(), "evolution results.csv");
+	}
+	
+	private File getMaximalCliquesFolder() {
+		return new File(getRootFolder(), "MaximalCliques");
+	}
+
+	@Override
+	public File getMaximalCliquesFile(Integer account) {
+		return new File(getMaximalCliquesFolder(), account+"_MaximalCliques.txt");
 	}
 
 }

@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import metrics.Metric;
@@ -31,13 +30,13 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import bus.thunderbird.FileIO;
 import testbed.dataset.group.GroupDataSet;
+import testbed.dataset.group.MixedInitiativeDataSet;
 import testbed.dataset.group.SnapGroupDataSet;
 
 public class SeedlessGroupRecommendationTestBed {
 
-	static Collection<GroupDataSet> dataSets = new ArrayList<GroupDataSet>();
+	static Collection<GroupDataSet<Integer>> dataSets = new ArrayList<GroupDataSet<Integer>>();
 	static Collection<GroupDistanceMetric<Integer>> similarityMetrics = new ArrayList<GroupDistanceMetric<Integer>>();
 	static Collection<SeedlessGroupRecommenderFactory<Integer>> recommenderFactories = new ArrayList<SeedlessGroupRecommenderFactory<Integer>>();
 
@@ -46,8 +45,13 @@ public class SeedlessGroupRecommendationTestBed {
 	static {
 		
 		//Add data sets
-		Integer[] snapAccounts = {0, 348, 414, 686, 698, 1684, 3437, 3980};
-		dataSets.add(new SnapGroupDataSet("snap_facebook", snapAccounts, new File("data/Stanford_snap/facebook")));
+		Integer[] snapAccounts = { 0, 348, 414, 686, 698, 1684, 3437, 3980 };
+		dataSets.add(new SnapGroupDataSet("snap_facebook", snapAccounts,
+				new File("data/Stanford_snap/facebook")));
+		Integer[] mixedInitiativeAccounts = { 1, 2, 5, 8, 9, 10, 12, 13, 16,
+				17, 19, 21, 22, 23, 24, 25 };
+		dataSets.add(new MixedInitiativeDataSet("mixed_initiative",
+				mixedInitiativeAccounts, new File("data/kelli")));
 		
 		//Add similarity metrics
 		similarityMetrics.add(new GoodnessGroupDistance<Integer>());
@@ -69,9 +73,9 @@ public class SeedlessGroupRecommendationTestBed {
 	
 	public static void main(String[] args) throws IOException {
 		
-		for (GroupDataSet dataset : dataSets) {
+		for (GroupDataSet<Integer> dataset : dataSets) {
 			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>("type,account", new ArrayList<Metric>(metrics));
-			for (int accountId : dataset.getAccountIds()) {
+			for (Integer accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Integer, DefaultEdge> graph = dataset.getGraph(accountId);
 				Collection<Set<Integer>> idealGroups = dataset.getIdealGroups(accountId);

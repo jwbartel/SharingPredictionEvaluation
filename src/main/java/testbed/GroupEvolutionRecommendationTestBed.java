@@ -54,7 +54,7 @@ public class GroupEvolutionRecommendationTestBed {
 
 	static double[] growthRates = {0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
 	static int[] testIds = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
-	static Collection<GroupDataSet> dataSets = new ArrayList<GroupDataSet>();
+	static Collection<GroupDataSet<Integer>> dataSets = new ArrayList<GroupDataSet<Integer>>();
 	static Collection<GroupDistanceMetric<Integer>> distanceMetrics = new ArrayList<GroupDistanceMetric<Integer>>();
 	static Collection<GroupEvolutionRecommenderFactory<Integer>> evolutionRecommenderFactories = new ArrayList<GroupEvolutionRecommenderFactory<Integer>>();
 	static Collection<SeedlessGroupRecommenderFactory<Integer>> seedlessRecommenderFactories = new ArrayList<SeedlessGroupRecommenderFactory<Integer>>();
@@ -129,10 +129,10 @@ public class GroupEvolutionRecommendationTestBed {
 	
 	public static void main(String[] args) throws IOException {
 		
-		for (GroupDataSet dataset : dataSets) {
+		for (GroupDataSet<Integer> dataset : dataSets) {
 			String headerPrefix = "evolution-type,distance measure,growth rate,test,account";
 			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(headerPrefix, new ArrayList<Metric>(metrics));
-			for (int accountId : dataset.getAccountIds()) {
+			for (Integer accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Integer, DefaultEdge> graph = dataset.getGraph(accountId);
 				Collection<Set<Integer>> idealGroups = dataset.getIdealGroups(accountId);

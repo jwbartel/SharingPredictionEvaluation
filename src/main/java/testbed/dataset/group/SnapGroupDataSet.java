@@ -15,10 +15,10 @@ import bus.tools.io.CollectionIOAssist;
 import bus.tools.io.IntegerValueParser;
 import bus.tools.io.SnapIOFunctions;
 
-public class SnapGroupDataSet extends GroupDataSet {
+public class SnapGroupDataSet extends GroupDataSet<Integer> {
 
 	public SnapGroupDataSet(String name, Integer[] accountIds, File rootFolder) {
-		super(name, accountIds, rootFolder);
+		super(name, accountIds, rootFolder, Integer.class);
 		ioHelp = new SnapIOFunctions<Integer>(Integer.class);
 		ioHelp.setStoreSubSteps(false);
 	}
@@ -32,32 +32,32 @@ public class SnapGroupDataSet extends GroupDataSet {
 	}
 	
 	@Override
-	public File getGraphFile(int account) {
+	public File getGraphFile(Integer account) {
 		return new File(getPureDataFolder(), account+".edges");
 	}
 
 	@Override
-	public UndirectedGraph<Integer, DefaultEdge> getGraph(int account) {
+	public UndirectedGraph<Integer, DefaultEdge> getGraph(Integer account) {
 		return ioHelp.createUIDGraph(getGraphFile(account).getAbsolutePath());
 	}
 
 	@Override
-	public File getIdealGroupsFile(int account) {
+	public File getIdealGroupsFile(Integer account) {
 		return new File(getPureDataFolder(), account+".circles");
 	}
 
 	@Override
-	public Collection<Set<Integer>> getIdealGroups(int account) {
+	public Collection<Set<Integer>> getIdealGroups(Integer account) {
 		return ioHelp.loadIdealGroups(getIdealGroupsFile(account).getAbsolutePath());
 	}
 
 	@Override
-	public File getSubstepsFolder(int account) {
+	public File getSubstepsFolder(Integer account) {
 		return new File(getSubstepsFolder(), ""+account);
 	}
 
 	@Override
-	public Collection<Set<Integer>> getMaximalCliques(int account) {
+	public Collection<Set<Integer>> getMaximalCliques(Integer account) {
 		File maximalCliquesFile = new File(getSubstepsFolder(account), "maximal_cliques");
 		return ioHelp.loadCliqueIDs(maximalCliquesFile.getAbsolutePath());
 	}
@@ -67,7 +67,7 @@ public class SnapGroupDataSet extends GroupDataSet {
 	}
 	
 	@Override
-	public File getPredictedGroupsFolder(String predictionType, int account) {
+	public File getPredictedGroupsFolder(String predictionType, Integer account) {
 		File folder = new File(getPredictedGroupsFolder(), predictionType);
 		if (!folder.exists()) {
 			folder.mkdirs();
@@ -76,7 +76,7 @@ public class SnapGroupDataSet extends GroupDataSet {
 	}
 
 	@Override
-	public void writeGroupPredictions(String predictionType, int account,
+	public void writeGroupPredictions(String predictionType, Integer account,
 			Collection<Set<Integer>> predictions) {
 		
 		File outFile = getPredictedGroupsFolder(predictionType, account);
@@ -98,13 +98,13 @@ public class SnapGroupDataSet extends GroupDataSet {
 	}
 	
 	@Override
-	public File getNewMembersFile(int account, double growthRate, int test) {
+	public File getNewMembersFile(Integer account, double growthRate, int test) {
 		File growthRateFolder = new File(getNewMembersFolder(), ""+growthRate);
 		return new File(growthRateFolder, "participant"+account+"_test"+test+".txt");
 	}
 
 	@Override
-	public Set<Integer> getNewMembers(int account, double growthRate, int test) {
+	public Set<Integer> getNewMembers(Integer account, double growthRate, int test) {
 		try {
 			File newMembersFile = getNewMembersFile(account, growthRate, test);
 			if (!newMembersFile.exists()) {

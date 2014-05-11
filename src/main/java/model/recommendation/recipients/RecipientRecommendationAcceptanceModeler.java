@@ -75,7 +75,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 
 		ReplayedMessage<RecipientType> replayMessage = createReplayMessage(message);
 
-		if (seed.size() < 2) {
+		if (seed.size() < 2 || collaborators.size() == 0) {
 			events.add(RecipientAddressingEvents.SeedTooSmallForListGeneration);
 		} else {
 			for (RecipientType seedMember : seed) {
@@ -109,8 +109,8 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 							events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
 						}
 						lastActiveUserEvent = RecipientAddressingEvents.SelectSingleRecipient;
+						recommendationSelected = true;
 					}
-					recommendationSelected = true;
 				}
 				if (recommendationSelected) {
 					continue;

@@ -44,6 +44,7 @@ public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extend
 			for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
 				metric.addMessageResult(testMessage, events);
 			}
+			recommender.addPastAction(testMessage);
 		}
 
 		Collection<MetricResult> results = new ArrayList<>();

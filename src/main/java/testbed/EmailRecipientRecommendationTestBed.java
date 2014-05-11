@@ -10,8 +10,17 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.recipients.MessagesWithSmallSeedsMetric;
+import metrics.recipients.PrecisionMetric;
+import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
+import metrics.recipients.RelativeClicksMetric;
+import metrics.recipients.RelativeManualEntriesMetric;
+import metrics.recipients.RelativeScansMetric;
+import metrics.recipients.RelativeSwitchesMetric;
+import metrics.recipients.TestWithMultipleFromMetric;
+import metrics.recipients.TrainWithMultipleFromMetric;
 import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
 
 import org.apache.commons.io.FileUtils;
@@ -41,6 +50,17 @@ public class EmailRecipientRecommendationTestBed {
 		// Add recommender factories
 		recommenderFactories
 				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
+		
+		// Add metric factories
+		metricFactories.add(PrecisionMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RecallMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(MessagesWithSmallSeedsMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RelativeScansMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RelativeClicksMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RelativeManualEntriesMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RelativeSwitchesMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, EmailMessage.class));
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -56,6 +76,7 @@ public class EmailRecipientRecommendationTestBed {
 					new MetricResultCollection<String>(headerPrefix, unusedMetrics);
 
 			for (String account : dataset.getAccountIds()) {
+				System.out.println(account);
 
 				Collection<EmailMessage<String>> trainingMessages = dataset
 						.getTrainMessages(account, percentTraining);

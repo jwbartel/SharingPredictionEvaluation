@@ -7,14 +7,15 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 
-public interface RecipientMetric<V, MessageType extends SingleMessage<V>> extends Metric {
+public interface RecipientMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
+		extends Metric {
 
 	String getHeader();
 
-	void addMessageResult(SingleMessage<V> message,
+	public void addMessageResult(SingleMessage<RecipientType> message,
 			Collection<RecipientAddressingEvents> events);
 
-	MetricResult evaluate(Collection<MessageType> trainMessages,
+	public MetricResult evaluate(Collection<MessageType> trainMessages,
 			Collection<MessageType> testMessages);
 
 }

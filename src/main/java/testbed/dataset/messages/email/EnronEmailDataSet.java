@@ -40,7 +40,7 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			"storey-g", "sturm-f", "swerzbin-m", "symes-k", "tholt-j",
 			"townsend-j", "tycholiz-b", "ward-k", "watson-k", "white-s",
 			"whitt-m", "williams-w3", "wolfe-j", "ybarbo-p", "zipper-a",
-			"zufferli-j" };
+			"zufferli-j" };*/
 
 	private final String messageListName;
 	private String currentAccountMessages = null;

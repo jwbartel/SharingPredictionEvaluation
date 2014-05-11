@@ -23,4 +23,6 @@ public abstract class MessageDataSet<IdType,RecipientType, MessageType extends S
 	public abstract Collection<MessageThread<RecipientType,MessageType>> getTrainThreads(IdType account, double percentTrain);
 	public abstract Collection<MessageThread<RecipientType,MessageType>> getTestThreads(IdType account, double percentTest);
 
+	public abstract File getRecipientRecommendationMetricsFile();
+
 }

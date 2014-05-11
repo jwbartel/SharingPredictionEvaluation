@@ -3,23 +3,26 @@ package testbed;
 import general.actionbased.messages.email.EmailMessage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
-import metrics.recipients.RecipientAddressingEvents;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
+import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
+
+import org.apache.commons.io.FileUtils;
+
 import recipients.RecipientRecommender;
 import recipients.RecipientRecommenderFactory;
 import recipients.groupbased.google.GoogleGroupBasedRecipientRecommenderFactory;
 import testbed.dataset.messages.email.EmailDataSet;
 import testbed.dataset.messages.email.EnronEmailDataSet;
 
-public class EmailRecipientRecommendationTestBed extends
-		RecipientRecommendationTestBed {
+public class EmailRecipientRecommendationTestBed {
 
 	static double percentTraining = 0.8;
 	static int listSize = 4;
@@ -40,17 +43,17 @@ public class EmailRecipientRecommendationTestBed extends
 				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		for (EmailDataSet<String, String> dataset : dataSets) {
 
-			Collection<RecipientMetric<String, EmailMessage<String>>> unusedMetrics = new ArrayList<>();
+			Collection<Metric> unusedMetrics = new ArrayList<>();
 			for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
 			String headerPrefix = "recommendationType,account";
-			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
-					headerPrefix, new ArrayList<Metric>(unusedMetrics));
+			MetricResultCollection<String> resultCollection =
+					new MetricResultCollection<String>(headerPrefix, unusedMetrics);
 
 			for (String account : dataset.getAccountIds()) {
 
@@ -68,30 +71,23 @@ public class EmailRecipientRecommendationTestBed extends
 						metrics.add(metricFactory.create());
 					}
 
-					for (EmailMessage<String> trainingMessage : trainingMessages) {
-						recommender.addPastAction(trainingMessage);
-					}
+					SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
+							listSize, recommender, trainingMessages,
+							testMessages, metrics);
+					Collection<MetricResult> results = modeler
+							.modelRecommendationAcceptance();
 
-					for (EmailMessage<String> testMessage : testMessages) {
-						Collection<RecipientAddressingEvents> events = modelSelection(
-								testMessage, recommender, listSize);
-						for (RecipientMetric<String, EmailMessage<String>> metric : metrics) {
-							metric.addMessageResult(testMessage, events);
-						}
-					}
-
-					Collection<MetricResult> results = new ArrayList<>();
-					for (RecipientMetric<String, EmailMessage<String>> metric : metrics) {
-						MetricResult result = metric.evaluate(trainingMessages,
-								testMessages);
-						results.add(result);
-					}
-					//TODO: add results to result collection
+					resultCollection.addResults(
+							recommender.getTypeOfRecommender(), account,
+							results);
 
 				}
 
 			}
+			FileUtils.write(dataset.getRecipientRecommendationMetricsFile(),
+					resultCollection.toString());
 		}
+
 	}
 
 }

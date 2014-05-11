@@ -1,4 +1,4 @@
-package testbed;
+package model.recommendation.recipients;
 
 import general.actionbased.messages.SingleMessage;
 
@@ -7,12 +7,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.TreeSet;
 
-import metrics.recipients.RecipientAddressingEvents;
 import recipients.RecipientRecommender;
 import recipients.ScoredRecipientRecommendation;
+import metrics.MetricResult;
+import metrics.recipients.RecipientAddressingEvents;
 
-public abstract class RecipientRecommendationTestBed {
+public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 
+	public abstract Collection<MetricResult> modelRecommendationAcceptance();
+	
 	protected static class ReplayedMessage<V> implements SingleMessage<V> {
 
 		Collection<V> creators;
@@ -53,36 +56,34 @@ public abstract class RecipientRecommendationTestBed {
 		}
 	}
 	
-	protected static <V extends Comparable<V>, MessageType extends SingleMessage<V>>
-			ReplayedMessage<V> createReplayMessage(MessageType message) {
+	protected ReplayedMessage<RecipientType> createReplayMessage(MessageType message) {
 		return new ReplayedMessage<>(message);
 	}
 
-	protected static <V extends Comparable<V>, MessageType extends SingleMessage<V>>
-			ArrayList<RecipientAddressingEvents> modelSelection(MessageType message,
-					RecipientRecommender<V> recommender, int listSize) {
+	protected ArrayList<RecipientAddressingEvents> modelSelection(MessageType message,
+					RecipientRecommender<RecipientType> recommender, int listSize) {
 
 		ArrayList<RecipientAddressingEvents> events = new ArrayList<>();
 
-		Collection<V> seed = new TreeSet<>();
-		ArrayList<V> collaborators = new ArrayList<>(message.getCollaborators());
+		Collection<RecipientType> seed = new TreeSet<>();
+		ArrayList<RecipientType> collaborators = new ArrayList<>(message.getCollaborators());
 		while (seed.size() < 2 && collaborators.size() > 0) {
-			V seedMember = collaborators.get(0);
+			RecipientType seedMember = collaborators.get(0);
 			seed.add(seedMember);
 			while (collaborators.remove(seedMember)) {}
 		}
 
-		ReplayedMessage<V> replayMessage = createReplayMessage(message);
+		ReplayedMessage<RecipientType> replayMessage = createReplayMessage(message);
 
 		if (seed.size() < 2) {
 			events.add(RecipientAddressingEvents.SeedTooSmallForListGeneration);
 		} else {
-			for (V seedMember : seed) {
+			for (RecipientType seedMember : seed) {
 				replayMessage.addCollaborator(seedMember);
 			}
 			RecipientAddressingEvents lastActiveUserEvent = null;
 			while (collaborators.size() > 0) {
-				Collection<ScoredRecipientRecommendation<V>> recommendations = recommender
+				Collection<ScoredRecipientRecommendation<RecipientType>> recommendations = recommender
 						.recommendRecipients(replayMessage, listSize);
 
 				if (recommendations.size() > 0) {
@@ -92,7 +93,7 @@ public abstract class RecipientRecommendationTestBed {
 				}
 
 				boolean recommendationSelected = false;
-				for (ScoredRecipientRecommendation<V> recommendation : recommendations) {
+				for (ScoredRecipientRecommendation<RecipientType> recommendation : recommendations) {
 					if (collaborators.contains(recommendation.getRecipient())) {
 						
 						events.add(RecipientAddressingEvents.ListWithCorrectEntriesGenerated);
@@ -118,7 +119,7 @@ public abstract class RecipientRecommendationTestBed {
 				if(recommendations.size() > 0) {
 					events.add(RecipientAddressingEvents.ListWithNoCorrectEntriesGenerated);
 				}
-				V manuallyEnteredIndividual = collaborators.get(0);
+				RecipientType manuallyEnteredIndividual = collaborators.get(0);
 				while (collaborators.remove(manuallyEnteredIndividual)) {}
 				replayMessage.addCollaborator(manuallyEnteredIndividual);
 				events.add(RecipientAddressingEvents.TypeSingleRecipient);

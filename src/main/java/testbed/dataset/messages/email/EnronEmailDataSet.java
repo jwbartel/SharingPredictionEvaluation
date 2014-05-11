@@ -202,5 +202,14 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			String account, double percentTest) {
 		return null;
 	}
+	
+	private File getMetricsFolder() {
+		return new File(getRootFolder(), "metric statistics");
+	}
+	
+	@Override
+	public File getRecipientRecommendationMetricsFile() {
+		return new File(getMetricsFolder(), "recipient recommendation results.csv");
+	}
 
 }

@@ -95,7 +95,7 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 		try {
 			Date date = getMessageDate(messageFile);
 			AddressLists addressLists = getAddressLists(messageFile);
-			String from = addressLists.getFrom().get(0);
+			ArrayList<String> from = addressLists.getFrom();
 			ArrayList<String> to = addressLists.getTo();
 			ArrayList<String> cc = addressLists.getCC();
 			ArrayList<String> bcc = addressLists.getBCC();
@@ -177,7 +177,7 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 		for (EmailMessage<String> message : allMessages) {
 			if (count < numTrain) {
 				count++;
-				break;
+				continue;
 			}
 			testMessages.add(message);
 			count++;

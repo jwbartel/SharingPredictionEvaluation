@@ -105,7 +105,8 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 						events.add(RecipientAddressingEvents.SelectSingleRecipient);
 						
 						// Determine if the use switched from clicking to typing
-						if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient) {
+						if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient
+								|| lastActiveUserEvent == null) {
 							events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
 						}
 						lastActiveUserEvent = RecipientAddressingEvents.SelectSingleRecipient;
@@ -123,6 +124,11 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 				while (collaborators.remove(manuallyEnteredIndividual)) {}
 				replayMessage.addCollaborator(manuallyEnteredIndividual);
 				events.add(RecipientAddressingEvents.TypeSingleRecipient);
+				if (lastActiveUserEvent == RecipientAddressingEvents.SelectSingleRecipient
+						|| lastActiveUserEvent == RecipientAddressingEvents.SelectMultipleRecipients) {
+					events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+				}
+				lastActiveUserEvent = RecipientAddressingEvents.TypeSingleRecipient;
 
 			}
 		}

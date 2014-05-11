@@ -10,7 +10,7 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
-import metrics.recipients.MessagesWithSmallSeedsMetric;
+import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -19,7 +19,11 @@ import metrics.recipients.RelativeClicksMetric;
 import metrics.recipients.RelativeManualEntriesMetric;
 import metrics.recipients.RelativeScansMetric;
 import metrics.recipients.RelativeSwitchesMetric;
+import metrics.recipients.RequestsForListsMetric;
 import metrics.recipients.TestWithMultipleFromMetric;
+import metrics.recipients.TotalRecipientsToAddressMetric;
+import metrics.recipients.TotalTestMessagesMetric;
+import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
 import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
 
@@ -52,9 +56,13 @@ public class EmailRecipientRecommendationTestBed {
 				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
 		
 		// Add metric factories
+		metricFactories.add(TotalTrainMessagesMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(TotalTestMessagesMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RecommendableMessagesMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(TotalRecipientsToAddressMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RequestsForListsMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(PrecisionMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RecallMetric.factory(String.class, EmailMessage.class));
-		metricFactories.add(MessagesWithSmallSeedsMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeScansMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeClicksMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeManualEntriesMetric.factory(String.class, EmailMessage.class));

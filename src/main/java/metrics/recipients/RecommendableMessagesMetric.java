@@ -7,7 +7,7 @@ import java.util.Collection;
 import metrics.DoubleResult;
 import metrics.MetricResult;
 
-public class MessagesWithSmallSeedsMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
+public class RecommendableMessagesMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {
 
 	private int numMessages = 0;
@@ -20,14 +20,14 @@ public class MessagesWithSmallSeedsMetric<RecipientType, MessageType extends Sin
 
 			@Override
 			public RecipientMetric<RecipientType, MessageType> create() {
-				return new MessagesWithSmallSeedsMetric<>();
+				return new RecommendableMessagesMetric<>();
 			}
 		};
 	}
 
 	@Override
 	public String getHeader() {
-		return "messages with small seeds";
+		return "recommendable test messages";
 	}
 
 	@Override
@@ -44,8 +44,8 @@ public class MessagesWithSmallSeedsMetric<RecipientType, MessageType extends Sin
 	@Override
 	public MetricResult evaluate(Collection<MessageType> trainMessages,
 			Collection<MessageType> testMessages) {
-		return new DoubleResult((double) numMessagesWithSmallSeeds
-				/ numMessages);
+		return new DoubleResult(
+				(double) (numMessages - numMessagesWithSmallSeeds));
 	}
 
 }

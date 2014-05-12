@@ -108,6 +108,33 @@ public class EmailRecipientRecommendationTestBed {
 		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, EmailMessage.class));
 	}
+	
+	private static String getHalfLifeName(double halfLife) {
+		if (halfLife < 1000) {
+			return halfLife + " ms";
+		}
+		halfLife /= 1000;
+		if (halfLife < 60) {
+			return halfLife + " seconds";
+		}
+		halfLife /= 60;
+		if (halfLife < 60){
+			return halfLife + " minutes";
+		}
+		halfLife /= 60;
+		if (halfLife < 24){
+			return halfLife + " hours";
+		}
+		halfLife /= 24;
+		if (halfLife < 7) {
+			return halfLife + " days";
+		}
+		if (halfLife <= 28) {
+			return halfLife/7 + " weeks";
+		}
+		halfLife /= 365;
+		return halfLife + " years";
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -118,8 +145,9 @@ public class EmailRecipientRecommendationTestBed {
 				unusedMetrics.add(metricFactory.create());
 			}
 			String headerPrefix = "recommendationType,group scorer,w_out,half_life,account";
-			MetricResultCollection<String> resultCollection =
-					new MetricResultCollection<String>(headerPrefix, unusedMetrics);
+			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
+					headerPrefix, unusedMetrics,
+					dataset.getRecipientRecommendationMetricsFile());
 
 			for (String account : dataset.getAccountIds()) {
 				System.out.println(account);
@@ -156,7 +184,7 @@ public class EmailRecipientRecommendationTestBed {
 								String label = recommender.getTypeOfRecommender();
 								label += ","+groupScorer.getName();
 								label += ","+wOut;
-								label += ","+halfLife;
+								label += ","+getHalfLifeName(halfLife);
 								
 								resultCollection.addResults(label, account,
 										results);
@@ -164,10 +192,7 @@ public class EmailRecipientRecommendationTestBed {
 						}
 					}
 				}
-
 			}
-			FileUtils.write(dataset.getRecipientRecommendationMetricsFile(),
-					resultCollection.toString());
 		}
 
 	}

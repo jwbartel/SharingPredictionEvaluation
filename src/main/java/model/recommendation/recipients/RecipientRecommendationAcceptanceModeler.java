@@ -7,10 +7,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.TreeSet;
 
-import recipients.RecipientRecommender;
-import recipients.ScoredRecipientRecommendation;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvents;
+import recipients.RecipientRecommendation;
+import recipients.RecipientRecommender;
+import recipients.SingleRecipientRecommendation;
 
 public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 
@@ -90,8 +91,8 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			}
 			RecipientAddressingEvents lastActiveUserEvent = null;
 			while (collaborators.size() > 0) {
-				Collection<ScoredRecipientRecommendation<RecipientType>> recommendations = recommender
-						.recommendRecipients(replayMessage, listSize);
+				Collection<RecipientRecommendation<RecipientType>> recommendations =
+						recommender.recommendRecipients(replayMessage, listSize);
 
 				if (recommendations.size() > 0) {
 					events.add(RecipientAddressingEvents.Scan);
@@ -100,24 +101,27 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 				}
 
 				boolean recommendationSelected = false;
-				for (ScoredRecipientRecommendation<RecipientType> recommendation : recommendations) {
-					if (collaborators.contains(recommendation.getRecipient())) {
-						
-						events.add(RecipientAddressingEvents.ListWithCorrectEntriesGenerated);
-						
-						// Select the recipient and add it to the replay
-						while (collaborators.remove(recommendation
-								.getRecipient())) {}
-						replayMessage.addCollaborator(recommendation.getRecipient());
-						events.add(RecipientAddressingEvents.SelectSingleRecipient);
-						
-						// Determine if the use switched from clicking to typing
-						if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient
-								|| lastActiveUserEvent == null) {
-							events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+				for (RecipientRecommendation<RecipientType> recommendation : recommendations) {
+					if (recommendation instanceof SingleRecipientRecommendation) {
+						RecipientType recommendedRecipient = 
+								((SingleRecipientRecommendation<RecipientType>) recommendation).getRecipient();
+						if (collaborators.contains(recommendedRecipient)) {
+
+							events.add(RecipientAddressingEvents.ListWithCorrectEntriesGenerated);
+
+							// Select the recipient and add it to the replay
+							while (collaborators.remove(recommendedRecipient)) {}
+							replayMessage.addCollaborator(recommendedRecipient);
+							events.add(RecipientAddressingEvents.SelectSingleRecipient);
+
+							// Determine if the use switched from clicking to typing
+							if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient
+									|| lastActiveUserEvent == null) {
+								events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+							}
+							lastActiveUserEvent = RecipientAddressingEvents.SelectSingleRecipient;
+							recommendationSelected = true;
 						}
-						lastActiveUserEvent = RecipientAddressingEvents.SelectSingleRecipient;
-						recommendationSelected = true;
 					}
 				}
 				if (recommendationSelected) {

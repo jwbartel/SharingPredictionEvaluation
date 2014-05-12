@@ -39,10 +39,12 @@ public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extend
 		}
 
 		for (MessageType testMessage : testMessages) {
-			Collection<RecipientAddressingEvents> events = modelSelection(
-					testMessage, recommender, listSize);
-			for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
-				metric.addMessageResult(testMessage, events);
+			if (testMessage.wasSent()) {
+				Collection<RecipientAddressingEvents> events = modelSelection(
+						testMessage, recommender, listSize);
+				for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
+					metric.addMessageResult(testMessage, events);
+				}
 			}
 			recommender.addPastAction(testMessage);
 		}

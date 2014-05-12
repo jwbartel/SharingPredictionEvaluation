@@ -99,9 +99,10 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			ArrayList<String> to = addressLists.getTo();
 			ArrayList<String> cc = addressLists.getCC();
 			ArrayList<String> bcc = addressLists.getBCC();
+			boolean wasSent = id.toLowerCase().matches("(.*\\W)?((sent)|(draft)).*");
 
-			return new EmailMessage<String>(id, null, date, from, to, cc, bcc,
-					null, null);
+			return new EmailMessage<String>(id, null, date, wasSent, from, to,
+					cc, bcc, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

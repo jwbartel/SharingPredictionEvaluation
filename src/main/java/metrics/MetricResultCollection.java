@@ -4,13 +4,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class MetricResultCollection<V> {
 
 	private final String headerPrefix;
 	private final Collection<Metric> metrics;
-	private final Map<String, Map<V, Collection<MetricResult>>> typeToAccountToResult = new HashMap<String, Map<V, Collection<MetricResult>>>();
-	
+	private final Map<String, Map<V, Collection<MetricResult>>> typeToAccountToResult =
+			new TreeMap<String, Map<V, Collection<MetricResult>>>();
+
 	public MetricResultCollection(String headerPrefix, Collection<Metric> metrics) {
 		this.headerPrefix = headerPrefix;
 		this.metrics = metrics;

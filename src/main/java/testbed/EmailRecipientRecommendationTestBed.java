@@ -10,11 +10,11 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
-import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
+import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.RelativeClicksMetric;
 import metrics.recipients.RelativeManualEntriesMetric;
 import metrics.recipients.RelativeScansMetric;
@@ -32,16 +32,28 @@ import org.apache.commons.io.FileUtils;
 import recipients.RecipientRecommender;
 import recipients.RecipientRecommenderFactory;
 import recipients.groupbased.google.GoogleGroupBasedRecipientRecommenderFactory;
+import recipients.groupbased.google.scoring.GroupScorer;
+import recipients.groupbased.google.scoring.GroupScorer.GroupScorerFactory;
+import recipients.groupbased.google.scoring.IntersectionGroupCount;
+import recipients.groupbased.google.scoring.IntersectionGroupScore;
+import recipients.groupbased.google.scoring.IntersectionWeightedScore;
+import recipients.groupbased.google.scoring.SubsetGroupCount;
+import recipients.groupbased.google.scoring.SubsetGroupScore;
+import recipients.groupbased.google.scoring.SubsetWeightedScore;
+import recipients.groupbased.google.scoring.TopContactScore;
 import testbed.dataset.messages.email.EmailDataSet;
 import testbed.dataset.messages.email.EnronEmailDataSet;
 
 public class EmailRecipientRecommendationTestBed {
 
-	static double percentTraining = 0.8;
+	static double percentTraining = 0.5;
 	static int listSize = 4;
 
 	static Collection<EmailDataSet<String, String>> dataSets = new ArrayList<>();
 	static Collection<RecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
+	static Collection<Double> wOuts = new ArrayList<>();
+	static Collection<Double> halfLives = new ArrayList<>();
 
 	static Collection<RecipientMetricFactory<String, EmailMessage<String>>> metricFactories = new ArrayList<>();
 
@@ -54,6 +66,32 @@ public class EmailRecipientRecommendationTestBed {
 		// Add recommender factories
 		recommenderFactories
 				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
+		
+		// Add GroupScorerFactories
+		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
+		groupScorerFactories.add(IntersectionGroupScore.factory(String.class));
+		groupScorerFactories.add(IntersectionWeightedScore.factory(String.class));
+		groupScorerFactories.add(SubsetGroupCount.factory(String.class));
+		groupScorerFactories.add(SubsetGroupScore.factory(String.class));
+		groupScorerFactories.add(SubsetWeightedScore.factory(String.class));
+		groupScorerFactories.add(TopContactScore.factory(String.class));
+		
+		// Add w_outs
+		wOuts.add(0.25);
+		wOuts.add(0.5);
+		wOuts.add(1.0);
+		wOuts.add(2.0);
+		wOuts.add(4.0);
+		
+		// Add half lives
+		halfLives.add(1000.0*60); // 1 minute
+		halfLives.add(1000.0*60*60); // 1 hour
+		halfLives.add(1000.0*60*60*24); // 1 day
+		halfLives.add(1000.0*60*60*24*7); // 1 week
+		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
+		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+		halfLives.add(1000.0*60*60*24*365); // 1 year
+		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add metric factories
 		metricFactories.add(TotalTrainMessagesMetric.factory(String.class, EmailMessage.class));
@@ -79,7 +117,7 @@ public class EmailRecipientRecommendationTestBed {
 			for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "recommendationType,account";
+			String headerPrefix = "recommendationType,group scorer,w_out,half_life,account";
 			MetricResultCollection<String> resultCollection =
 					new MetricResultCollection<String>(headerPrefix, unusedMetrics);
 
@@ -90,26 +128,41 @@ public class EmailRecipientRecommendationTestBed {
 						.getTrainMessages(account, percentTraining);
 				Collection<EmailMessage<String>> testMessages = dataset
 						.getTestMessages(account, percentTraining);
+				
+				for (GroupScorerFactory<String> scorerFactory : groupScorerFactories) {
+					
+					for (Double wOut : wOuts) {
+						
+						for (Double halfLife : halfLives) {
+							
+							GroupScorer<String> groupScorer = scorerFactory
+									.create(wOut, halfLife);
 
-				for (RecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
-					RecipientRecommender<String> recommender = recommenderFactory
-							.createRecommender();
+							for (RecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
+								RecipientRecommender<String> recommender = recommenderFactory
+										.createRecommender(groupScorer);
 
-					Collection<RecipientMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
-					for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
-						metrics.add(metricFactory.create());
+								Collection<RecipientMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
+								for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
+									metrics.add(metricFactory.create());
+								}
+
+								SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
+										listSize, recommender, trainingMessages,
+										testMessages, metrics);
+								Collection<MetricResult> results = modeler
+										.modelRecommendationAcceptance();
+
+								String label = recommender.getTypeOfRecommender();
+								label += ","+groupScorer.getName();
+								label += ","+wOut;
+								label += ","+halfLife;
+								
+								resultCollection.addResults(label, account,
+										results);
+							}
+						}
 					}
-
-					SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
-							listSize, recommender, trainingMessages,
-							testMessages, metrics);
-					Collection<MetricResult> results = modeler
-							.modelRecommendationAcceptance();
-
-					resultCollection.addResults(
-							recommender.getTypeOfRecommender(), account,
-							results);
-
 				}
 
 			}

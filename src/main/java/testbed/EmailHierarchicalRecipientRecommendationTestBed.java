@@ -149,7 +149,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 			String headerPrefix = "recommendationType,group scorer,w_out,half_life,account";
 			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
 					headerPrefix, unusedMetrics,
-					dataset.getRecipientRecommendationMetricsFile());
+					dataset.getHierarchicalRecipientRecommendationMetricsFile());
 
 			for (String account : dataset.getAccountIds()) {
 				System.out.println(account);

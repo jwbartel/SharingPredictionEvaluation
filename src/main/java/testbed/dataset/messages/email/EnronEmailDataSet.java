@@ -212,5 +212,10 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 	public File getRecipientRecommendationMetricsFile() {
 		return new File(getMetricsFolder(), "recipient recommendation results.csv");
 	}
+	
+	@Override
+	public File getHierarchicalRecipientRecommendationMetricsFile() {
+		return new File(getMetricsFolder(), "hierarchical recipient recommendation results.csv");
+	}
 
 }

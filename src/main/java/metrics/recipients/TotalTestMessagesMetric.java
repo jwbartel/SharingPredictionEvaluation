@@ -29,7 +29,7 @@ public class TotalTestMessagesMetric<RecipientType, MessageType extends SingleMe
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 		// Do nothing
 	}
 

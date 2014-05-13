@@ -35,11 +35,11 @@ public class RelativeScansMetric<RecipientType, MessageType extends SingleMessag
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		int numScans = 0;
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.Scan) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.Scan) {
 				numScans++;
 			}
 		}

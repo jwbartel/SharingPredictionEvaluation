@@ -3,12 +3,18 @@ package metrics.recipients;
 import general.actionbased.messages.SingleMessage;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import metrics.DoubleResult;
 import metrics.MetricResult;
+import metrics.StatisticsResult;
 
-public class TotalTrainMessagesMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+public class TotalSelectedPerClickMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {
+
+	private DescriptiveStatistics stats = new DescriptiveStatistics();
 
 	public static <RecipientType, MessageType extends SingleMessage<RecipientType>> RecipientMetricFactory<RecipientType, MessageType> factory(
 			Class<RecipientType> recipientClass, Class<MessageType> messageClass) {
@@ -17,27 +23,33 @@ public class TotalTrainMessagesMetric<RecipientType, MessageType extends SingleM
 
 			@Override
 			public RecipientMetric<RecipientType, MessageType> create() {
-				return new TotalTrainMessagesMetric<>();
+				return new TotalSelectedPerClickMetric<>();
 			}
 		};
 	}
 
 	@Override
 	public String getHeader() {
-		return "train messages";
+		return "avg-selected per clicks,stdev-selected per clicks";
 	}
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
 			Collection<RecipientAddressingEvent> events) {
-		// Do nothing
+
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.SelectSingleRecipient) {
+				stats.addValue(1);
+			} else if (event instanceof RecipientAddressingEvent.SelectMultipleRecipientsEvent) {
+				stats.addValue(((RecipientAddressingEvent.SelectMultipleRecipientsEvent) event).numRecipients);
+			}
+		}
 	}
 
 	@Override
 	public MetricResult evaluate(Collection<MessageType> trainMessages,
 			Collection<MessageType> testMessages) {
-
-		return new DoubleResult(trainMessages.size());
+		return new StatisticsResult(stats);
 	}
 
 }

@@ -15,10 +15,13 @@ public class StatisticsResult implements MetricResult {
 	}
 
 	public String toString() {
-		double mean = (Double.isNaN(statistics.getMean())) ? 0 : statistics
-				.getMean();
-		double stdev = (Double.isNaN(statistics.getStandardDeviation())) ? 0
-				: statistics.getStandardDeviation();
+//		double mean = (Double.isNaN(statistics.getMean())) ? 0 : statistics
+//				.getMean();
+//		double stdev = (Double.isNaN(statistics.getStandardDeviation())) ? 0
+//				: statistics.getStandardDeviation();
+		
+		double mean = statistics.getMean();
+		double stdev = statistics.getStandardDeviation();
 
 		return "" + mean + "," + stdev;
 	}

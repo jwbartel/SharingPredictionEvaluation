@@ -32,11 +32,11 @@ public class RecommendableMessagesMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		numMessages++;
 		if (events
-				.contains(RecipientAddressingEvents.SeedTooSmallForListGeneration)) {
+				.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)) {
 			numMessagesWithSmallSeeds++;
 		}
 	}

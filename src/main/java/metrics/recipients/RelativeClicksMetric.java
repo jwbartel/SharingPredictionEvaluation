@@ -35,12 +35,12 @@ public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessa
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		int numClicks = 0;
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.SelectSingleRecipient
-					|| event == RecipientAddressingEvents.SelectMultipleRecipients) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.SelectSingleRecipient
+					|| event instanceof RecipientAddressingEvent.SelectMultipleRecipientsEvent) {
 				numClicks++;
 			}
 		}

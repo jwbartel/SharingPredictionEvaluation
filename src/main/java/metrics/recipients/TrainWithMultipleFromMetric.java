@@ -29,7 +29,7 @@ public class TrainWithMultipleFromMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 		// Do nothing
 	}
 

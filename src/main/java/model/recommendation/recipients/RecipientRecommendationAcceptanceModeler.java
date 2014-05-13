@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.TreeSet;
 
 import metrics.MetricResult;
-import metrics.recipients.RecipientAddressingEvents;
+import metrics.recipients.RecipientAddressingEvent;
 import recipients.RecipientRecommendation;
 import recipients.RecipientRecommender;
 import recipients.SingleRecipientRecommendation;
@@ -89,55 +89,55 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 	
 	private void addEventsBasedOnRecommendationListSize(
 			Collection<RecipientRecommendation<RecipientType>> recommendations,
-			ArrayList<RecipientAddressingEvents> events) {
+			ArrayList<RecipientAddressingEvent> events) {
 		
 		if (recommendations.size() > 0) {
-			events.add(RecipientAddressingEvents.Scan);
+			events.add(RecipientAddressingEvent.Scan);
 		} else {
-			events.add(RecipientAddressingEvents.EmptyListGenerated);
+			events.add(RecipientAddressingEvent.EmptyListGenerated);
 		}
 	}
 	
-	protected RecipientAddressingEvents processSingleRecipientRecommendation(
+	protected RecipientAddressingEvent processSingleRecipientRecommendation(
 			SingleRecipientRecommendation<RecipientType> recommendation,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
-			RecipientAddressingEvents lastActiveUserEvent,
-			ArrayList<RecipientAddressingEvents> events) {
+			RecipientAddressingEvent lastActiveUserEvent,
+			ArrayList<RecipientAddressingEvent> events) {
 
 		RecipientType recommendedRecipient = recommendation.getRecipient();
 		if (remainingCollaborators.contains(recommendedRecipient)) {
 
-			events.add(RecipientAddressingEvents.ListWithCorrectEntriesGenerated);
+			events.add(RecipientAddressingEvent.ListWithCorrectEntriesGenerated);
 
 			// Select the recipient and add it to the replay
 			while (remainingCollaborators.remove(recommendedRecipient)) {
 			}
 			replayMessage.addCollaborator(recommendedRecipient);
-			events.add(RecipientAddressingEvents.SelectSingleRecipient);
+			events.add(RecipientAddressingEvent.SelectSingleRecipient);
 
 			// Determine if the use switched from clicking to typing
-			if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient
+			if (lastActiveUserEvent == RecipientAddressingEvent.TypeSingleRecipient
 					|| lastActiveUserEvent == null) {
-				events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+				events.add(RecipientAddressingEvent.SwitchBetweenClickAndType);
 			}
-			return RecipientAddressingEvents.SelectSingleRecipient;
+			return RecipientAddressingEvent.SelectSingleRecipient;
 		}
 		return null;
 	}
 	
-	protected RecipientAddressingEvents modelSelectionFromNonEmptyRecommendationList(
+	protected RecipientAddressingEvent modelSelectionFromNonEmptyRecommendationList(
 			Collection<RecipientRecommendation<RecipientType>> recommendations,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
-			RecipientAddressingEvents lastActiveUserEvent,
-			ArrayList<RecipientAddressingEvents> events) {
+			RecipientAddressingEvent lastActiveUserEvent,
+			ArrayList<RecipientAddressingEvent> events) {
 		
-		RecipientAddressingEvents retVal = null;
+		RecipientAddressingEvent retVal = null;
 		for (RecipientRecommendation<RecipientType> recommendation : recommendations) {
 			if (recommendation instanceof SingleRecipientRecommendation) {
 				
-				RecipientAddressingEvents newLastActiveUserEvent = processSingleRecipientRecommendation(
+				RecipientAddressingEvent newLastActiveUserEvent = processSingleRecipientRecommendation(
 						(SingleRecipientRecommendation<RecipientType>) recommendation,
 						replayMessage, remainingCollaborators,
 						lastActiveUserEvent, events);
@@ -151,43 +151,43 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		
 	}
 	
-	private RecipientAddressingEvents modelManualEntry(
+	private RecipientAddressingEvent modelManualEntry(
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
-			RecipientAddressingEvents lastActiveUserEvent,
-			ArrayList<RecipientAddressingEvents> events) {
+			RecipientAddressingEvent lastActiveUserEvent,
+			ArrayList<RecipientAddressingEvent> events) {
 
 		RecipientType manuallyEnteredIndividual = remainingCollaborators.get(0);
 		while (remainingCollaborators.remove(manuallyEnteredIndividual)) {
 		}
 		replayMessage.addCollaborator(manuallyEnteredIndividual);
-		events.add(RecipientAddressingEvents.TypeSingleRecipient);
-		if (lastActiveUserEvent == RecipientAddressingEvents.SelectSingleRecipient
-				|| lastActiveUserEvent == RecipientAddressingEvents.SelectMultipleRecipients) {
-			events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+		events.add(RecipientAddressingEvent.TypeSingleRecipient);
+		if (lastActiveUserEvent == RecipientAddressingEvent.SelectSingleRecipient
+				|| lastActiveUserEvent instanceof RecipientAddressingEvent.SelectMultipleRecipientsEvent) {
+			events.add(RecipientAddressingEvent.SwitchBetweenClickAndType);
 		}
-		return RecipientAddressingEvents.TypeSingleRecipient;
+		return RecipientAddressingEvent.TypeSingleRecipient;
 	}
 
-	protected ArrayList<RecipientAddressingEvents> modelSelection(
+	protected ArrayList<RecipientAddressingEvent> modelSelection(
 			MessageType message,
 			RecipientRecommender<RecipientType> recommender, int listSize) {
 
-		ArrayList<RecipientAddressingEvents> events = new ArrayList<>();
+		ArrayList<RecipientAddressingEvent> events = new ArrayList<>();
 
 		ArrayList<RecipientType> remainingCollaborators = new ArrayList<>(
 				message.getCollaborators());
 		Collection<RecipientType> seed = determineSeed(remainingCollaborators);
 
 		if (seed.size() < 2 || remainingCollaborators.size() == 0) {
-			events.add(RecipientAddressingEvents.SeedTooSmallForListGeneration);
-			events.add(RecipientAddressingEvents.AddressingCompleted);
+			events.add(RecipientAddressingEvent.SeedTooSmallForListGeneration);
+			events.add(RecipientAddressingEvent.AddressingCompleted);
 			return events;
 		}
 
 		ReplayedMessage<RecipientType> replayMessage = createReplayMessage(
 				message, seed);
-		RecipientAddressingEvents lastActiveUserEvent = null;
+		RecipientAddressingEvent lastActiveUserEvent = null;
 		while (remainingCollaborators.size() > 0) {
 			
 			Collection<RecipientRecommendation<RecipientType>> recommendations = recommender
@@ -195,7 +195,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 
 			addEventsBasedOnRecommendationListSize(recommendations, events);
 
-			RecipientAddressingEvents newLastActiveUserEvent = modelSelectionFromNonEmptyRecommendationList(
+			RecipientAddressingEvent newLastActiveUserEvent = modelSelectionFromNonEmptyRecommendationList(
 					recommendations, replayMessage, remainingCollaborators,
 					lastActiveUserEvent, events);
 			
@@ -206,13 +206,13 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			}
 
 			if (recommendations.size() > 0) {
-				events.add(RecipientAddressingEvents.ListWithNoCorrectEntriesGenerated);
+				events.add(RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated);
 			}
 			lastActiveUserEvent = modelManualEntry(replayMessage, remainingCollaborators, newLastActiveUserEvent, events);
 
 		}
 
-		events.add(RecipientAddressingEvents.AddressingCompleted);
+		events.add(RecipientAddressingEvent.AddressingCompleted);
 		return events;
 
 	}

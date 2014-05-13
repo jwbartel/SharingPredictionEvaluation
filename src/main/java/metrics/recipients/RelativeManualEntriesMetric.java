@@ -35,11 +35,11 @@ public class RelativeManualEntriesMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		int numManualEntries = 0;
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.TypeSingleRecipient) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.TypeSingleRecipient) {
 				numManualEntries++;
 			}
 		}

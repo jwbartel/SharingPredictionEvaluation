@@ -9,7 +9,7 @@ import java.util.TreeSet;
 
 import bus.data.structures.ComparableSet;
 import metrics.MetricResult;
-import metrics.recipients.RecipientAddressingEvents;
+import metrics.recipients.RecipientAddressingEvent;
 import model.recommendation.recipients.RecipientRecommendationAcceptanceModeler.ReplayedMessage;
 import recipients.RecipientRecommendation;
 import recipients.SingleRecipientRecommendation;
@@ -64,12 +64,12 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 		return bestRecommendation;
 	}
 	
-	protected RecipientAddressingEvents processBestHierarchicalRecommendation(
+	protected RecipientAddressingEvent processBestHierarchicalRecommendation(
 			HierarchicalRecommendation<RecipientType> recommendation,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
-			RecipientAddressingEvents lastActiveUserEvent,
-			ArrayList<RecipientAddressingEvents> events) {
+			RecipientAddressingEvent lastActiveUserEvent,
+			ArrayList<RecipientAddressingEvent> events) {
 
 		if (recommendation == null) {
 			return null;
@@ -80,26 +80,26 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 		if (recommendation.getSize() > 0
 				&& remainingCollaborators.containsAll(recommendedRecipients)) {
 
-			events.add(RecipientAddressingEvents.ListWithCorrectEntriesGenerated);
+			events.add(RecipientAddressingEvent.ListWithCorrectEntriesGenerated);
 			
 			while(remainingCollaborators.removeAll(recommendedRecipients)) {}
 			for (RecipientType recommendedRecipient : recommendedRecipients) {
 				replayMessage.addCollaborator(recommendedRecipient);
 			}
 			
-			RecipientAddressingEvents userActiveAction;
+			RecipientAddressingEvent userActiveAction;
 			if (recommendedRecipients.size() == 1) {
-				userActiveAction = RecipientAddressingEvents.SelectSingleRecipient;
+				userActiveAction = RecipientAddressingEvent.SelectSingleRecipient;
 			} else {
-				userActiveAction = RecipientAddressingEvents.SelectMultipleRecipients;
-				//TODO provide some measurement of how many were selected
+				userActiveAction = RecipientAddressingEvent
+						.SelectMultipleRecipients(recommendedRecipients.size());
 			}
 			events.add(userActiveAction);
 			
 			// Determine if the use switched from clicking to typing
-			if (lastActiveUserEvent == RecipientAddressingEvents.TypeSingleRecipient
+			if (lastActiveUserEvent == RecipientAddressingEvent.TypeSingleRecipient
 					|| lastActiveUserEvent == null) {
-				events.add(RecipientAddressingEvents.SwitchBetweenClickAndType);
+				events.add(RecipientAddressingEvent.SwitchBetweenClickAndType);
 			}
 			return userActiveAction;
 		}
@@ -108,14 +108,14 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 	}
 	
 
-	protected RecipientAddressingEvents modelSelectionFromNonEmptyRecommendationList(
+	protected RecipientAddressingEvent modelSelectionFromNonEmptyRecommendationList(
 			Collection<RecipientRecommendation<RecipientType>> recommendations,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
-			RecipientAddressingEvents lastActiveUserEvent,
-			ArrayList<RecipientAddressingEvents> events) {
+			RecipientAddressingEvent lastActiveUserEvent,
+			ArrayList<RecipientAddressingEvent> events) {
 		
-		RecipientAddressingEvents retVal = null;
+		RecipientAddressingEvent retVal = null;
 		
 		HierarchicalRecommendation<RecipientType> bestRecommendation = null;
 		for (RecipientRecommendation<RecipientType> recommendation : recommendations) {

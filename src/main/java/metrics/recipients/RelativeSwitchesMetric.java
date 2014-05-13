@@ -35,11 +35,11 @@ public class RelativeSwitchesMetric<RecipientType, MessageType extends SingleMes
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		int numSwitches = 0;
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.SwitchBetweenClickAndType) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.SwitchBetweenClickAndType) {
 				numSwitches++;
 			}
 		}

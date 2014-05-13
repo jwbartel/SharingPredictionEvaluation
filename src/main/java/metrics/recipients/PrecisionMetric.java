@@ -32,14 +32,14 @@ public class PrecisionMetric<RecipientType, MessageType extends SingleMessage<Re
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.ListWithNoCorrectEntriesGenerated
-					|| event == RecipientAddressingEvents.ListWithCorrectEntriesGenerated) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated
+					|| event == RecipientAddressingEvent.ListWithCorrectEntriesGenerated) {
 
 				numNonEmptyLists++;
-				if (event == RecipientAddressingEvents.ListWithCorrectEntriesGenerated) {
+				if (event == RecipientAddressingEvent.ListWithCorrectEntriesGenerated) {
 					numNonEmptyListsWithCorrectPrediction++;
 				}
 			}

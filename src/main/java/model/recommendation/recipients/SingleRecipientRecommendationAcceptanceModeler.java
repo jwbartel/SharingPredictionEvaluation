@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import metrics.MetricResult;
-import metrics.recipients.RecipientAddressingEvents;
+import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
 import recipients.RecipientRecommender;
 
@@ -40,7 +40,7 @@ public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extend
 
 		for (MessageType testMessage : testMessages) {
 			if (testMessage.wasSent()) {
-				Collection<RecipientAddressingEvents> events = modelSelection(
+				Collection<RecipientAddressingEvent> events = modelSelection(
 						testMessage, recommender, listSize);
 				for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
 					metric.addMessageResult(testMessage, events);

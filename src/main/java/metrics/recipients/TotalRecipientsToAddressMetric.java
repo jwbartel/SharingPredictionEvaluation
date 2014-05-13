@@ -33,7 +33,7 @@ public class TotalRecipientsToAddressMetric<RecipientType, MessageType extends S
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
 		Set<RecipientType> recipients = new HashSet<>(message.getCollaborators());
 		if (recipients.size() > 2) {

@@ -10,6 +10,7 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -101,6 +102,7 @@ public class EmailRecipientRecommendationTestBed {
 		metricFactories.add(RequestsForListsMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(PrecisionMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RecallMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(TotalSelectedPerClickMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeScansMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeClicksMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RelativeManualEntriesMetric.factory(String.class, EmailMessage.class));

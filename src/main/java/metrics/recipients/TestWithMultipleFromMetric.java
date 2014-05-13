@@ -29,7 +29,7 @@ public class TestWithMultipleFromMetric<RecipientType, MessageType extends Singl
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 		// Do nothing
 	}
 

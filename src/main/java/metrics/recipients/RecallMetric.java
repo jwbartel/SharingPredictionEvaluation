@@ -32,14 +32,14 @@ public class RecallMetric<RecipientType, MessageType extends SingleMessage<Recip
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvents> events) {
+			Collection<RecipientAddressingEvent> events) {
 
-		for (RecipientAddressingEvents event : events) {
-			if (event == RecipientAddressingEvents.EmptyListGenerated) {
+		for (RecipientAddressingEvent event : events) {
+			if (event == RecipientAddressingEvent.EmptyListGenerated) {
 				numRequestsForLists++;
 			}
-			if (event == RecipientAddressingEvents.ListWithNoCorrectEntriesGenerated
-					|| event == RecipientAddressingEvents.ListWithCorrectEntriesGenerated) {
+			if (event == RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated
+					|| event == RecipientAddressingEvent.ListWithCorrectEntriesGenerated) {
 
 				numNonEmptyLists++;
 				numRequestsForLists++;

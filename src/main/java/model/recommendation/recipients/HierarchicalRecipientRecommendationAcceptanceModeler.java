@@ -15,6 +15,7 @@ import recipients.RecipientRecommender;
 import recipients.SingleRecipientRecommendation;
 import recipients.groupbased.hierarchical.HierarchicalGroupRecommendation;
 import recipients.groupbased.hierarchical.HierarchicalIndividualRecommendation;
+import recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
 import recipients.groupbased.hierarchical.HierarchicalRecommendation;
 
 public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>>
@@ -28,7 +29,7 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 	private final Collection<RecipientMetric<RecipientType, MessageType>> metrics;
 	
 	public HierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
-			RecipientRecommender<RecipientType> recommender,
+			HierarchicalRecipientRecommender<RecipientType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
@@ -154,31 +155,25 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 			RecipientAddressingEvent lastActiveUserEvent,
 			ArrayList<RecipientAddressingEvent> events) {
 		
-		RecipientAddressingEvent retVal = null;
-		
 		HierarchicalRecommendation<RecipientType> bestRecommendation = null;
 		for (RecipientRecommendation<RecipientType> recommendation : recommendations) {
-			if (recommendation instanceof SingleRecipientRecommendation) {
 
-				if (recommendation instanceof HierarchicalRecommendation) {
-					bestRecommendation = getBestRecommendation(
-							(HierarchicalRecommendation<RecipientType>) recommendation,
-							remainingCollaborators, bestRecommendation);
-				} else if (recommendation instanceof SingleRecipientRecommendation) {
-					HierarchicalRecommendation<RecipientType> tempRecommendation = new HierarchicalIndividualRecommendation<RecipientType>(
-							((SingleRecipientRecommendation<RecipientType>) recommendation)
-									.getRecipient(), null);
-					bestRecommendation = getBestRecommendation(
-							tempRecommendation, remainingCollaborators,
-							bestRecommendation);
-				}
+			if (recommendation instanceof HierarchicalRecommendation) {
+				bestRecommendation = getBestRecommendation(
+						(HierarchicalRecommendation<RecipientType>) recommendation,
+						remainingCollaborators, bestRecommendation);
+			} else if (recommendation instanceof SingleRecipientRecommendation) {
+				HierarchicalRecommendation<RecipientType> tempRecommendation = new HierarchicalIndividualRecommendation<RecipientType>(
+						((SingleRecipientRecommendation<RecipientType>) recommendation)
+								.getRecipient(), null);
+				bestRecommendation = getBestRecommendation(tempRecommendation,
+						remainingCollaborators, bestRecommendation);
 			}
 		}
 		
-		processBestHierarchicalRecommendation(bestRecommendation,
+		return processBestHierarchicalRecommendation(bestRecommendation,
 				replayMessage, remainingCollaborators, lastActiveUserEvent,
 				events);
-		return retVal;
 		
 	}
 }

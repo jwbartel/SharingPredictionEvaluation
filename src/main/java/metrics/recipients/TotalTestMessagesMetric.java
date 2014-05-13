@@ -24,7 +24,7 @@ public class TotalTestMessagesMetric<RecipientType, MessageType extends SingleMe
 
 	@Override
 	public String getHeader() {
-		return "train messages";
+		return "test messages";
 	}
 
 	@Override

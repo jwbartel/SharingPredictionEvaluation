@@ -10,7 +10,6 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
-import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -23,15 +22,13 @@ import metrics.recipients.RelativeSwitchesMetric;
 import metrics.recipients.RequestsForListsMetric;
 import metrics.recipients.TestWithMultipleFromMetric;
 import metrics.recipients.TotalRecipientsToAddressMetric;
+import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
-import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
-
-import org.apache.commons.io.FileUtils;
-
-import recipients.RecipientRecommender;
-import recipients.RecipientRecommenderFactory;
+import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
+import recipients.groupbased.GroupBasedRecipientRecommender;
+import recipients.groupbased.GroupBasedRecipientRecommenderFactory;
 import recipients.groupbased.google.GoogleGroupBasedRecipientRecommenderFactory;
 import recipients.groupbased.google.scoring.GroupScorer;
 import recipients.groupbased.google.scoring.GroupScorer.GroupScorerFactory;
@@ -42,6 +39,7 @@ import recipients.groupbased.google.scoring.SubsetGroupCount;
 import recipients.groupbased.google.scoring.SubsetGroupScore;
 import recipients.groupbased.google.scoring.SubsetWeightedScore;
 import recipients.groupbased.google.scoring.TopContactScore;
+import recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
 import testbed.dataset.messages.email.EmailDataSet;
 import testbed.dataset.messages.email.EnronEmailDataSet;
 
@@ -51,7 +49,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 	static int listSize = 4;
 
 	static Collection<EmailDataSet<String, String>> dataSets = new ArrayList<>();
-	static Collection<RecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupBasedRecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -168,17 +166,18 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 							GroupScorer<String> groupScorer = scorerFactory
 									.create(wOut, halfLife);
 
-							for (RecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
-								RecipientRecommender<String> recommender = recommenderFactory
+							for (GroupBasedRecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
+								GroupBasedRecipientRecommender<String> recommender = recommenderFactory
 										.createRecommender(groupScorer);
+								HierarchicalRecipientRecommender<String> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
 
 								Collection<RecipientMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
 								for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 									metrics.add(metricFactory.create());
 								}
 
-								SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
-										listSize, recommender, trainingMessages,
+								HierarchicalRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new HierarchicalRecipientRecommendationAcceptanceModeler<>(
+										listSize, hierarchicalRecommender, trainingMessages,
 										testMessages, metrics);
 								Collection<MetricResult> results = modeler
 										.modelRecommendationAcceptance();

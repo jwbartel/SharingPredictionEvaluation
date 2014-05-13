@@ -7,11 +7,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import bus.data.structures.ComparableSet;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
-import model.recommendation.recipients.RecipientRecommendationAcceptanceModeler.ReplayedMessage;
+import metrics.recipients.RecipientMetric;
 import recipients.RecipientRecommendation;
+import recipients.RecipientRecommender;
 import recipients.SingleRecipientRecommendation;
 import recipients.groupbased.hierarchical.HierarchicalGroupRecommendation;
 import recipients.groupbased.hierarchical.HierarchicalIndividualRecommendation;
@@ -21,10 +21,49 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 		extends
 		RecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 
+	private final int listSize;
+	private final RecipientRecommender<RecipientType> recommender;
+	private final Collection<MessageType> trainingMessages;
+	private final Collection<MessageType> testMessages;
+	private final Collection<RecipientMetric<RecipientType, MessageType>> metrics;
+	
+	public HierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
+			RecipientRecommender<RecipientType> recommender,
+			Collection<MessageType> trainingMessages,
+			Collection<MessageType> testMessages,
+			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
+		this.listSize = listSize;
+		this.recommender = recommender;
+		this.trainingMessages = trainingMessages;
+		this.testMessages = testMessages;
+		this.metrics = metrics;
+	}
+	
 	@Override
 	public Collection<MetricResult> modelRecommendationAcceptance() {
-		// TODO Auto-generated method stub
-		return null;
+		for (MessageType trainingMessage : trainingMessages) {
+			recommender.addPastAction(trainingMessage);
+		}
+
+		for (MessageType testMessage : testMessages) {
+			if (testMessage.wasSent()) {
+				Collection<RecipientAddressingEvent> events = modelSelection(
+						testMessage, recommender, listSize);
+				for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
+					metric.addMessageResult(testMessage, events);
+				}
+			}
+			recommender.addPastAction(testMessage);
+		}
+
+		Collection<MetricResult> results = new ArrayList<>();
+		for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
+			MetricResult result = metric.evaluate(trainingMessages,
+					testMessages);
+			results.add(result);
+		}
+		
+		return results;
 	}
 
 	private int intersectionSize(Collection<RecipientType> remainingCollaborators,

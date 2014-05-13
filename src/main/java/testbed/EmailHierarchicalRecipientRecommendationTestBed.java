@@ -10,6 +10,7 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -22,25 +23,29 @@ import metrics.recipients.RelativeSwitchesMetric;
 import metrics.recipients.RequestsForListsMetric;
 import metrics.recipients.TestWithMultipleFromMetric;
 import metrics.recipients.TotalRecipientsToAddressMetric;
-import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
-import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
+import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
+
+import org.apache.commons.io.FileUtils;
+
 import recipients.RecipientRecommender;
 import recipients.RecipientRecommenderFactory;
 import recipients.groupbased.google.GoogleGroupBasedRecipientRecommenderFactory;
 import recipients.groupbased.google.scoring.GroupScorer;
 import recipients.groupbased.google.scoring.GroupScorer.GroupScorerFactory;
+import recipients.groupbased.google.scoring.IntersectionGroupCount;
 import recipients.groupbased.google.scoring.IntersectionGroupScore;
 import recipients.groupbased.google.scoring.IntersectionWeightedScore;
+import recipients.groupbased.google.scoring.SubsetGroupCount;
 import recipients.groupbased.google.scoring.SubsetGroupScore;
 import recipients.groupbased.google.scoring.SubsetWeightedScore;
 import recipients.groupbased.google.scoring.TopContactScore;
 import testbed.dataset.messages.email.EmailDataSet;
 import testbed.dataset.messages.email.EnronEmailDataSet;
 
-public class EmailRecipientRecommendationTestBed {
+public class EmailHierarchicalRecipientRecommendationTestBed {
 
 	static double percentTraining = 0.5;
 	static int listSize = 4;
@@ -64,8 +69,10 @@ public class EmailRecipientRecommendationTestBed {
 				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
 		
 		// Add GroupScorerFactories
+		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
 		groupScorerFactories.add(IntersectionGroupScore.factory(String.class));
 		groupScorerFactories.add(IntersectionWeightedScore.factory(String.class));
+		groupScorerFactories.add(SubsetGroupCount.factory(String.class));
 		groupScorerFactories.add(SubsetGroupScore.factory(String.class));
 		groupScorerFactories.add(SubsetWeightedScore.factory(String.class));
 		groupScorerFactories.add(TopContactScore.factory(String.class));
@@ -170,7 +177,7 @@ public class EmailRecipientRecommendationTestBed {
 									metrics.add(metricFactory.create());
 								}
 
-								HierarchicalRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new HierarchicalRecipientRecommendationAcceptanceModeler<>(
+								SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
 										listSize, recommender, trainingMessages,
 										testMessages, metrics);
 								Collection<MetricResult> results = modeler

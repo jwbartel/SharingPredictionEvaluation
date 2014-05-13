@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import metrics.MetricResult;
-import metrics.groups.GroupMetric;
 import metrics.groups.distance.GroupDistanceMetric;
 import metrics.groups.evolution.GroupEvolutionMetric;
 

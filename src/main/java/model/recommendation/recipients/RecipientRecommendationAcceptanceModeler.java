@@ -98,7 +98,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		}
 	}
 	
-	private RecipientAddressingEvents processSingleRecipientRecommendation(
+	protected RecipientAddressingEvents processSingleRecipientRecommendation(
 			SingleRecipientRecommendation<RecipientType> recommendation,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,
@@ -126,7 +126,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		return null;
 	}
 	
-	private RecipientAddressingEvents modelSelectionFromNonEmptyRecommendationList(
+	protected RecipientAddressingEvents modelSelectionFromNonEmptyRecommendationList(
 			Collection<RecipientRecommendation<RecipientType>> recommendations,
 			ReplayedMessage<RecipientType> replayMessage,
 			ArrayList<RecipientType> remainingCollaborators,

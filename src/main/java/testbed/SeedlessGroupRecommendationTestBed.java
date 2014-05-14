@@ -25,9 +25,9 @@ import org.apache.commons.io.FileUtils;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import recommendation.groups.old.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.SeedlessGroupRecommender;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
+import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.group.GroupDataSet;
 import testbed.dataset.group.MixedInitiativeDataSet;

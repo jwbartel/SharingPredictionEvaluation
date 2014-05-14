@@ -8,7 +8,7 @@ import java.util.Collection;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
-import recipients.RecipientRecommender;
+import recommendation.recipients.RecipientRecommender;
 
 public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>>
 	extends RecipientRecommendationAcceptanceModeler<RecipientType,MessageType> {

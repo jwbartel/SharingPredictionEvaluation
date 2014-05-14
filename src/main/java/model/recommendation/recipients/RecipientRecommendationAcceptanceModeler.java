@@ -9,10 +9,9 @@ import java.util.TreeSet;
 
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
-import recipients.RecipientRecommendation;
-import recipients.RecipientRecommender;
-import recipients.SingleRecipientRecommendation;
-import recipients.groupbased.hierarchical.HierarchicalRecommendation;
+import recommendation.recipients.RecipientRecommendation;
+import recommendation.recipients.RecipientRecommender;
+import recommendation.recipients.SingleRecipientRecommendation;
 
 public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 

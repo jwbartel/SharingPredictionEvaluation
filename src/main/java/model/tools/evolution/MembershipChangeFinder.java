@@ -1,7 +1,5 @@
 package model.tools.evolution;
 
-import groups.comparison.SeedFinder;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

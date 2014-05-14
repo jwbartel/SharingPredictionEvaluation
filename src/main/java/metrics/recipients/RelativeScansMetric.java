@@ -1,7 +1,5 @@
 package metrics.recipients;
 
-import general.actionbased.messages.SingleMessage;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +8,8 @@ import metrics.MetricResult;
 import metrics.StatisticsResult;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import recommendation.general.actionbased.messages.SingleMessage;
 
 public class RelativeScansMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {

@@ -1,9 +1,5 @@
 package metrics.groups.evolution;
 
-import groups.evolution.recommendations.RecommendedEvolution;
-import groups.evolution.recommendations.RecommendedGroupChangeEvolution;
-import groups.evolution.recommendations.RecommendedGroupCreationEvolution;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +10,10 @@ import metrics.MetricResult;
 import metrics.StatisticsResult;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import recommendation.groups.evolution.recommendations.RecommendedEvolution;
+import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
+import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
 
 public class RelativeChangeAdditions<V> extends GroupEvolutionMetric<V> {
 

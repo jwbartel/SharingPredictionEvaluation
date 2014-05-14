@@ -1,15 +1,5 @@
 package testbed;
 
-import groups.evolution.GroupEvolutionRecommender;
-import groups.evolution.GroupEvolutionRecommenderFactory;
-import groups.evolution.composed.ComposedGroupEvolutionRecommenderFactory;
-import groups.evolution.fullrecommendation.FullRecommendationGroupEvolutionRecommenderFactory;
-import groups.evolution.recommendations.RecommendedEvolution;
-import groups.seedless.SeedlessGroupRecommender;
-import groups.seedless.SeedlessGroupRecommenderFactory;
-import groups.seedless.fellows.FellowsRecommenderFactory;
-import groups.seedless.hybrid.HybridRecommenderFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +37,15 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
+import recommendation.groups.evolution.GroupEvolutionRecommender;
+import recommendation.groups.evolution.GroupEvolutionRecommenderFactory;
+import recommendation.groups.evolution.composed.ComposedGroupEvolutionRecommenderFactory;
+import recommendation.groups.evolution.fullrecommendation.FullRecommendationGroupEvolutionRecommenderFactory;
+import recommendation.groups.evolution.recommendations.RecommendedEvolution;
+import recommendation.groups.old.seedless.fellows.FellowsRecommenderFactory;
+import recommendation.groups.seedless.SeedlessGroupRecommender;
+import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
+import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.group.GroupDataSet;
 import testbed.dataset.group.SnapGroupDataSet;
 

@@ -1,7 +1,5 @@
 package testbed;
 
-import general.actionbased.messages.email.EmailMessage;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +25,7 @@ import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
 import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
+import recommendation.general.actionbased.messages.email.EmailMessage;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommender;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommenderFactory;
 import recommendation.recipients.groupbased.GroupScorer;

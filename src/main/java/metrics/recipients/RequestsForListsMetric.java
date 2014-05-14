@@ -1,9 +1,8 @@
 package metrics.recipients;
 
-import general.actionbased.messages.SingleMessage;
-
 import java.util.Collection;
 
+import recommendation.general.actionbased.messages.SingleMessage;
 import metrics.DoubleResult;
 import metrics.MetricResult;
 

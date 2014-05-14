@@ -1,7 +1,5 @@
 package model.recommendation.recipients;
 
-import general.actionbased.messages.SingleMessage;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -10,6 +8,7 @@ import java.util.TreeSet;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
+import recommendation.general.actionbased.messages.SingleMessage;
 import recommendation.recipients.RecipientRecommendation;
 import recommendation.recipients.RecipientRecommender;
 import recommendation.recipients.SingleRecipientRecommendation;

@@ -1,11 +1,10 @@
 package testbed.dataset.messages;
 
-import general.actionbased.messages.MessageThread;
-import general.actionbased.messages.SingleMessage;
-
 import java.io.File;
 import java.util.Collection;
 
+import recommendation.general.actionbased.messages.MessageThread;
+import recommendation.general.actionbased.messages.SingleMessage;
 import testbed.dataset.DataSet;
 
 public abstract class MessageDataSet<IdType,RecipientType, MessageType extends SingleMessage<RecipientType>> extends DataSet<IdType>{

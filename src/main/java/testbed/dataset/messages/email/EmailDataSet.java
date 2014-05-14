@@ -2,7 +2,7 @@ package testbed.dataset.messages.email;
 
 import java.io.File;
 
-import general.actionbased.messages.email.EmailMessage;
+import recommendation.general.actionbased.messages.email.EmailMessage;
 import testbed.dataset.messages.MessageDataSet;
 
 public abstract class EmailDataSet<IdType, RecipientType> extends

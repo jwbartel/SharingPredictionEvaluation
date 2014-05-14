@@ -1,8 +1,5 @@
 package testbed.dataset.messages.email;
 
-import general.actionbased.messages.MessageThread;
-import general.actionbased.messages.email.EmailMessage;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import recommendation.general.actionbased.messages.MessageThread;
+import recommendation.general.actionbased.messages.email.EmailMessage;
 import bus.data.structures.AddressLists;
 
 public class EnronEmailDataSet extends EmailDataSet<String, String> {

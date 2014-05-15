@@ -39,8 +39,8 @@ import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupC
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeightedScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.TopContactScore;
-import testbed.dataset.messages.email.EmailDataSet;
-import testbed.dataset.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.email.EmailDataSet;
+import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 
 public class EmailHierarchicalRecipientRecommendationTestBed {
 

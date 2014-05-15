@@ -1,4 +1,4 @@
-package testbed.dataset.messages.email;
+package testbed.dataset.actions.messages.email;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,7 @@ import java.util.Date;
 
 import recommendation.general.actionbased.messages.MessageThread;
 import recommendation.general.actionbased.messages.email.EmailMessage;
+import recommendation.general.actionbased.messages.email.EmailThread;
 import bus.data.structures.AddressLists;
 
 public class EnronEmailDataSet extends EmailDataSet<String, String> {
@@ -186,19 +187,19 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 	}
 
 	@Override
-	public Collection<MessageThread<String, EmailMessage<String>>> getAllThreads(
+	public Collection<EmailThread<String, EmailMessage<String>>> getAllThreads(
 			String account) {
 		return null;
 	}
 
 	@Override
-	public Collection<MessageThread<String, EmailMessage<String>>> getTrainThreads(
+	public Collection<EmailThread<String, EmailMessage<String>>> getTrainThreads(
 			String account, double percentTrain) {
 		return null;
 	}
 
 	@Override
-	public Collection<MessageThread<String, EmailMessage<String>>> getTestThreads(
+	public Collection<EmailThread<String, EmailMessage<String>>> getTestThreads(
 			String account, double percentTest) {
 		return null;
 	}

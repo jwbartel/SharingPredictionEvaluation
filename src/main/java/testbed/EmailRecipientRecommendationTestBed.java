@@ -30,14 +30,14 @@ import recommendation.recipients.RecipientRecommender;
 import recommendation.recipients.RecipientRecommenderFactory;
 import recommendation.recipients.groupbased.GroupScorer;
 import recommendation.recipients.groupbased.GroupScorer.GroupScorerFactory;
-import recommendation.recipients.groupbased.google.GoogleGroupBasedRecipientRecommenderFactory;
-import recommendation.recipients.groupbased.google.scoring.IntersectionGroupCount;
-import recommendation.recipients.groupbased.google.scoring.IntersectionGroupScore;
-import recommendation.recipients.groupbased.google.scoring.IntersectionWeightedScore;
-import recommendation.recipients.groupbased.google.scoring.SubsetGroupCount;
-import recommendation.recipients.groupbased.google.scoring.SubsetGroupScore;
-import recommendation.recipients.groupbased.google.scoring.SubsetWeightedScore;
-import recommendation.recipients.groupbased.google.scoring.TopContactScore;
+import recommendation.recipients.groupbased.interactionrank.InteractionRankGroupBasedRecipientRecommenderFactory;
+import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionGroupCount;
+import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionGroupScore;
+import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionWeightedScore;
+import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupCount;
+import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupScore;
+import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeightedScore;
+import recommendation.recipients.groupbased.interactionrank.scoring.TopContactScore;
 import testbed.dataset.messages.email.EmailDataSet;
 import testbed.dataset.messages.email.EnronEmailDataSet;
 
@@ -62,7 +62,7 @@ public class EmailRecipientRecommendationTestBed {
 
 		// Add recommender factories
 		recommenderFactories
-				.add(new GoogleGroupBasedRecipientRecommenderFactory<String>());
+				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String>());
 		
 		// Add GroupScorerFactories
 		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));

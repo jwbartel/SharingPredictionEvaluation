@@ -11,7 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import metrics.MetricResult;
 import metrics.StatisticsResult;
 
-public class RelativeRequiredAdds<V> implements GroupMetric<V> {
+public class RelativeRequiredAdds<V> extends GroupMetric<V> {
 	
 	@Override
 	public String getHeader() {

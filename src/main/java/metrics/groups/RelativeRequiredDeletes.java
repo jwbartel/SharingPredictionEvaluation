@@ -1,17 +1,16 @@
 package metrics.groups;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import metrics.MetricResult;
 import metrics.StatisticsResult;
 
-public class RelativeRequiredDeletes<V> implements GroupMetric<V> {
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+public class RelativeRequiredDeletes<V> extends GroupMetric<V> {
 
 	@Override
 	public String getHeader() {
@@ -29,10 +28,7 @@ public class RelativeRequiredDeletes<V> implements GroupMetric<V> {
 			Set<V> recommendation = entry.getKey();
 			Set<V> ideal = entry.getValue();
 			
-			Set<V> deletes = new HashSet<V>(recommendation);
-			deletes.removeAll(ideal);
-			
-			stats.addValue(((double) deletes.size())/recommendation.size());
+			stats.addValue(relativeRequiredDeletions(ideal, recommendation));
 		}
 		
 		return new StatisticsResult(stats);

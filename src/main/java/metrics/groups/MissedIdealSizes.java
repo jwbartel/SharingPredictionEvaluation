@@ -9,7 +9,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import metrics.MetricResult;
 import metrics.StatisticsResult;
 
-public class MissedIdealSizes<V> implements GroupMetric<V> {
+public class MissedIdealSizes<V> extends GroupMetric<V> {
 	
 	@Override
 	public String getHeader() {

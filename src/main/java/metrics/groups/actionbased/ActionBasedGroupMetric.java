@@ -10,10 +10,11 @@ import metrics.MetricResult;
 public interface ActionBasedGroupMetric<V, ActionType extends CollaborativeAction<V>> {
 
 	public MetricResult evaluate(
-			Map<Set<V>, Set<V>> recommendationsToIdeals,
-			Collection<Set<V>> unusedRecommendations,
-			Collection<Set<V>> unusedIdeals,
+			Collection<Set<V>> recommendations,
+			Collection<Set<V>> ideals,
 			Collection<ActionType> testActions,
+			Map<Set<V>, Set<V>> recommendationsToIdeals,
+			Map<Set<V>, ActionType> recommendationsToTestActions,
 			Map<ActionType, Set<V>> testActionsToRecommendations);
 	
 }

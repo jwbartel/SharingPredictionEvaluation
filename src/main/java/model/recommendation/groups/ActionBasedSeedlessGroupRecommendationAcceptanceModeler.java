@@ -42,11 +42,12 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 		
 		Map<Set<CollaboratorType>, Set<CollaboratorType>> recommendationsToIdeals = new HashMap<>();
 		Map<ActionType, Set<CollaboratorType>> testActionsToRecommendations = new HashMap<>();
+		Map<Set<CollaboratorType>, ActionType> recommendationsToTestAction = new HashMap<>();
 		Collection<Set<CollaboratorType>> unusedIdeals = new HashSet<>(idealGroups);
-		Collection<Set<CollaboratorType>> unusedRecommendations = new HashSet<Set<CollaboratorType>>(recommendations);
 
 		for (Set<CollaboratorType> recommendation : recommendations) {
 
+			// Find best ideal to match with recommendation
 			double minDistanceToIdeal = Double.MAX_VALUE;
 			Set<CollaboratorType> bestIdeal = null;
 
@@ -62,8 +63,24 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 
 			if (bestIdeal != null) {
 				recommendationsToIdeals.put(recommendation, bestIdeal);
-				unusedRecommendations.remove(recommendation);
 				unusedIdeals.remove(bestIdeal);
+			}
+			
+			//Find best action to match with recommendation
+			double minDistanceToAction = Double.MAX_VALUE;
+			ActionType bestAction = null;
+
+			for (ActionType testAction : testActions) {
+				Double distance = distanceMetric.distance(
+						recommendation, new HashSet<>(testAction.getCollaborators()));
+				if (distance != null && distance < minDistanceToAction) {
+					minDistanceToAction = distance;
+					bestAction = testAction;
+				}
+			}
+
+			if (bestAction != null) {
+				recommendationsToTestAction.put(recommendation, bestAction);
 			}
 		}
 		
@@ -75,7 +92,7 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 
 			for (Set<CollaboratorType> recommendation : recommendations) {
 				Double distance = distanceMetric.distance(
-						new HashSet<>(testAction.getCollaborators()), recommendation);
+						recommendation, new HashSet<>(testAction.getCollaborators()));
 				if (distance != null && distance < minDistanceToRecommendation) {
 					minDistanceToRecommendation = distance;
 					bestRecommendation = recommendation;
@@ -89,8 +106,9 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 		
 		Collection<MetricResult> results = new ArrayList<MetricResult>();
 		for (ActionBasedGroupMetric<CollaboratorType, ActionType> metric : metrics) {
-			results.add(metric.evaluate(recommendationsToIdeals, unusedRecommendations,
-					unusedIdeals, testActions, testActionsToRecommendations));
+			results.add(metric.evaluate(recommendations, idealGroups,
+					testActions, recommendationsToIdeals,
+					recommendationsToTestAction, testActionsToRecommendations));
 		}
 
 		return results;

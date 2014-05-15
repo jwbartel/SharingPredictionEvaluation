@@ -27,16 +27,19 @@ public class AdditionsToUseRecommendationsWithTestActionsMetric<CollaboratorType
 			Map<ActionType, Set<CollaboratorType>> testActionsToRecommendations) {
 
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		for (Entry<ActionType, Set<CollaboratorType>> entry : testActionsToRecommendations
-				.entrySet()) {
-			
-			ActionType action = entry.getKey();
+		for (ActionType action : testActions) {
+
 			Set<CollaboratorType> collaborators = new HashSet<>(
 					action.getCollaborators());
-			Set<CollaboratorType> recommendation = entry.getValue();
+			Set<CollaboratorType> recommendation = testActionsToRecommendations
+					.get(action);
 
-			stats.addValue(GroupMetric.relativeRequiredAdditions(collaborators,
-					recommendation));
+			if (recommendation == null) {
+				stats.addValue(1.0);
+			} else {
+				stats.addValue(GroupMetric.relativeRequiredAdditions(
+						collaborators, recommendation));
+			}
 		}
 		
 		return new StatisticsResult(stats);

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import recommendation.general.actionbased.messages.MessageThread;
 import recommendation.general.actionbased.messages.email.EmailMessage;
 import recommendation.general.actionbased.messages.email.EmailThread;
 import bus.data.structures.AddressLists;

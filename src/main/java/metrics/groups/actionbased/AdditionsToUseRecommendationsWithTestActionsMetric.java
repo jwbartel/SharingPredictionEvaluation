@@ -34,9 +34,7 @@ public class AdditionsToUseRecommendationsWithTestActionsMetric<CollaboratorType
 			Set<CollaboratorType> recommendation = testActionsToRecommendations
 					.get(action);
 
-			if (recommendation == null) {
-				stats.addValue(1.0);
-			} else {
+			if (recommendation != null) {
 				stats.addValue(GroupMetric.relativeRequiredAdditions(
 						collaborators, recommendation));
 			}

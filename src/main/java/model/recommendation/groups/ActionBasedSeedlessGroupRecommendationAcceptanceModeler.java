@@ -17,20 +17,17 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 		implements GroupRecommendationAcceptanceModeler {
 
 
-	GroupDistanceMetric<CollaboratorType> distanceMetric;
 	Collection<Set<CollaboratorType>> recommendations;
 	Collection<Set<CollaboratorType>> idealGroups;
 	Collection<ActionType> testActions;
 	Collection<ActionBasedGroupMetric<CollaboratorType,ActionType>> metrics;
 	
 	public ActionBasedSeedlessGroupRecommendationAcceptanceModeler(
-			GroupDistanceMetric<CollaboratorType> distanceMetric,
 			Collection<Set<CollaboratorType>> recommendations,
 			Collection<Set<CollaboratorType>> idealGroups,
 			Collection<ActionType> testActions,
 			Collection<ActionBasedGroupMetric<CollaboratorType,ActionType>> metrics) {
 
-		this.distanceMetric = distanceMetric;
 		this.recommendations = recommendations;
 		this.idealGroups = recommendations;
 		this.testActions = testActions;
@@ -53,7 +50,7 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 
 			for (Set<CollaboratorType> ideal : idealGroups) {
 				if (unusedIdeals.contains(ideal)) {
-					Double distance = distanceMetric.distance(recommendation, ideal);
+					Double distance = distance(recommendation, ideal);
 					if (distance != null && distance < minDistanceToIdeal) {
 						minDistanceToIdeal = distance;
 						bestIdeal = ideal;
@@ -71,7 +68,7 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 			ActionType bestAction = null;
 
 			for (ActionType testAction : testActions) {
-				Double distance = distanceMetric.distance(
+				Double distance = distance(
 						recommendation, new HashSet<>(testAction.getCollaborators()));
 				if (distance != null && distance < minDistanceToAction) {
 					minDistanceToAction = distance;
@@ -91,7 +88,7 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 			Set<CollaboratorType> bestRecommendation = null;
 
 			for (Set<CollaboratorType> recommendation : recommendations) {
-				Double distance = distanceMetric.distance(
+				Double distance = distance(
 						recommendation, new HashSet<>(testAction.getCollaborators()));
 				if (distance != null && distance < minDistanceToRecommendation) {
 					minDistanceToRecommendation = distance;
@@ -113,6 +110,20 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, Col
 
 		return results;
 		
+	}
+	
+	public Double distance(Set<CollaboratorType> recommendation, Set<CollaboratorType> intendedGroup) {
+		Set<CollaboratorType> adds = new HashSet<CollaboratorType>(intendedGroup);
+		adds.removeAll(recommendation);
+		
+		Set<CollaboratorType> deletes = new HashSet<CollaboratorType>(recommendation);
+		deletes.removeAll(intendedGroup);
+		
+		double distance = ((double) adds.size() + deletes.size());
+		if (distance >= intendedGroup.size()) {
+			return null;
+		}
+		return distance;
 	}
 
 }

@@ -15,7 +15,7 @@ import bus.data.structures.AddressLists;
 public class EnronEmailDataSet extends EmailDataSet<String, String> {
 
 	public static final String[] DEFAULT_ACCOUNTS = { "allen-p", "arnold-j",
-			"arora-h", "badeer-r", "bailey-s", "baughman-d", "beck-s",
+			"arora-h", "badeer-r","bailey-s", "baughman-d", "beck-s",
 			"blair-l", "buy-r", "campbell-l", "carson-m", "cash-m",
 			"causholli-m", "corman-s", "cuilla-m", "davis-d", "dean-c",
 			"delainey-d", "derrick-j", "dickson-s", "donoho-l", "donohoe-t",

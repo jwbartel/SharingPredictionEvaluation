@@ -18,11 +18,13 @@ import metrics.groups.actionbased.TestActionsMatchedToRecommendationMetric;
 import metrics.groups.actionbased.TestActionsToRecommendationPerfectMatchesMetric;
 import metrics.groups.actionbased.TotalRecommendedGroupsMetric;
 import metrics.groups.actionbased.TotalTestActionsMetric;
-import metrics.groups.distance.AddsAndDeletesGroupDistance;
 import model.recommendation.groups.ActionBasedSeedlessGroupRecommendationAcceptanceModeler;
 import recommendation.general.actionbased.CollaborativeAction;
 import recommendation.general.actionbased.graphbuilder.ActionBasedGraphBuilder;
+import recommendation.general.actionbased.graphbuilder.ActionBasedGraphBuilderFactory;
+import recommendation.general.actionbased.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
 import recommendation.general.actionbased.graphbuilder.SimpleActionBasedGraphBuilder;
+import recommendation.general.actionbased.graphbuilder.TimeThresholdActionBasedGraphBuilder;
 import recommendation.general.actionbased.messages.email.EmailMessage;
 import recommendation.general.actionbased.messages.email.EmailThread;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
@@ -39,10 +41,11 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 	static Collection<ActionsDataSet<String,String,EmailMessage<String>,EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 	
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
-	static Collection<ActionBasedGraphBuilder<String, CollaborativeAction<String>>> graphBuilders = new ArrayList<>();
+	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
 	
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
+	static Collection<Double> scoreThresholds = new ArrayList<>();
 
 	static Collection<ActionBasedGroupMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
 
@@ -54,28 +57,41 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 		
 		// Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
-//		seedlessRecommender.add(new FellowsRecommenderFactory<String>());
+		seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
 		
 		// Add graph builders
-		graphBuilders.add(new SimpleActionBasedGraphBuilder<String,CollaborativeAction<String>>());
-		//TODO: add remaining graph builders
+		graphBuilderFactories.add(SimpleActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
+		graphBuilderFactories.add(TimeThresholdActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
+		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		
 		// Add w_outs
-//		wOuts.add(0.25);
-//		wOuts.add(0.5);
-//		wOuts.add(1.0);
-//		wOuts.add(2.0);
-//		wOuts.add(4.0);
+		wOuts.add(0.25);
+		wOuts.add(0.5);
+		wOuts.add(1.0);
+		wOuts.add(2.0);
+		wOuts.add(4.0);
 		
 		// Add half lives
-//		halfLives.add(1000.0*60); // 1 minute
-//		halfLives.add(1000.0*60*60); // 1 hour
-//		halfLives.add(1000.0*60*60*24); // 1 day
-//		halfLives.add(1000.0*60*60*24*7); // 1 week
-//		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
-//		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-//		halfLives.add(1000.0*60*60*24*365); // 1 year
-//		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+		halfLives.add(1000.0*60); // 1 minute
+		halfLives.add(1000.0*60*60); // 1 hour
+		halfLives.add(1000.0*60*60*24); // 1 day
+		halfLives.add(1000.0*60*60*24*7); // 1 week
+		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
+		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+		halfLives.add(1000.0*60*60*24*365); // 1 year
+		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+		
+		// Add score thresholds
+		scoreThresholds.add(0.05);
+		scoreThresholds.add(0.10);
+		scoreThresholds.add(0.15);
+		scoreThresholds.add(0.20);
+		scoreThresholds.add(0.25);
+		scoreThresholds.add(0.30);
+		scoreThresholds.add(0.35);
+		scoreThresholds.add(0.40);
+		scoreThresholds.add(0.45);
+		scoreThresholds.add(0.50);
 		
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<String, EmailMessage<String>>());
@@ -116,11 +132,108 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 		return halfLife + " years";
 	}
 	
+	private static Collection<MetricResult> collectResults(
+			Collection<EmailMessage<String>> trainMessages,
+			Collection<EmailMessage<String>> testMessages,
+			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender) {
+		
+		for (EmailMessage<String> pastAction : trainMessages) {
+			recommender.addPastAction(pastAction);
+		}
+
+		Collection<Set<String>> recommendations = recommender
+				.getRecommendations();
+		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>(
+				recommendations, new ArrayList<Set<String>>(),
+				testMessages, metrics);
+
+		Collection<MetricResult> results = modeler
+				.modelRecommendationAcceptance();
+		return results;
+	}
+	
+	private static void useGraphBuilderNoArgs(
+			String account,
+			Collection<EmailMessage<String>> trainMessages,
+			Collection<EmailMessage<String>> testMessages,
+			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
+			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			MetricResultCollection<String> resultCollection) throws IOException {
+		
+		ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder =
+				graphBuilderFactory.create();
+		
+		GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = 
+				new GraphFormingActionBasedSeedlessGroupRecommender<>(
+						seedlessRecommenderFactory, graphBuilder);
+
+		Collection<MetricResult> results = collectResults(trainMessages,
+				testMessages, recommender);
+		
+		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
+		resultCollection.addResults(label, account, results);
+	}
+	
+	private static void useGraphBuilderTimeThreshold(
+			String account,
+			Collection<EmailMessage<String>> trainMessages,
+			Collection<EmailMessage<String>> testMessages,
+			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
+			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			MetricResultCollection<String> resultCollection) throws IOException {
+		
+		for (double timeThreshold : halfLives) {
+			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder =
+					graphBuilderFactory.create((long) timeThreshold);
+
+			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = 
+					new GraphFormingActionBasedSeedlessGroupRecommender<>(
+							seedlessRecommenderFactory, graphBuilder);
+
+			Collection<MetricResult> results = collectResults(trainMessages,
+					testMessages, recommender);
+
+			String label = graphBuilder.getName() + ",N/A,N/A," + getHalfLifeName(timeThreshold);
+			resultCollection.addResults(label, account, results);
+		}
+	}
+	
+	private static void useGraphBuilderScoredEdges(
+			String account,
+			Collection<EmailMessage<String>> trainMessages,
+			Collection<EmailMessage<String>> testMessages,
+			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
+			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			MetricResultCollection<String> resultCollection) throws IOException {
+		
+		for (double halfLife : halfLives) {
+			for (double wOut : wOuts) {
+				for (double scoreThreshold : scoreThresholds) {
+					ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder =
+							graphBuilderFactory.create( (long) halfLife, wOut, scoreThreshold);
+
+					GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = 
+							new GraphFormingActionBasedSeedlessGroupRecommender<>(
+									seedlessRecommenderFactory, graphBuilder);
+
+					Collection<MetricResult> results = collectResults(
+							trainMessages, testMessages, recommender);
+
+					String label = graphBuilder.getName() +
+							"," + getHalfLifeName(halfLife) +
+							"," + wOut +
+							"," + scoreThreshold;
+					resultCollection.addResults(label, account, results);
+				}
+			}
+		}
+	}
+	
 	public static void main(String[] args) throws IOException {
 		
 		for (ActionsDataSet<String,String,EmailMessage<String>,EmailThread<String, EmailMessage<String>>> dataset : dataSets) {
 			
-			String headerPrefix = ",account";
+			String headerPrefix = "graph builder,w_out,half_life,threshold,account";
 			MetricResultCollection<String> resultCollection =
 					new MetricResultCollection<String>(
 							headerPrefix, new ArrayList<Metric>(metrics),
@@ -133,25 +246,23 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 				Collection<EmailMessage<String>> testMessages = dataset.getTestMessages(account, percentTraining);
 				
 				for (SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory : seedlessRecommenderFactories) {
-				for (ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder : graphBuilders) {
-					GraphFormingActionBasedSeedlessGroupRecommender<String> recommender =
-							new GraphFormingActionBasedSeedlessGroupRecommender<String>(seedlessRecommenderFactory, graphBuilder);
-					
-					for (EmailMessage<String> pastAction : trainMessages) {
-						recommender.addPastAction(pastAction);
-					}
-
-						Collection<Set<String>> recommendations = recommender
-								.getRecommendations();
-						ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>(
-								new AddsAndDeletesGroupDistance<String>(),
-								recommendations, new ArrayList<Set<String>>(),
-								testMessages, metrics);
-
-						Collection<MetricResult> results = modeler
-								.modelRecommendationAcceptance();
-						resultCollection.addResults("", account, results);
+					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {
 						
+						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
+							useGraphBuilderScoredEdges(account, trainMessages,
+									testMessages, seedlessRecommenderFactory,
+									graphBuilderFactory, resultCollection);
+						} else if (graphBuilderFactory.takesTime()) {
+							useGraphBuilderTimeThreshold(account,
+									trainMessages, testMessages,
+									seedlessRecommenderFactory,
+									graphBuilderFactory, resultCollection);
+						} else {
+							useGraphBuilderNoArgs(account, trainMessages,
+									testMessages, seedlessRecommenderFactory,
+									graphBuilderFactory, resultCollection);
+						}
+
 					}
 				}
 			}

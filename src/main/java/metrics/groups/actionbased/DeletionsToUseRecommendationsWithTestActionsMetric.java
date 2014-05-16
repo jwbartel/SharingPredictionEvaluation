@@ -27,6 +27,19 @@ public class DeletionsToUseRecommendationsWithTestActionsMetric<CollaboratorType
 			Map<ActionType, Set<CollaboratorType>> testActionsToRecommendations) {
 
 		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		for (ActionType action : testActions) {
+			Set<CollaboratorType> collaborators = new HashSet<>(
+					action.getCollaborators());
+			Set<CollaboratorType> recommendation = testActionsToRecommendations
+					.get(action);
+			
+			if (recommendation != null) {
+				stats.addValue(GroupMetric.relativeRequiredDeletions(collaborators,
+						recommendation));
+			}
+			
+		}
 		for (Entry<ActionType, Set<CollaboratorType>> entry : testActionsToRecommendations
 				.entrySet()) {
 			

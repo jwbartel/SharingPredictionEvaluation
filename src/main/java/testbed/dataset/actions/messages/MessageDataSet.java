@@ -3,8 +3,8 @@ package testbed.dataset.actions.messages;
 import java.io.File;
 import java.util.Collection;
 
-import recommendation.general.actionbased.messages.MessageThread;
-import recommendation.general.actionbased.messages.SingleMessage;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 import testbed.dataset.actions.ActionsDataSet;
 
 public abstract class MessageDataSet<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>

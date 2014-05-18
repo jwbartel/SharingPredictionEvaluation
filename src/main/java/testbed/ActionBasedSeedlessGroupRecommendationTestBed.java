@@ -6,6 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
+import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.email.EmailThread;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -19,14 +27,6 @@ import metrics.groups.actionbased.TestActionsToRecommendationPerfectMatchesMetri
 import metrics.groups.actionbased.TotalRecommendedGroupsMetric;
 import metrics.groups.actionbased.TotalTestActionsMetric;
 import model.recommendation.groups.ActionBasedSeedlessGroupRecommendationAcceptanceModeler;
-import recommendation.general.actionbased.CollaborativeAction;
-import recommendation.general.actionbased.graphbuilder.ActionBasedGraphBuilder;
-import recommendation.general.actionbased.graphbuilder.ActionBasedGraphBuilderFactory;
-import recommendation.general.actionbased.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
-import recommendation.general.actionbased.graphbuilder.SimpleActionBasedGraphBuilder;
-import recommendation.general.actionbased.graphbuilder.TimeThresholdActionBasedGraphBuilder;
-import recommendation.general.actionbased.messages.email.EmailMessage;
-import recommendation.general.actionbased.messages.email.EmailThread;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
 import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
@@ -57,7 +57,7 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 		
 		// Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
-		seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
+		//seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
 		
 		// Add graph builders
 		graphBuilderFactories.add(SimpleActionBasedGraphBuilder.factory(String.class, EmailMessage.class));

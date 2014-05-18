@@ -3,10 +3,10 @@ package model.recommendation.recipients;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import data.representation.actionbased.messages.SingleMessage;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
-import recommendation.general.actionbased.messages.SingleMessage;
 import recommendation.recipients.RecipientRecommender;
 
 public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>>

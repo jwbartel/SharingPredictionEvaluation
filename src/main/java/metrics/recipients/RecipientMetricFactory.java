@@ -1,6 +1,6 @@
 package metrics.recipients;
 
-import recommendation.general.actionbased.messages.SingleMessage;
+import data.representation.actionbased.messages.SingleMessage;
 
 public interface RecipientMetricFactory<V,MessageType extends SingleMessage<V>> {
 

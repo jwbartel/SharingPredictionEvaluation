@@ -3,8 +3,8 @@ package testbed.dataset.actions;
 import java.io.File;
 import java.util.Collection;
 
-import recommendation.general.actionbased.CollaborativeAction;
-import recommendation.general.actionbased.CollaborativeActionThread;
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.CollaborativeActionThread;
 import testbed.dataset.DataSet;
 
 public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>, ThreadType extends CollaborativeActionThread<CollaboratorType, ActionType>>

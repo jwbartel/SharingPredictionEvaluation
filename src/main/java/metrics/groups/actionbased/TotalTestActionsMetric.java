@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import data.representation.actionbased.CollaborativeAction;
 import metrics.DoubleResult;
 import metrics.MetricResult;
-import recommendation.general.actionbased.CollaborativeAction;
 
 public class TotalTestActionsMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
 		implements ActionBasedGroupMetric<CollaboratorType, ActionType> {

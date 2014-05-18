@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import data.representation.actionbased.messages.email.EmailMessage;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -25,7 +26,6 @@ import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
 import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
-import recommendation.general.actionbased.messages.email.EmailMessage;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommender;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommenderFactory;
 import recommendation.recipients.groupbased.GroupScorer;

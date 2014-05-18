@@ -9,7 +9,7 @@ import metrics.StatisticsResult;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import recommendation.general.actionbased.messages.SingleMessage;
+import data.representation.actionbased.messages.SingleMessage;
 
 public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {

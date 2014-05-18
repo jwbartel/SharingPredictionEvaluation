@@ -12,7 +12,7 @@ import metrics.groups.GroupMetric;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import recommendation.general.actionbased.CollaborativeAction;
+import data.representation.actionbased.CollaborativeAction;
 
 public class AdditionsToUseRecommendationsWithTestActionsMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
 		implements ActionBasedGroupMetric<CollaboratorType, ActionType> {

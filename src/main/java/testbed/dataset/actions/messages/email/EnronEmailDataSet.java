@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import recommendation.general.actionbased.messages.email.EmailMessage;
-import recommendation.general.actionbased.messages.email.EmailThread;
+import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.email.EmailThread;
 import bus.data.structures.AddressLists;
 
 public class EnronEmailDataSet extends EmailDataSet<String, String> {
@@ -100,8 +100,8 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			ArrayList<String> bcc = addressLists.getBCC();
 			boolean wasSent = id.toLowerCase().matches("(.*\\W)?((sent)|(draft)).*");
 
-			return new EmailMessage<String>(id, null, date, wasSent, from, to,
-					cc, bcc, null, null);
+			return new EmailMessage<>(id, null, date, wasSent, from, to, cc,
+					bcc, null, null, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

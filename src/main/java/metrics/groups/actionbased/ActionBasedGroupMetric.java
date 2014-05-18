@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import data.representation.actionbased.CollaborativeAction;
 import metrics.Metric;
 import metrics.MetricResult;
-import recommendation.general.actionbased.CollaborativeAction;
 
 public interface ActionBasedGroupMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
 		extends Metric {

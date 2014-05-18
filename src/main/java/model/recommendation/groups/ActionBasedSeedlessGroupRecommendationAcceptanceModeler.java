@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.CollaborativeActionThread;
 import metrics.MetricResult;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
 import metrics.groups.distance.GroupDistanceMetric;
-import recommendation.general.actionbased.CollaborativeAction;
-import recommendation.general.actionbased.CollaborativeActionThread;
 
 public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<IdType, CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>, ThreadType extends CollaborativeActionThread<CollaboratorType, ActionType>>
 		implements GroupRecommendationAcceptanceModeler {

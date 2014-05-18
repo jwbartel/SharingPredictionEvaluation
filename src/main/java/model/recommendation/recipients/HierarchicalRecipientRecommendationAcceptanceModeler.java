@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import data.representation.actionbased.messages.SingleMessage;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
-import recommendation.general.actionbased.messages.SingleMessage;
 import recommendation.recipients.RecipientRecommendation;
 import recommendation.recipients.RecipientRecommender;
 import recommendation.recipients.SingleRecipientRecommendation;

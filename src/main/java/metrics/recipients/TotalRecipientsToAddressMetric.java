@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import recommendation.general.actionbased.messages.SingleMessage;
+import data.representation.actionbased.messages.SingleMessage;
 import metrics.DoubleResult;
 import metrics.MetricResult;
 

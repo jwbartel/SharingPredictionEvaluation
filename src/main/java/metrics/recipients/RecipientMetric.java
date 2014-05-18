@@ -2,7 +2,7 @@ package metrics.recipients;
 
 import java.util.Collection;
 
-import recommendation.general.actionbased.messages.SingleMessage;
+import data.representation.actionbased.messages.SingleMessage;
 import metrics.Metric;
 import metrics.MetricResult;
 

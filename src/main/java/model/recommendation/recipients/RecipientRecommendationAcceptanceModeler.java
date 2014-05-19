@@ -14,6 +14,8 @@ import recommendation.recipients.SingleRecipientRecommendation;
 
 public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 
+	protected int seedSize = 2;
+	
 	public abstract Collection<MetricResult> modelRecommendationAcceptance();
 
 	protected static class ReplayedMessage<V> implements SingleMessage<V> {
@@ -73,10 +75,10 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		return replayMessage;
 	}
 
-	private Collection<RecipientType> determineSeed(
+	protected Collection<RecipientType> determineSeed(
 			ArrayList<RecipientType> collaborators) {
 		Collection<RecipientType> seed = new TreeSet<>();
-		while (seed.size() < 2 && collaborators.size() > 0) {
+		while (seed.size() < seedSize && collaborators.size() > 0) {
 			RecipientType seedMember = collaborators.get(0);
 			seed.add(seedMember);
 			while (collaborators.remove(seedMember)) {
@@ -177,7 +179,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 				message.getCollaborators());
 		Collection<RecipientType> seed = determineSeed(remainingCollaborators);
 
-		if (seed.size() < 2 || remainingCollaborators.size() == 0) {
+		if (seed.size() < seedSize || remainingCollaborators.size() == 0) {
 			events.add(RecipientAddressingEvent.SeedTooSmallForListGeneration);
 			events.add(RecipientAddressingEvent.AddressingCompleted);
 			return events;
@@ -207,7 +209,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 				events.add(RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated);
 			}
 			lastActiveUserEvent = modelManualEntry(replayMessage, remainingCollaborators, newLastActiveUserEvent, events);
-
+			seed = replayMessage.collaborators;
 		}
 
 		events.add(RecipientAddressingEvent.AddressingCompleted);

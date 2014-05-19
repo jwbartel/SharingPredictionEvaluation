@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Properties;
 import java.util.TreeSet;
 
-import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -17,19 +17,25 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.io.FileUtils;
 
 import data.preprocess.threading.JavaMailNewsgroupThreadRetriever;
+import data.representation.actionbased.messages.ComparableAddress;
 import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
 import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupThread;
+import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 
-public class Newsgroups20Dataset extends NewsgroupDataset<Integer, Address, JavaMailNewsgroupPost, JavaMailNewsgroupThread<JavaMailNewsgroupPost>> {
+public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress,JavaMailNewsgroupPost>> {
 
 	private JavaMailNewsgroupThreadRetriever<JavaMailNewsgroupPost> threadRetriever = new JavaMailNewsgroupThreadRetriever<>();
 	private Collection<JavaMailNewsgroupPost> posts;
-	private Collection<JavaMailNewsgroupThread<JavaMailNewsgroupPost>> threads;
+	private Collection<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> threads;
 
-	public Newsgroups20Dataset(String name, File rootFolder,
-			Class<Integer> genericClass) throws MessagingException, IOException {
-		super(name, new Integer[0], rootFolder, genericClass);
-		loadPostsAndThreads();
+	public Newsgroups20Dataset(String name, File rootFolder) {
+		super(name, new Integer[1], rootFolder, Integer.class);
+		try {
+			loadPostsAndThreads();
+		} catch (MessagingException | IOException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
 	}
 
 	private File getPostsFolder() {
@@ -38,7 +44,9 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, Address, Java
 
 	private MimeMessage loadPost(File location) throws MessagingException,
 			IOException {
-		Session session = Session.getDefaultInstance(System.getProperties());
+		Properties properties = System.getProperties();
+		properties.setProperty("mail.mime.address.strict", "false");
+		Session session = Session.getDefaultInstance(properties);
 
 		String postContents = FileUtils.readFileToString(location);
 		MimeMessage post = new MimeMessage(session, new ByteArrayInputStream(
@@ -50,8 +58,9 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, Address, Java
 		if (folder.isFile()) {
 			Message message = loadPost(folder);
 			posts.add(new JavaMailNewsgroupPost(message, false));
+			System.out.println(posts.size());
 		} else {
-			for (File subFolder : getPostsFolder().listFiles()) {
+			for (File subFolder : folder.listFiles()) {
 				loadPosts(subFolder);
 			}
 		}
@@ -64,7 +73,7 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, Address, Java
 					@Override
 					public int compare(JavaMailNewsgroupPost arg0,
 							JavaMailNewsgroupPost arg1) {
-						if (arg0.getLastActiveDate().equals(
+						if (!arg0.getLastActiveDate().equals(
 								arg1.getLastActiveDate())) {
 							return arg0.getLastActiveDate().compareTo(
 									arg1.getLastActiveDate());
@@ -97,16 +106,18 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, Address, Java
 		for (File folder : getPostsFolder().listFiles()) {
 			loadPosts(folder);
 		}
-		threads = threadRetriever.retrieveThreads(posts);
+		threads = new ArrayList<>();
+		Collection<JavaMailNewsgroupThread<JavaMailNewsgroupPost>> retrieveThreads = threadRetriever.retrieveThreads(posts);
+		threads.addAll(retrieveThreads);
 	}
 
 	@Override
 	public Collection<JavaMailNewsgroupPost> getAllMessages(Integer account) {
-		return new ArrayList<JavaMailNewsgroupPost>(posts);
+		return new ArrayList<>(posts);
 	}
 
 	@Override
-	public Collection<JavaMailNewsgroupThread<JavaMailNewsgroupPost>> getAllThreads(
+	public Collection<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> getAllThreads(
 			Integer account) {
 		return new ArrayList<>(threads);
 	}

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.email.EmailThread;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -47,7 +48,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 	static double percentTraining = 0.5;
 	static int listSize = 4;
 
-	static Collection<EmailDataSet<String, String>> dataSets = new ArrayList<>();
+	static Collection<EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<GroupBasedRecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
@@ -137,7 +138,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 
 	public static void main(String[] args) throws IOException {
 
-		for (EmailDataSet<String, String> dataset : dataSets) {
+		for (EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> dataset : dataSets) {
 
 			Collection<Metric> unusedMetrics = new ArrayList<>();
 			for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {

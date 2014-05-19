@@ -12,10 +12,11 @@ import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
 import bus.data.structures.AddressLists;
 
-public class EnronEmailDataSet extends EmailDataSet<String, String> {
+public class EnronEmailDataSet extends
+		EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> {
 
 	public static final String[] DEFAULT_ACCOUNTS = { "allen-p", "arnold-j",
-			"arora-h", "badeer-r","bailey-s", "baughman-d", "beck-s",
+			"arora-h", "badeer-r", "bailey-s", "baughman-d", "beck-s",
 			"blair-l", "buy-r", "campbell-l", "carson-m", "cash-m",
 			"causholli-m", "corman-s", "cuilla-m", "davis-d", "dean-c",
 			"delainey-d", "derrick-j", "dickson-s", "donoho-l", "donohoe-t",
@@ -98,7 +99,8 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 			ArrayList<String> to = addressLists.getTo();
 			ArrayList<String> cc = addressLists.getCC();
 			ArrayList<String> bcc = addressLists.getBCC();
-			boolean wasSent = id.toLowerCase().matches("(.*\\W)?((sent)|(draft)).*");
+			boolean wasSent = id.toLowerCase().matches(
+					"(.*\\W)?((sent)|(draft)).*");
 
 			return new EmailMessage<>(id, null, date, wasSent, from, to, cc,
 					bcc, null, null, null);
@@ -144,82 +146,9 @@ public class EnronEmailDataSet extends EmailDataSet<String, String> {
 	}
 
 	@Override
-	public Collection<EmailMessage<String>> getTrainMessages(String account,
-			double percentTrain) {
-
-		Collection<EmailMessage<String>> allMessages = getAllMessages(account);
-		if (allMessages == null) {
-			return null;
-		}
-
-		int numTrain = (int) (allMessages.size() * percentTrain);
-		Collection<EmailMessage<String>> trainingMessages = new ArrayList<>();
-		for (EmailMessage<String> message : allMessages) {
-			if (trainingMessages.size() == numTrain) {
-				break;
-			}
-			trainingMessages.add(message);
-		}
-		return trainingMessages;
-	}
-
-	@Override
-	public Collection<EmailMessage<String>> getTestMessages(String account,
-			double percentTrain) {
-		Collection<EmailMessage<String>> allMessages = getAllMessages(account);
-		if (allMessages == null) {
-			return null;
-		}
-
-		int numTrain = (int) (allMessages.size() * percentTrain);
-		Collection<EmailMessage<String>> testMessages = new ArrayList<>();
-		int count = 0;
-		for (EmailMessage<String> message : allMessages) {
-			if (count < numTrain) {
-				count++;
-				continue;
-			}
-			testMessages.add(message);
-			count++;
-		}
-		return testMessages;
-	}
-
-	@Override
 	public Collection<EmailThread<String, EmailMessage<String>>> getAllThreads(
 			String account) {
 		return null;
-	}
-
-	@Override
-	public Collection<EmailThread<String, EmailMessage<String>>> getTrainThreads(
-			String account, double percentTrain) {
-		return null;
-	}
-
-	@Override
-	public Collection<EmailThread<String, EmailMessage<String>>> getTestThreads(
-			String account, double percentTest) {
-		return null;
-	}
-	
-	private File getMetricsFolder() {
-		return new File(getRootFolder(), "metric statistics");
-	}
-	
-	@Override
-	public File getRecipientRecommendationMetricsFile() {
-		return new File(getMetricsFolder(), "recipient recommendation results.csv");
-	}
-	
-	@Override
-	public File getHierarchicalRecipientRecommendationMetricsFile() {
-		return new File(getMetricsFolder(), "hierarchical recipient recommendation results.csv");
-	}
-
-	@Override
-	public File getActionBasedSeedlessGroupsMetricsFile() {
-		return new File(getMetricsFolder(), "action based seedless group recommendation results.csv");
 	}
 
 }

@@ -2,12 +2,12 @@ package testbed.dataset.actions.messages.email;
 
 import java.io.File;
 
+import testbed.dataset.actions.messages.MessageDataSet;
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
-import testbed.dataset.actions.messages.MessageDataSet;
 
-public abstract class EmailDataSet<IdType, RecipientType> extends
-		MessageDataSet<IdType, RecipientType, EmailMessage<RecipientType>, EmailThread<RecipientType, EmailMessage<RecipientType>>> {
+public abstract class EmailDataSet<IdType, RecipientType, MessageType extends EmailMessage<RecipientType>, ThreadType extends EmailThread<RecipientType, MessageType>>
+		extends MessageDataSet<IdType, RecipientType, MessageType, ThreadType> {
 
 	public EmailDataSet(String name, IdType[] accountIds, File rootFolder,
 			Class<IdType> genericClass) {

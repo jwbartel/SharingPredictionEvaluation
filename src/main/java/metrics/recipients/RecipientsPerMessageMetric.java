@@ -11,7 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import data.representation.actionbased.messages.SingleMessage;
 
-public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
+public class RecipientsPerMessageMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {
 
 	private DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -23,35 +23,22 @@ public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessa
 
 			@Override
 			public RecipientMetric<RecipientType, MessageType> create() {
-				return new RelativeClicksMetric<>();
+				return new RecipientsPerMessageMetric<>();
 			}
 		};
 	}
 
 	@Override
 	public String getHeader() {
-		return "avg-relative clicks,stdev-relative clicks";
+		return "avg-recipients per message,stdev-recipients per message";
 	}
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
 			Collection<RecipientAddressingEvent> events) {
-
-		if (events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)) {
-			return;
-		}
 		
-		int numClicks = 0;
-		for (RecipientAddressingEvent event : events) {
-			if (event == RecipientAddressingEvent.SelectSingleRecipient
-					|| event instanceof RecipientAddressingEvent.SelectMultipleRecipientsEvent) {
-				numClicks++;
-			}
-		}
-
-		Set<RecipientType> collaborators = new TreeSet<>(
-				message.getCollaborators());
-		stats.addValue((double) numClicks / (collaborators.size()));
+		Set<RecipientType> collaborators = new TreeSet<>(message.getCollaborators());
+		stats.addValue(collaborators.size());
 	}
 
 	@Override

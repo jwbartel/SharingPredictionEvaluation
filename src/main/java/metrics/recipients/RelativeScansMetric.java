@@ -1,8 +1,8 @@
 package metrics.recipients;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import metrics.MetricResult;
 import metrics.StatisticsResult;
@@ -36,6 +36,10 @@ public class RelativeScansMetric<RecipientType, MessageType extends SingleMessag
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
 			Collection<RecipientAddressingEvent> events) {
+		
+		if(events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)) {
+			return;
+		}
 
 		int numScans = 0;
 		for (RecipientAddressingEvent event : events) {
@@ -44,10 +48,8 @@ public class RelativeScansMetric<RecipientType, MessageType extends SingleMessag
 			}
 		}
 		
-		Set<RecipientType> collaborators = new HashSet<>(message.getCollaborators());
-		if (collaborators.size() > 2) {
-			stats.addValue((double)numScans / (collaborators.size() - 2));
-		}
+		Set<RecipientType> collaborators = new TreeSet<>(message.getCollaborators());
+		stats.addValue((double)numScans / (collaborators.size()));
 	}
 
 	@Override

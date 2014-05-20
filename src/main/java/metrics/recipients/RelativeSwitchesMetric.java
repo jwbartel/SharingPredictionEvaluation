@@ -1,8 +1,8 @@
 package metrics.recipients;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import metrics.MetricResult;
 import metrics.StatisticsResult;
@@ -44,10 +44,10 @@ public class RelativeSwitchesMetric<RecipientType, MessageType extends SingleMes
 			}
 		}
 
-		Set<RecipientType> collaborators = new HashSet<>(
+		Set<RecipientType> collaborators = new TreeSet<>(
 				message.getCollaborators());
 		if (collaborators.size() > 2) {
-			stats.addValue((double) numSwitches / (collaborators.size() - 2));
+			stats.addValue((double) numSwitches / collaborators.size());
 		}
 	}
 

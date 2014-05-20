@@ -12,6 +12,7 @@ import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
+import metrics.recipients.RecipientsPerMessageMetric;
 import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.RelativeClicksMetric;
 import metrics.recipients.RelativeManualEntriesMetric;
@@ -46,7 +47,7 @@ import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 
 public class NewsgroupRecipientRecommendationTestBed {
 
-	static double percentTraining = 0.5;
+	static double percentTraining = 0.8;
 	static int listSize = 4;
 
 	static Collection<NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress,JavaMailNewsgroupPost>>> dataSets = new ArrayList<>();
@@ -93,6 +94,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 		metricFactories.add(TotalTestMessagesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(RecommendableMessagesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(TotalRecipientsToAddressMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RecipientsPerMessageMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(RequestsForListsMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(PrecisionMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(RecallMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
@@ -146,7 +148,6 @@ public class NewsgroupRecipientRecommendationTestBed {
 					dataset.getRecipientRecommendationMetricsFile());
 
 			for (Integer account : dataset.getAccountIds()) {
-				System.out.println(account);
 
 				Collection<JavaMailNewsgroupPost> trainingMessages = dataset
 						.getTrainMessages(account, percentTraining);
@@ -165,6 +166,11 @@ public class NewsgroupRecipientRecommendationTestBed {
 							for (RecipientRecommenderFactory<ComparableAddress> recommenderFactory : recommenderFactories) {
 								RecipientRecommender<ComparableAddress> recommender = recommenderFactory
 										.createRecommender(groupScorer);
+								
+								String label = recommender.getTypeOfRecommender();
+								label += ","+groupScorer.getName();
+								label += ","+getHalfLifeName(halfLife);
+								System.out.println(label);
 
 								Collection<RecipientMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
 								for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
@@ -178,9 +184,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 								Collection<MetricResult> results = modeler
 										.modelRecommendationAcceptance();
 
-								String label = recommender.getTypeOfRecommender();
-								label += ","+groupScorer.getName();
-								label += ","+getHalfLifeName(halfLife);
+								
 								
 								resultCollection.addResults(label, account,
 										results);

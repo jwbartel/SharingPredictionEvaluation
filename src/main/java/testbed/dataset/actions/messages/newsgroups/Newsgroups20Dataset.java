@@ -58,7 +58,6 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 		if (folder.isFile()) {
 			Message message = loadPost(folder);
 			posts.add(new JavaMailNewsgroupPost(message, false));
-			System.out.println(posts.size());
 		} else {
 			for (File subFolder : folder.listFiles()) {
 				loadPosts(subFolder);

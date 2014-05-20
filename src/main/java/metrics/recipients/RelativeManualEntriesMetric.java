@@ -1,8 +1,8 @@
 package metrics.recipients;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import metrics.MetricResult;
 import metrics.StatisticsResult;
@@ -38,17 +38,26 @@ public class RelativeManualEntriesMetric<RecipientType, MessageType extends Sing
 			Collection<RecipientAddressingEvent> events) {
 
 		int numManualEntries = 0;
+		int numSelectedThroughRecommendations = 0;
 		for (RecipientAddressingEvent event : events) {
 			if (event == RecipientAddressingEvent.TypeSingleRecipient) {
 				numManualEntries++;
 			}
+			if (event == RecipientAddressingEvent.SelectSingleRecipient) {
+				numSelectedThroughRecommendations++;
+			}
+			if (event instanceof RecipientAddressingEvent.SelectMultipleRecipientsEvent) {
+				numSelectedThroughRecommendations +=
+						((RecipientAddressingEvent.SelectMultipleRecipientsEvent) event).numRecipients;
+			}
 		}
+		
 
-		Set<RecipientType> collaborators = new HashSet<>(
+		Set<RecipientType> collaborators = new TreeSet<>(
 				message.getCollaborators());
-		if (collaborators.size() > 2) {
-			stats.addValue((double) numManualEntries / (collaborators.size() - 2));
-		}
+
+		numManualEntries = collaborators.size() - numSelectedThroughRecommendations;
+		stats.addValue((double) numManualEntries / (collaborators.size()));
 	}
 
 	@Override

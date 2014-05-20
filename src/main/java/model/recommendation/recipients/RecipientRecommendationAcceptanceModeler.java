@@ -202,13 +202,14 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			if (newLastActiveUserEvent != null) {
 				// If we selected one of the recommendations
 				lastActiveUserEvent = newLastActiveUserEvent;
+				seed = replayMessage.collaborators;
 				continue;
 			}
 
 			if (recommendations.size() > 0) {
 				events.add(RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated);
 			}
-			lastActiveUserEvent = modelManualEntry(replayMessage, remainingCollaborators, newLastActiveUserEvent, events);
+			lastActiveUserEvent = modelManualEntry(replayMessage, remainingCollaborators, lastActiveUserEvent, events);
 			seed = replayMessage.collaborators;
 		}
 

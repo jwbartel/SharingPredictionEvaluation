@@ -21,11 +21,11 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 		extends
 		RecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 
-	private final int listSize;
-	private final RecipientRecommender<RecipientType> recommender;
-	private final Collection<MessageType> trainingMessages;
-	private final Collection<MessageType> testMessages;
-	private final Collection<RecipientMetric<RecipientType, MessageType>> metrics;
+	protected final int listSize;
+	protected final RecipientRecommender<RecipientType> recommender;
+	protected final Collection<MessageType> trainingMessages;
+	protected final Collection<MessageType> testMessages;
+	protected final Collection<RecipientMetric<RecipientType, MessageType>> metrics;
 	
 	public HierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
 			HierarchicalRecipientRecommender<RecipientType> recommender,

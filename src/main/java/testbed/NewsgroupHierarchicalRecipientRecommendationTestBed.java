@@ -26,6 +26,7 @@ import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
 import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
+import model.recommendation.recipients.NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommender;
 import recommendation.recipients.groupbased.GroupBasedRecipientRecommenderFactory;
 import recommendation.recipients.groupbased.GroupScorer;
@@ -39,15 +40,10 @@ import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupC
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeightedScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.TopContactScore;
-import testbed.dataset.actions.messages.email.EmailDataSet;
-import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.newsgroups.NewsgroupDataset;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 import data.representation.actionbased.messages.ComparableAddress;
-import data.representation.actionbased.messages.email.EmailMessage;
-import data.representation.actionbased.messages.email.EmailThread;
 import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
-import data.representation.actionbased.messages.newsgroup.NewsgroupPost;
 import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 
 public class NewsgroupHierarchicalRecipientRecommendationTestBed {
@@ -83,11 +79,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 		groupScorerFactories.add(TopContactScore.factory(ComparableAddress.class));
 		
 		// Add w_outs
-		wOuts.add(0.25);
-		wOuts.add(0.5);
 		wOuts.add(1.0);
-		wOuts.add(2.0);
-		wOuts.add(4.0);
 		
 		// Add half lives
 		halfLives.add(1000.0*60); // 1 minute
@@ -100,21 +92,22 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add metric factories
-		metricFactories.add(TotalTrainMessagesMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(TotalTestMessagesMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RecommendableMessagesMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RecipientsPerMessageMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(TotalRecipientsToAddressMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RequestsForListsMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(PrecisionMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RecallMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(TotalSelectedPerClickMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RelativeScansMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RelativeClicksMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RelativeManualEntriesMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(RelativeSwitchesMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(TrainWithMultipleFromMetric.factory(ComparableAddress.class, EmailMessage.class));
-		metricFactories.add(TestWithMultipleFromMetric.factory(ComparableAddress.class, EmailMessage.class));
+		metricFactories.add(TotalTrainMessagesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(TotalTestMessagesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RecommendableMessagesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RecipientsPerMessageMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(TotalRecipientsToAddressMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RecipientsPerMessageMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RequestsForListsMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(PrecisionMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RecallMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(TotalSelectedPerClickMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RelativeScansMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RelativeClicksMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RelativeManualEntriesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(RelativeSwitchesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(TrainWithMultipleFromMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		metricFactories.add(TestWithMultipleFromMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 	}
 	
 	private static String getHalfLifeName(double halfLife) {
@@ -143,6 +136,90 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 		halfLife /= 365;
 		return halfLife + " years";
 	}
+	
+	private static void runWithoutWoutAndHalfLife(Integer account,
+			Collection<JavaMailNewsgroupPost> trainingMessages,
+			Collection<JavaMailNewsgroupPost> testMessages,
+			MetricResultCollection<Integer> resultCollection,
+			GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			GroupScorerFactory<ComparableAddress> scorerFactory)
+			throws IOException {
+		
+		
+		GroupScorer<ComparableAddress> groupScorer = scorerFactory
+				.create();
+
+		
+			GroupBasedRecipientRecommender<ComparableAddress> recommender = recommenderFactory
+					.createRecommender(groupScorer);
+			HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
+
+
+
+			String label = recommender.getTypeOfRecommender();
+			label += ","+groupScorer.getName();
+			label += ",N/A";
+			System.out.println(label);
+
+			Collection<MetricResult> results = modelRecommendations(
+					trainingMessages, testMessages, hierarchicalRecommender);
+			
+			resultCollection.addResults(label, account,
+					results);
+	}
+	
+	private static void runWithWoutAndHalfLife(
+			Integer account,
+			Collection<JavaMailNewsgroupPost> trainingMessages,
+			Collection<JavaMailNewsgroupPost> testMessages,
+			MetricResultCollection<Integer> resultCollection,
+			GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			GroupScorerFactory<ComparableAddress> scorerFactory)
+			throws IOException {
+
+		for (Double wOut : wOuts) {
+
+			for (Double halfLife : halfLives) {
+
+				GroupScorer<ComparableAddress> groupScorer = scorerFactory
+						.create(wOut, halfLife);
+
+				GroupBasedRecipientRecommender<ComparableAddress> recommender = recommenderFactory
+						.createRecommender(groupScorer);
+				HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
+						recommender);
+
+
+				String label = recommender.getTypeOfRecommender();
+				label += "," + groupScorer.getName();
+				label += "," + getHalfLifeName(halfLife);
+				System.out.println(label);
+
+				Collection<MetricResult> results = modelRecommendations(
+						trainingMessages, testMessages, hierarchicalRecommender);
+
+				resultCollection.addResults(label, account, results);
+			}
+		}
+	}
+	
+	private static Collection<MetricResult> modelRecommendations(
+			Collection<JavaMailNewsgroupPost> trainingMessages,
+			Collection<JavaMailNewsgroupPost> testMessages,
+			HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender) {
+		
+		Collection<RecipientMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
+		for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
+			metrics.add(metricFactory.create());
+		}
+
+		HierarchicalRecipientRecommendationAcceptanceModeler<ComparableAddress, JavaMailNewsgroupPost> modeler = new NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<>(
+				listSize, hierarchicalRecommender, trainingMessages,
+				testMessages, metrics);
+		Collection<MetricResult> results = modeler
+				.modelRecommendationAcceptance();
+		return results;
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -164,40 +241,19 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 						.getTrainMessages(account, percentTraining);
 				Collection<JavaMailNewsgroupPost> testMessages = dataset
 						.getTestMessages(account, percentTraining);
-				
-				for (GroupScorerFactory<ComparableAddress> scorerFactory : groupScorerFactories) {
-					
-					for (Double wOut : wOuts) {
-						
-						for (Double halfLife : halfLives) {
-							
-							GroupScorer<ComparableAddress> groupScorer = scorerFactory
-									.create(wOut, halfLife);
 
-							for (GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory : recommenderFactories) {
-								GroupBasedRecipientRecommender<ComparableAddress> recommender = recommenderFactory
-										.createRecommender(groupScorer);
-								HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
+				for (GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory : recommenderFactories) {
+					for (GroupScorerFactory<ComparableAddress> scorerFactory : groupScorerFactories) {
 
-								Collection<RecipientMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
-								for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
-									metrics.add(metricFactory.create());
-								}
-
-								HierarchicalRecipientRecommendationAcceptanceModeler<ComparableAddress, JavaMailNewsgroupPost> modeler = new HierarchicalRecipientRecommendationAcceptanceModeler<>(
-										listSize, hierarchicalRecommender, trainingMessages,
-										testMessages, metrics);
-								Collection<MetricResult> results = modeler
-										.modelRecommendationAcceptance();
-
-								String label = recommender.getTypeOfRecommender();
-								label += ","+groupScorer.getName();
-								label += ","+wOut;
-								label += ","+getHalfLifeName(halfLife);
-								
-								resultCollection.addResults(label, account,
-										results);
-							}
+						if (scorerFactory.takesWOutAndHalfLife()) {
+							runWithWoutAndHalfLife(account, trainingMessages,
+									testMessages, resultCollection,
+									recommenderFactory, scorerFactory);
+						} else {
+							runWithoutWoutAndHalfLife(account,
+									trainingMessages, testMessages,
+									resultCollection, recommenderFactory,
+									scorerFactory);
 						}
 					}
 				}

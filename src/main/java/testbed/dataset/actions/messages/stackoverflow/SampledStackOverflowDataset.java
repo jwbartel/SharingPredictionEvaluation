@@ -55,7 +55,7 @@ public class SampledStackOverflowDataset extends
 				}
 			}
 			
-			String threadIdStr = content.substring(content.indexOf("Thread ID:" + 10));
+			String threadIdStr = content.substring(content.indexOf("Thread ID:") + 10);
 			threadIdStr = threadIdStr.substring(0, threadIdStr.indexOf('\n'));
 			long threadId = Long.parseLong(threadIdStr);
 			
@@ -72,13 +72,15 @@ public class SampledStackOverflowDataset extends
 				throw new RuntimeException("Unknown type: "+type);
 			}
 			
-			String tagStr = content.substring(content.indexOf("Tags:"));
+			String tagStr = content.substring(content.indexOf("Tags:")+5);
 			tagStr = tagStr.substring(0, tagStr.indexOf('\n'));
 			Collection<String> tags = new TreeSet<>();
 			if(tagStr.length() > 2) {
 				tagStr = tagStr.substring(1,tagStr.length()-1);
 				String[] splitTagStr = tagStr.split(",");
-				tags.addAll(Arrays.asList(splitTagStr));
+				for(String tag : splitTagStr) {
+					tags.add(tag.trim());
+				}
 			}
 
 			StackOverflowMessage<String> message = new StackOverflowMessage<String>(

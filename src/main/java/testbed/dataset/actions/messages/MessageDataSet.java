@@ -49,9 +49,15 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 			return null;
 		}
 
-		int numTrain = (int) (allMessages.size() * percentTrain);
+		return getTrainMessages(allMessages, percentTrain);
+	}
+	
+	protected Collection<MessageType> getTrainMessages(
+			Collection<MessageType> messages, double percentTrain) {
+
+		int numTrain = (int) (messages.size() * percentTrain);
 		Collection<MessageType> trainingMessages = new ArrayList<>();
-		for (MessageType message : allMessages) {
+		for (MessageType message : messages) {
 			if (trainingMessages.size() == numTrain) {
 				break;
 			}
@@ -68,10 +74,16 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 			return null;
 		}
 
-		int numTrain = (int) (allMessages.size() * percentTrain);
+		return getTestMessages(allMessages, percentTrain);
+	}
+	
+	protected Collection<MessageType> getTestMessages(
+			Collection<MessageType> messages, double percentTrain) {
+		
+		int numTrain = (int) (messages.size() * percentTrain);
 		Collection<MessageType> testMessages = new ArrayList<>();
 		int count = 0;
-		for (MessageType message : allMessages) {
+		for (MessageType message : messages) {
 			if (count < numTrain) {
 				count++;
 				continue;

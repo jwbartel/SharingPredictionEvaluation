@@ -43,6 +43,18 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 		return questions;
 	}
 	
+	public Collection<MessageType> getTrainQuestions(Long account, double percentTrain) {
+		
+		Collection<MessageType> questions = getQuestions(getAllMessages(account));
+		return getTrainMessages(questions, percentTrain);
+	}
+	
+	public Collection<MessageType> getTestQuestions(Long account, double percentTrain) {
+		
+		Collection<MessageType> questions = getQuestions(getAllMessages(account));
+		return getTestMessages(questions, percentTrain);
+	}
+	
 	public abstract ThreadType createThread();
 	
 	protected void addToThread(MessageType message) {

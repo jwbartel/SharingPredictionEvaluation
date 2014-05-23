@@ -30,7 +30,7 @@ public class RequestsForListsMetric<RecipientType, MessageType extends SingleMes
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		for (RecipientAddressingEvent event : events) {
 			if (event == RecipientAddressingEvent.EmptyListGenerated) {

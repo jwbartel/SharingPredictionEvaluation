@@ -19,7 +19,6 @@ public class NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientTy
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
 		super(listSize, recommender, trainingMessages, testMessages, metrics);
-		seedSize = 1;
 	}
 	
 	@Override
@@ -33,7 +32,7 @@ public class NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientTy
 			Collection<RecipientAddressingEvent> events = modelSelection(
 					testMessage, recommender, listSize);
 			for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
-				metric.addMessageResult(testMessage, events);
+				metric.addMessageResult(testMessage, events, seedSize);
 			}
 			recommender.addPastAction(testMessage);
 		}

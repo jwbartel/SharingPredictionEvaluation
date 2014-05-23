@@ -35,9 +35,11 @@ public class RelativeScansMetric<RecipientType, MessageType extends SingleMessag
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
-		
-		if(events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
+
+		Set<RecipientType> collaborators = new TreeSet<>(message.getCollaborators());
+		if(events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)
+				|| collaborators.size() <= seedSize) {
 			return;
 		}
 
@@ -48,8 +50,7 @@ public class RelativeScansMetric<RecipientType, MessageType extends SingleMessag
 			}
 		}
 		
-		Set<RecipientType> collaborators = new TreeSet<>(message.getCollaborators());
-		stats.addValue((double)numScans / (collaborators.size()));
+		stats.addValue((double)numScans / (collaborators.size() - seedSize));
 	}
 
 	@Override

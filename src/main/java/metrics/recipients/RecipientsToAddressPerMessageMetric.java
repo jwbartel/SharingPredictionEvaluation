@@ -11,7 +11,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import data.representation.actionbased.messages.SingleMessage;
 
-public class RecipientsPerMessageMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
+public class RecipientsToAddressPerMessageMetric<RecipientType, MessageType extends SingleMessage<RecipientType>>
 		implements RecipientMetric<RecipientType, MessageType> {
 
 	private DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -23,22 +23,24 @@ public class RecipientsPerMessageMetric<RecipientType, MessageType extends Singl
 
 			@Override
 			public RecipientMetric<RecipientType, MessageType> create() {
-				return new RecipientsPerMessageMetric<>();
+				return new RecipientsToAddressPerMessageMetric<>();
 			}
 		};
 	}
 
 	@Override
 	public String getHeader() {
-		return "avg-recipients per message,stdev-recipients per message";
+		return "avg-recipients to address per message,stdev-recipients to address per message";
 	}
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 		
 		Set<RecipientType> collaborators = new TreeSet<>(message.getCollaborators());
-		stats.addValue(collaborators.size());
+		if (collaborators.size() > seedSize) {
+			stats.addValue(collaborators.size() - seedSize);
+		}
 	}
 
 	@Override

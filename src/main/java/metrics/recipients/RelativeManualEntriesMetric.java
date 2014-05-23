@@ -35,7 +35,13 @@ public class RelativeManualEntriesMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
+		
+		Set<RecipientType> collaborators = new TreeSet<>(
+				message.getCollaborators());
+		if (collaborators.size() <= seedSize) {
+			return;
+		}
 
 		int numManualEntries = 0;
 		int numSelectedThroughRecommendations = 0;
@@ -53,11 +59,8 @@ public class RelativeManualEntriesMetric<RecipientType, MessageType extends Sing
 		}
 		
 
-		Set<RecipientType> collaborators = new TreeSet<>(
-				message.getCollaborators());
-
-		numManualEntries = collaborators.size() - numSelectedThroughRecommendations;
-		stats.addValue((double) numManualEntries / (collaborators.size()));
+		numManualEntries = collaborators.size() - numSelectedThroughRecommendations - seedSize;
+		stats.addValue((double) numManualEntries / (collaborators.size() - seedSize));
 	}
 
 	@Override

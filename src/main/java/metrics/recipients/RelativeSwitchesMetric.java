@@ -35,7 +35,7 @@ public class RelativeSwitchesMetric<RecipientType, MessageType extends SingleMes
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		int numSwitches = 0;
 		for (RecipientAddressingEvent event : events) {
@@ -46,8 +46,8 @@ public class RelativeSwitchesMetric<RecipientType, MessageType extends SingleMes
 
 		Set<RecipientType> collaborators = new TreeSet<>(
 				message.getCollaborators());
-		if (collaborators.size() > 2) {
-			stats.addValue((double) numSwitches / collaborators.size());
+		if (collaborators.size() > seedSize) {
+			stats.addValue((double) numSwitches / (collaborators.size() - seedSize));
 		}
 	}
 

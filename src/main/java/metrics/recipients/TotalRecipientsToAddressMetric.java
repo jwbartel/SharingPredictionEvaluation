@@ -32,11 +32,11 @@ public class TotalRecipientsToAddressMetric<RecipientType, MessageType extends S
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		Set<RecipientType> recipients = new HashSet<>(message.getCollaborators());
 		if (recipients.size() > 2) {
-			totalRecipients += recipients.size() - 2;
+			totalRecipients += recipients.size() - seedSize;
 		}
 	}
 

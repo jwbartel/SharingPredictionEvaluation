@@ -42,7 +42,7 @@ public class SingleRecipientRecommendationAcceptanceModeler<RecipientType extend
 				Collection<RecipientAddressingEvent> events = modelSelection(
 						testMessage, recommender, listSize);
 				for (RecipientMetric<RecipientType, MessageType> metric : metrics) {
-					metric.addMessageResult(testMessage, events);
+					metric.addMessageResult(testMessage, events, seedSize);
 				}
 			}
 			recommender.addPastAction(testMessage);

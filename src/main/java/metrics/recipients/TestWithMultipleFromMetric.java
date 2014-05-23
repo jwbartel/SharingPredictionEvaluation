@@ -28,7 +28,7 @@ public class TestWithMultipleFromMetric<RecipientType, MessageType extends Singl
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 		// Do nothing
 	}
 

@@ -28,7 +28,7 @@ public class TrainWithMultipleFromMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 		// Do nothing
 	}
 

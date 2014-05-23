@@ -13,7 +13,7 @@ import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
-import metrics.recipients.RecipientsPerMessageMetric;
+import metrics.recipients.RecipientsToAddressPerMessageMetric;
 import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.RelativeClicksMetric;
 import metrics.recipients.RelativeManualEntriesMetric;
@@ -105,7 +105,7 @@ public class StackOverflowRecipientRecommendationTestBed {
 				StackOverflowMessage.class));
 		metricFactories.add(TotalRecipientsToAddressMetric.factory(
 				String.class, StackOverflowMessage.class));
-		metricFactories.add(RecipientsPerMessageMetric.factory(String.class,
+		metricFactories.add(RecipientsToAddressPerMessageMetric.factory(String.class,
 				StackOverflowMessage.class));
 		metricFactories.add(RequestsForListsMetric.factory(String.class,
 				StackOverflowMessage.class));

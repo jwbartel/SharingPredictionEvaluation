@@ -14,7 +14,7 @@ import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
 import metrics.recipients.RecipientMetricFactory;
-import metrics.recipients.RecipientsPerMessageMetric;
+import metrics.recipients.RecipientsToAddressPerMessageMetric;
 import metrics.recipients.RecommendableMessagesMetric;
 import metrics.recipients.RelativeClicksMetric;
 import metrics.recipients.RelativeManualEntriesMetric;
@@ -97,7 +97,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 		metricFactories.add(TotalTrainMessagesMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TotalTestMessagesMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RecommendableMessagesMetric.factory(String.class, EmailMessage.class));
-		metricFactories.add(RecipientsPerMessageMetric.factory(String.class, EmailMessage.class));
+		metricFactories.add(RecipientsToAddressPerMessageMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TotalRecipientsToAddressMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RequestsForListsMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(PrecisionMetric.factory(String.class, EmailMessage.class));

@@ -31,7 +31,7 @@ public class PrecisionMetric<RecipientType, MessageType extends SingleMessage<Re
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		for (RecipientAddressingEvent event : events) {
 			if (event == RecipientAddressingEvent.ListWithNoCorrectEntriesGenerated

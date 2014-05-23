@@ -31,7 +31,7 @@ public class RecallMetric<RecipientType, MessageType extends SingleMessage<Recip
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		for (RecipientAddressingEvent event : events) {
 			if (event == RecipientAddressingEvent.EmptyListGenerated) {

@@ -12,7 +12,7 @@ public interface RecipientMetric<RecipientType, MessageType extends SingleMessag
 	String getHeader();
 
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events);
+			Collection<RecipientAddressingEvent> events, int seedSize);
 
 	public MetricResult evaluate(Collection<MessageType> trainMessages,
 			Collection<MessageType> testMessages);

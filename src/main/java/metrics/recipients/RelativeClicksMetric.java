@@ -35,9 +35,12 @@ public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessa
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
-		if (events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)) {
+		Set<RecipientType> collaborators = new TreeSet<>(
+				message.getCollaborators());
+		if (events.contains(RecipientAddressingEvent.SeedTooSmallForListGeneration)
+				|| collaborators.size() <= seedSize) {
 			return;
 		}
 		
@@ -49,9 +52,7 @@ public class RelativeClicksMetric<RecipientType, MessageType extends SingleMessa
 			}
 		}
 
-		Set<RecipientType> collaborators = new TreeSet<>(
-				message.getCollaborators());
-		stats.addValue((double) numClicks / (collaborators.size()));
+		stats.addValue((double) numClicks / (collaborators.size() - seedSize));
 	}
 
 	@Override

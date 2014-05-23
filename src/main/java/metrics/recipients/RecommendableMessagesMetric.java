@@ -31,7 +31,7 @@ public class RecommendableMessagesMetric<RecipientType, MessageType extends Sing
 
 	@Override
 	public void addMessageResult(SingleMessage<RecipientType> message,
-			Collection<RecipientAddressingEvent> events) {
+			Collection<RecipientAddressingEvent> events, int seedSize) {
 
 		numMessages++;
 		if (events

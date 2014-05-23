@@ -69,26 +69,26 @@ public class NewsgroupRecipientRecommendationTestBed {
 				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<ComparableAddress>());
 
 		// Add GroupScorerFactories
-//		groupScorerFactories.add(IntersectionGroupCount.factory(ComparableAddress.class));
-//		groupScorerFactories.add(IntersectionGroupScore.factory(ComparableAddress.class));
+		groupScorerFactories.add(IntersectionGroupCount.factory(ComparableAddress.class));
+		groupScorerFactories.add(IntersectionGroupScore.factory(ComparableAddress.class));
 		groupScorerFactories.add(IntersectionWeightedScore.factory(ComparableAddress.class));
-//		groupScorerFactories.add(SubsetGroupCount.factory(ComparableAddress.class));
-//		groupScorerFactories.add(SubsetGroupScore.factory(ComparableAddress.class));
-//		groupScorerFactories.add(SubsetWeightedScore.factory(ComparableAddress.class));
-//		groupScorerFactories.add(TopContactScore.factory(ComparableAddress.class));
+		groupScorerFactories.add(SubsetGroupCount.factory(ComparableAddress.class));
+		groupScorerFactories.add(SubsetGroupScore.factory(ComparableAddress.class));
+		groupScorerFactories.add(SubsetWeightedScore.factory(ComparableAddress.class));
+		groupScorerFactories.add(TopContactScore.factory(ComparableAddress.class));
 
 		// Add w_outs
 		wOuts.add(1.0);
 
 		// Add half lives
-//		halfLives.add(1000.0 * 60); // 1 minute
-//		halfLives.add(1000.0 * 60 * 60); // 1 hour
-//		halfLives.add(1000.0 * 60 * 60 * 24); // 1 day
-//		halfLives.add(1000.0 * 60 * 60 * 24 * 7); // 1 week
+		halfLives.add(1000.0 * 60); // 1 minute
+		halfLives.add(1000.0 * 60 * 60); // 1 hour
+		halfLives.add(1000.0 * 60 * 60 * 24); // 1 day
+		halfLives.add(1000.0 * 60 * 60 * 24 * 7); // 1 week
 		halfLives.add(1000.0 * 60 * 60 * 24 * 7 * 4); // 4 weeks
-//		halfLives.add(1000.0 * 60 * 60 * 24 * 365 / 2); // 6 months
-//		halfLives.add(1000.0 * 60 * 60 * 24 * 365); // 1 year
-//		halfLives.add(1000.0 * 60 * 60 * 24 * 365 * 2); // 2 years
+		halfLives.add(1000.0 * 60 * 60 * 24 * 365 / 2); // 6 months
+		halfLives.add(1000.0 * 60 * 60 * 24 * 365); // 1 year
+		halfLives.add(1000.0 * 60 * 60 * 24 * 365 * 2); // 2 years
 
 		// Add metric factories
 		metricFactories.add(TotalTrainMessagesMetric.factory(

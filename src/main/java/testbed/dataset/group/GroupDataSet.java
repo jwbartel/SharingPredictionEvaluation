@@ -12,9 +12,9 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.BronKerboschCliqueFinder;
 import org.jgrapht.graph.DefaultEdge;
 
-import bus.tools.io.CollectionIOAssist;
-import bus.tools.io.IntegerValueParser;
 import testbed.dataset.DataSet;
+import util.tools.io.CollectionIOAssist;
+import util.tools.io.IntegerValueParser;
 
 public abstract class GroupDataSet<V> extends DataSet<V> {
 	public GroupDataSet(String name, V[] accountIds, File rootFolder, Class<V> genericClass) {

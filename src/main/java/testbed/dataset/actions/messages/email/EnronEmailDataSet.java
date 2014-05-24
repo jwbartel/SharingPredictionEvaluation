@@ -10,7 +10,7 @@ import java.util.Date;
 
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
-import bus.data.structures.AddressLists;
+import data.structures.AddressLists;
 
 public class EnronEmailDataSet extends
 		EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> {

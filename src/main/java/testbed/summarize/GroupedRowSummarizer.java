@@ -12,7 +12,7 @@ import java.util.TreeMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-public class GroupedRowSummarizer {
+public class GroupedRowSummarizer implements Summarizer {
 
 	private final File resultsFile;
 	private final String ungroupedPrefixColumn;
@@ -49,10 +49,10 @@ public class GroupedRowSummarizer {
 		return prefix;
 	}
 
-	private Map<String, Collection<String[]>> groupRows(int ignoredColumn,
+	protected Map<String, Collection<String[]>> groupRows(int ignoredColumn,
 			int lastPrefixColumnPos, List<String> lines) {
 
-		Map<String, Collection<String[]>> retVal = new HashMap<>();
+		Map<String, Collection<String[]>> retVal = new TreeMap<>();
 
 		for (int i = 1; i < lines.size(); i++) {
 			String line = lines.get(i);
@@ -172,6 +172,7 @@ public class GroupedRowSummarizer {
 		}
 	}
 
+	@Override
 	public void summarize(File outputFile) throws IOException {
 		List<String> lines = FileUtils.readLines(resultsFile);
 
@@ -187,5 +188,18 @@ public class GroupedRowSummarizer {
 				ignoredColumn, cleanedHeaders, groupedRows);
 
 		printStats(outputFile, header.split(","), cleanedHeaders, rowsStats);
+	}
+
+	public static void main(String[] args) throws IOException {
+		File inputFile = new File(
+				"/home/bartizzi/Workspaces/SharingPredictionEvaluation/data/"
+						+ "Enron/metric statistics/recipient recommendation results.csv");
+		File outputFile = new File(
+				"/home/bartizzi/Workspaces/SharingPredictionEvaluation/data/"
+						+ "Enron/metric statistics/summarized - recipient recommendation results.csv");
+
+		GroupedRowSummarizer summarizer = new GroupedRowSummarizer(inputFile,
+				"account", "account");
+		summarizer.summarize(outputFile);
 	}
 }

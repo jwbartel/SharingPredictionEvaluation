@@ -12,41 +12,53 @@ import java.util.TreeMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-public class CrossAccountSummarizer {
+public class GroupedRowSummarizer {
 
 	private final File resultsFile;
+	private final String ungroupedPrefixColumn;
+	private final String lastPrefixColumn;
 
-	public CrossAccountSummarizer(File resultsFile) {
+	public GroupedRowSummarizer(File resultsFile, String ungroupedPrefixColumn,
+			String lastPrefixColumn) {
 		this.resultsFile = resultsFile;
+		this.ungroupedPrefixColumn = ungroupedPrefixColumn;
+		this.lastPrefixColumn = lastPrefixColumn;
 	}
 
-	private int columnOfAccount(String header) {
+	private int columnOfLabel(String header, String headerLabel) {
 		String[] columns = header.split(",");
 		for (int i = 0; i < columns.length; i++) {
-			if (columns[i].equals("account")) {
+			if (columns[i].equals(headerLabel)) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
-	private String getPrefix(String[] columns, int accountColumn) {
+	private String getPrefix(String[] columns, int ignoredColumn,
+			int lastPrefixColumnPos) {
 		String prefix = "";
 		for (int i = 0; i < columns.length; i++) {
-			prefix += columns[i];
+			if (i != ignoredColumn) {
+				prefix += columns[i] + ",";
+			}
+			if (i == lastPrefixColumnPos) {
+				break;
+			}
 		}
 		return prefix;
 	}
 
-	private Map<String, Collection<String[]>> groupRows(int accountColumn,
-			List<String> lines) {
+	private Map<String, Collection<String[]>> groupRows(int ignoredColumn,
+			int lastPrefixColumnPos, List<String> lines) {
 
 		Map<String, Collection<String[]>> retVal = new HashMap<>();
 
 		for (int i = 1; i < lines.size(); i++) {
 			String line = lines.get(i);
 			String[] lineColumns = line.split(",");
-			String prefix = getPrefix(lineColumns, accountColumn);
+			String prefix = getPrefix(lineColumns, ignoredColumn,
+					lastPrefixColumnPos);
 
 			Collection<String[]> prefixRows = retVal.get(prefix);
 			if (prefixRows == null) {
@@ -60,10 +72,10 @@ public class CrossAccountSummarizer {
 	}
 
 	private ArrayList<String> getCleanedHeader(String[] header,
-			int accountColumn) {
+			int ignoredColumn) {
 		ArrayList<String> cleanedHeader = new ArrayList<>();
 
-		for (int i = accountColumn + 1; i < header.length; i++) {
+		for (int i = ignoredColumn + 1; i < header.length; i++) {
 			String headerLabel = header[i];
 			if (headerLabel.startsWith("stdev-")) {
 				headerLabel = null;
@@ -78,7 +90,7 @@ public class CrossAccountSummarizer {
 	}
 
 	private Map<String, Map<Integer, DescriptiveStatistics>> calculateStats(
-			int accountColumn, ArrayList<String> cleanedHeaders,
+			int ignoredColumn, ArrayList<String> cleanedHeaders,
 			Map<String, Collection<String[]>> groupedRows) {
 
 		Map<String, Map<Integer, DescriptiveStatistics>> retVal = new TreeMap<>();
@@ -93,7 +105,10 @@ public class CrossAccountSummarizer {
 
 				DescriptiveStatistics stats = new DescriptiveStatistics();
 				for (String[] row : groupedRows.get(rowPrefix)) {
-					stats.addValue(Double.parseDouble(row[i]));
+					String dataPoint = row[i + ignoredColumn + 1];
+					if (!dataPoint.equalsIgnoreCase("nan")) {
+						stats.addValue(Double.parseDouble(dataPoint));
+					}
 				}
 				columnStats.put(i, stats);
 			}
@@ -101,17 +116,37 @@ public class CrossAccountSummarizer {
 		return retVal;
 	}
 
-	private void printStats(File outputFile, ArrayList<String> cleanedHeaders,
+	private void printStats(File outputFile, String[] headers,
+			ArrayList<String> cleanedHeaders,
 			Map<String, Map<Integer, DescriptiveStatistics>> rowsStats)
 			throws IOException {
 
 		String header = "";
+		for (String headerPrefixLabel : headers) {
+			if (!headerPrefixLabel.equals(ungroupedPrefixColumn)) {
+				header += headerPrefixLabel + ",";
+			}
+			if (headerPrefixLabel.equals(lastPrefixColumn)) {
+				break;
+			}
+		}
+
 		for (String cleanedHeader : cleanedHeaders) {
 			if (cleanedHeader != null) {
 				header += cleanedHeader + ",,,";
 			}
 		}
+
 		header += "\n";
+
+		for (String headerPrefixLabel : headers) {
+			if (!headerPrefixLabel.equals(ungroupedPrefixColumn)) {
+				header += ",";
+			}
+			if (headerPrefixLabel.equals(lastPrefixColumn)) {
+				break;
+			}
+		}
 		for (String cleanedHeader : cleanedHeaders) {
 			if (cleanedHeader != null) {
 				header += "n,mean,stdev,";
@@ -126,8 +161,10 @@ public class CrossAccountSummarizer {
 					DescriptiveStatistics colStats = rowsStats.get(rowPrefix)
 							.get(col);
 					if (colStats != null) {
-						row += "," + colStats.getN() + "," + colStats.getMean()
-								+ "," + colStats.getStandardDeviation();
+						row += colStats.getN() + "," + colStats.getMean() + ","
+								+ colStats.getStandardDeviation() + ",";
+					} else {
+						row += ",,,";
 					}
 				}
 			}
@@ -139,15 +176,16 @@ public class CrossAccountSummarizer {
 		List<String> lines = FileUtils.readLines(resultsFile);
 
 		String header = lines.get(0);
-		int accountColumn = columnOfAccount(header);
+		int ignoredColumn = columnOfLabel(header, ungroupedPrefixColumn);
+		int lastPrefixColumnPos = columnOfLabel(header, lastPrefixColumn);
 		Map<String, Collection<String[]>> groupedRows = groupRows(
-				accountColumn, lines);
+				ignoredColumn, lastPrefixColumnPos, lines);
 
 		ArrayList<String> cleanedHeaders = getCleanedHeader(header.split(","),
-				accountColumn);
+				ignoredColumn);
 		Map<String, Map<Integer, DescriptiveStatistics>> rowsStats = calculateStats(
-				accountColumn, cleanedHeaders, groupedRows);
-		
-		printStats(outputFile, cleanedHeaders, rowsStats);
+				ignoredColumn, cleanedHeaders, groupedRows);
+
+		printStats(outputFile, header.split(","), cleanedHeaders, rowsStats);
 	}
 }

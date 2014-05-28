@@ -143,7 +143,7 @@ public class ActionBasedSeedlessGroupRecommendationTestBed {
 
 		Collection<Set<String>> recommendations = recommender
 				.getRecommendations();
-		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>(
+		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>>(
 				recommendations, new ArrayList<Set<String>>(),
 				testMessages, metrics);
 

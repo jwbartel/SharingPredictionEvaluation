@@ -15,8 +15,9 @@ public class RecommendationsCreatedPerBurstMetric<Collaborator, Action extends C
 		implements BurstyGroupMetric<Collaborator, Action> {
 
 	DescriptiveStatistics stats = new DescriptiveStatistics();
-	
-	public static <Collaborator, Action extends CollaborativeAction<Collaborator>> BurstyGroupMetricFactory<Collaborator, Action> factory() {
+
+	public static <Collaborator, Action extends CollaborativeAction<Collaborator>> BurstyGroupMetricFactory<Collaborator, Action> factory(
+			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {
 		return new BurstyGroupMetricFactory<Collaborator, Action>() {
 
 			@Override
@@ -25,7 +26,7 @@ public class RecommendationsCreatedPerBurstMetric<Collaborator, Action extends C
 			}
 		};
 	}
-	
+
 	@Override
 	public MetricResult evaluate(Collection<Set<Collaborator>> recommendations,
 			Collection<Set<Collaborator>> ideals,

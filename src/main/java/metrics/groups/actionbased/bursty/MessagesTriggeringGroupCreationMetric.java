@@ -13,8 +13,9 @@ public class MessagesTriggeringGroupCreationMetric<Collaborator, Action extends 
 
 	int totalMessages = 0;
 	int totalMessagesWithRecommendations;
-	
-	public static <Collaborator, Action extends CollaborativeAction<Collaborator>> BurstyGroupMetricFactory<Collaborator, Action> factory() {
+
+	public static <Collaborator, Action extends CollaborativeAction<Collaborator>> BurstyGroupMetricFactory<Collaborator, Action> factory(
+			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {
 		return new BurstyGroupMetricFactory<Collaborator, Action>() {
 
 			@Override
@@ -23,7 +24,7 @@ public class MessagesTriggeringGroupCreationMetric<Collaborator, Action extends 
 			}
 		};
 	}
-	
+
 	@Override
 	public MetricResult evaluate(Collection<Set<Collaborator>> recommendations,
 			Collection<Set<Collaborator>> ideals,

@@ -37,6 +37,18 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 			System.exit(0);
 		}
 	}
+	
+	public Newsgroups20Dataset(String name, File rootFolder, boolean loadPostsAndThreads) {
+		super(name, new Integer[1], rootFolder, Integer.class);
+		if (loadPostsAndThreads) {
+			try {
+				loadPostsAndThreads();
+			} catch (MessagingException | IOException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		}
+	}
 
 	private File getPostsFolder() {
 		return new File(getRootFolder(), "posts");

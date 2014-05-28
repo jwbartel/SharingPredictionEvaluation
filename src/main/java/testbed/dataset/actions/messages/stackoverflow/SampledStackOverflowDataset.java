@@ -27,6 +27,14 @@ public class SampledStackOverflowDataset extends
 		loadMessages();
 	}
 	
+	public SampledStackOverflowDataset(String name, File rootFolder, boolean loadMessages)
+			throws IOException, ParseException {
+		super(name, new Long[1], rootFolder);
+		if (loadMessages) {
+			loadMessages();
+		}
+	}
+	
 	public File getInteractionsFolder() {
 		return new File(getRootFolder(), "interactions");
 	}

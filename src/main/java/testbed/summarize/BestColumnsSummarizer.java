@@ -13,15 +13,17 @@ import java.util.TreeSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import testbed.summarize.SortableColumn.Order;
+
 public class BestColumnsSummarizer extends GroupedRowSummarizer {
 
 	private final File resultsFile;
 	private final String lastPrefixColumn;
-	private final Collection<String> columnsToRankBy;
+	private final Collection<SortableColumn> columnsToRankBy;
 	private final int offset;
 
 	public BestColumnsSummarizer(File resultsFile, String lastPrefixColumn,
-			Collection<String> columnsToRankBy) {
+			Collection<SortableColumn> columnsToRankBy) {
 		super(resultsFile, null, lastPrefixColumn);
 		this.resultsFile = resultsFile;
 		this.lastPrefixColumn = lastPrefixColumn;
@@ -30,7 +32,7 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 	}
 
 	public BestColumnsSummarizer(File resultsFile, String lastPrefixColumn,
-			Collection<String> columnsToRankBy, int offset) {
+			Collection<SortableColumn> columnsToRankBy, int offset) {
 		super(resultsFile, null, lastPrefixColumn);
 		this.resultsFile = resultsFile;
 		this.lastPrefixColumn = lastPrefixColumn;
@@ -52,19 +54,23 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 		return Double.parseDouble(row.split(",")[rankIndex]);
 	}
 
-	private void sortRows(final String column, final String header,
+	private void sortRows(final SortableColumn column, final String header,
 			ArrayList<String> rows) {
 		final ArrayList<String> originalOrder = new ArrayList<>(rows);
 		Collections.sort(rows, new Comparator<String>() {
 
-			private int compare(String columnName, String[] row1, String[] row2)
+			private int compare(SortableColumn column, String[] row1, String[] row2)
 					throws NumberFormatException {
-				int colIndex = indexOfLabel(header, columnName);
+				int colIndex = indexOfLabel(header, column.getLabel());
 				if (colIndex >= 0) {
 					colIndex += offset;
 					Double row1Val = Double.parseDouble(row1[colIndex]);
 					Double row2Val = Double.parseDouble(row2[colIndex]);
-					return -1*row1Val.compareTo(row2Val);
+					int retVal = row1Val.compareTo(row2Val);
+					if (column.getOrder() == Order.Descending) {
+						retVal *= -1;
+					}
+					return retVal;
 				}
 				return 0;
 			}
@@ -77,7 +83,7 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 				int compareVal = 0;
 				try {
 					compareVal = compare(column, splitRow1, splitRow2);
-					for (String secondarySort : columnsToRankBy) {
+					for (SortableColumn secondarySort : columnsToRankBy) {
 						if (compareVal != 0) {
 							return compareVal;
 						}
@@ -104,8 +110,8 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 		outputLines.add("ranking," + header);
 
 		int testIndex = -1;
-		for (String columnToRankBy : columnsToRankBy) {
-			testIndex = indexOfLabel(header, columnToRankBy);
+		for (SortableColumn columnToRankBy : columnsToRankBy) {
+			testIndex = indexOfLabel(header, columnToRankBy.getLabel());
 			if (testIndex != -1) {
 				break;
 			}
@@ -138,8 +144,8 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 	public void addBestValues(String header, Collection<String[]> rows,
 			ArrayList<String> outputLines) {
 
-		for (String columnToRankBy : columnsToRankBy) {
-			int index = indexOfLabel(header, columnToRankBy);
+		for (SortableColumn columnToRankBy : columnsToRankBy) {
+			int index = indexOfLabel(header, columnToRankBy.getLabel());
 			if (index == -1) {
 				continue;
 			}
@@ -172,22 +178,5 @@ public class BestColumnsSummarizer extends GroupedRowSummarizer {
 			output += outputLine + "\n";
 		}
 		FileUtils.write(outputFile, output);
-	}
-
-	public static void main(String[] args) throws IOException {
-		File inputFile = new File(
-				"/home/bartizzi/Workspaces/SharingPredictionEvaluation/data/"
-						+ "20 Newsgroups/metric statistics/recipient recommendation results.csv");
-		File outputFile = new File(
-				"/home/bartizzi/Workspaces/SharingPredictionEvaluation/data/"
-						+ "20 Newsgroups/metric statistics/best - recipient recommendation results.csv");
-
-		Collection<String> sortedColumns = new ArrayList<String>();
-		sortedColumns.add("precision");
-		sortedColumns.add("recall");
-		
-		BestColumnsSummarizer summarizer = new BestColumnsSummarizer(inputFile,
-				"group scorer", sortedColumns);
-		summarizer.summarize(outputFile);
 	}
 }

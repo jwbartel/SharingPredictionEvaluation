@@ -47,6 +47,7 @@ import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.group.GroupDataSet;
+import testbed.dataset.group.MixedInitiativeDataSet;
 import testbed.dataset.group.SnapGroupDataSet;
 
 public class GroupEvolutionRecommendationTestBed {
@@ -65,6 +66,9 @@ public class GroupEvolutionRecommendationTestBed {
 		//Add data sets
 		Integer[] snapAccounts = {0, 348, 414, 686, 698, 1684, 3437, 3980};
 		dataSets.add(new SnapGroupDataSet("snap_facebook", snapAccounts, new File("data/Stanford_snap/facebook")));
+		Integer[] mixedInitiativeAccounts = MixedInitiativeDataSet.DEFAULT_ACCOUNT_SET;
+		dataSets.add(new MixedInitiativeDataSet("mixed_initiative",
+				mixedInitiativeAccounts, new File("data/kelli")));
 		
 		//Add similarity metrics
 		distanceMetrics.add(new GoodnessGroupDistance<Integer>());
@@ -130,7 +134,8 @@ public class GroupEvolutionRecommendationTestBed {
 		
 		for (GroupDataSet<Integer> dataset : dataSets) {
 			String headerPrefix = "evolution-type,distance measure,growth rate,test,account";
-			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(headerPrefix, new ArrayList<Metric>(metrics));
+			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(
+					headerPrefix, new ArrayList<Metric>(metrics),dataset.getEvolutionMetricsFile());
 			for (Integer accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Integer, DefaultEdge> graph = dataset.getGraph(accountId);
@@ -180,8 +185,6 @@ public class GroupEvolutionRecommendationTestBed {
 				}
 				
 			}
-			
-			FileUtils.write(dataset.getEvolutionMetricsFile(), resultCollection.toString());
 		}
 		
 	}

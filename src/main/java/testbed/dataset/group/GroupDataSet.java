@@ -54,6 +54,9 @@ public abstract class GroupDataSet<V> extends DataSet<V> {
 		try {
 			File newMembersFile = getNewMembersFile(account, growthRate, test);
 			if (!newMembersFile.exists()) {
+				if (!newMembersFile.getParentFile().exists()) {
+					newMembersFile.getParentFile().mkdirs();
+				}
 				MembershipChangeFinder<V> changeFinder = new MembershipChangeFinder<>();
 				Set<V> newMembers = changeFinder
 						.getPseudoRandomNewIndividuals(getGraph(account)

@@ -72,7 +72,9 @@ public class SeedlessGroupRecommendationTestBed {
 	public static void main(String[] args) throws IOException {
 		
 		for (GroupDataSet<Integer> dataset : dataSets) {
-			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>("type,account", new ArrayList<Metric>(metrics));
+			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(
+					"type,account", new ArrayList<Metric>(metrics),
+					dataset.getSeedlessMetricsFile());
 			for (Integer accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Integer, DefaultEdge> graph = dataset.getGraph(accountId);
@@ -98,8 +100,6 @@ public class SeedlessGroupRecommendationTestBed {
 				}
 				
 			}
-			
-			FileUtils.write(dataset.getSeedlessMetricsFile(), resultCollection.toString());
 		}
 		
 	}

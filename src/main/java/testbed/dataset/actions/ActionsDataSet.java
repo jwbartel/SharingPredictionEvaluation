@@ -24,5 +24,6 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 	public abstract Collection<ThreadType> getTestThreads(IdType account, double percentTest);
 	
 	public abstract File getActionBasedSeedlessGroupsMetricsFile();
+	public abstract File getBurstyGroupsMetricsFile();
 
 }

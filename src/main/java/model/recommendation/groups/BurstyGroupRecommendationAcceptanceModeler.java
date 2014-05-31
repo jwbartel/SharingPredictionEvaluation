@@ -3,12 +3,12 @@ package model.recommendation.groups;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import metrics.MetricResult;
-import metrics.groups.GroupMetric;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
 import metrics.groups.actionbased.bursty.BurstyGroupMetric;
 import recommendation.groups.seedless.actionbased.bursty.BurstyGroupRecommender;
@@ -41,6 +41,7 @@ public class BurstyGroupRecommendationAcceptanceModeler<Collaborator extends Com
 	@Override
 	public Collection<MetricResult> modelRecommendationAcceptance() {
 
+		Collection<Set<Collaborator>> allRecommendations = new HashSet<>();
 		Map<Set<Collaborator>, Set<Collaborator>> recommendationsToIdeals = new HashMap<>();
 		Map<Action, Set<Collaborator>> actionsToRecommendations = new HashMap<>();
 		Map<Set<Collaborator>, Action> recommendationsToAction = new HashMap<>();
@@ -49,11 +50,12 @@ public class BurstyGroupRecommendationAcceptanceModeler<Collaborator extends Com
 			recommender.addPastAction(trainingAction);
 		}
 
-		Collection<Action> futureActions = testActions;
+		Collection<Action> futureActions = new HashSet<>(testActions);
 		for (Action testAction : testActions) {
 			recommender.addPastAction(testAction);
 			Collection<Set<Collaborator>> recommendations = recommender
 					.getRecommendations();
+			allRecommendations.addAll(recommendations);
 			for (BurstyGroupMetric<Collaborator, Action> metric : metrics) {
 				metric.recordBurstyRecommendation(testAction, recommendations);
 			}
@@ -92,7 +94,7 @@ public class BurstyGroupRecommendationAcceptanceModeler<Collaborator extends Com
 
 		Collection<MetricResult> results = new ArrayList<MetricResult>();
 		for (BurstyGroupMetric<Collaborator, Action> metric : metrics) {
-			results.add(metric.evaluate(recommendations, idealGroups,
+			results.add(metric.evaluate(allRecommendations, idealGroups,
 					testActions, recommendationsToIdeals,
 					recommendationsToAction, actionsToRecommendations));
 		}

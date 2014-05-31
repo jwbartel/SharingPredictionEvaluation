@@ -100,12 +100,12 @@ public class EmailBurstyGroupCreationTestBed {
 		scoreThresholds.add(0.50);
 
 		// Add thresholds for seed and recommendation matchers
-		scoreThresholds.add(0.00);
-		scoreThresholds.add(0.05);
-		scoreThresholds.add(0.10);
-		scoreThresholds.add(0.15);
-		scoreThresholds.add(0.20);
-		scoreThresholds.add(0.25);
+		distanceThresholds.add(0.00);
+		distanceThresholds.add(0.05);
+		distanceThresholds.add(0.10);
+		distanceThresholds.add(0.15);
+		distanceThresholds.add(0.20);
+		distanceThresholds.add(0.25);
 
 		// Add metrics
 		metricFactories.add(MessagesTriggeringGroupCreationMetric.factory(String.class, EmailMessage.class));
@@ -187,8 +187,8 @@ public class EmailBurstyGroupCreationTestBed {
 
 		GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 				seedlessRecommenderFactory, graphBuilder);
-		for (Double seedThreshold : scoreThresholds) {
-			for (Double recommendationThreshold : scoreThresholds) {
+		for (Double seedThreshold : distanceThresholds) {
+			for (Double recommendationThreshold : distanceThresholds) {
 				Collection<MetricResult> results = collectResults(
 						trainMessages, testMessages, seedThreshold,
 						recommendationThreshold, recommender);
@@ -215,8 +215,8 @@ public class EmailBurstyGroupCreationTestBed {
 			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 					seedlessRecommenderFactory, graphBuilder);
 
-			for (Double seedThreshold : scoreThresholds) {
-				for (Double recommendationThreshold : scoreThresholds) {
+			for (Double seedThreshold : distanceThresholds) {
+				for (Double recommendationThreshold : distanceThresholds) {
 					Collection<MetricResult> results = collectResults(
 							trainMessages, testMessages, seedThreshold,
 							recommendationThreshold, recommender);
@@ -248,8 +248,8 @@ public class EmailBurstyGroupCreationTestBed {
 					GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 
-					for (Double seedThreshold : scoreThresholds) {
-						for (Double recommendationThreshold : scoreThresholds) {
+					for (Double seedThreshold : distanceThresholds) {
+						for (Double recommendationThreshold : distanceThresholds) {
 							Collection<MetricResult> results = collectResults(
 									trainMessages, testMessages, seedThreshold,
 									recommendationThreshold, recommender);
@@ -280,7 +280,7 @@ public class EmailBurstyGroupCreationTestBed {
 					+ ",seed threshold,recommendation threshold,account";
 			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
 					headerPrefix, tempMetrics,
-					dataset.getActionBasedSeedlessGroupsMetricsFile());
+					dataset.getBurstyGroupsMetricsFile());
 
 			for (String account : dataset.getAccountIds()) {
 				System.out.println(account);

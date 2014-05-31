@@ -6,7 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
@@ -15,7 +18,7 @@ import data.structures.AddressLists;
 public class EnronEmailDataSet extends
 		EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> {
 
-	public static final String[] DEFAULT_ACCOUNTS = { "allen-p", "arnold-j",
+	public static final String[] DEFAULT_ACCOUNTS = { "allen-p",/* "arnold-j",
 			"arora-h", "badeer-r", "bailey-s", "baughman-d", "beck-s",
 			"blair-l", "buy-r", "campbell-l", "carson-m", "cash-m",
 			"causholli-m", "corman-s", "cuilla-m", "davis-d", "dean-c",
@@ -40,11 +43,11 @@ public class EnronEmailDataSet extends
 			"storey-g", "sturm-f", "swerzbin-m", "symes-k", "tholt-j",
 			"townsend-j", "tycholiz-b", "ward-k", "watson-k", "white-s",
 			"whitt-m", "williams-w3", "wolfe-j", "ybarbo-p", "zipper-a",
-			"zufferli-j" };
+			"zufferli-j"*/ };
 
 	private final String messageListName;
 	private String currentAccountMessages = null;
-	private Collection<EmailMessage<String>> currentMessages;
+	private List<EmailMessage<String>> currentMessages;
 
 	public EnronEmailDataSet(String name, String[] accountIds, File rootFolder) {
 		super(name, accountIds, rootFolder, String.class);
@@ -128,6 +131,19 @@ public class EnronEmailDataSet extends
 			line = in.readLine();
 		}
 		in.close();
+		Collections.sort(currentMessages, new Comparator<EmailMessage<String>>() {
+			
+			@Override
+			public int compare(EmailMessage<String> m1, EmailMessage<String> m2) {
+				Date date1 = m1.getLastActiveDate();
+				Date date2 = m2.getLastActiveDate();
+				if (!date1.equals(date2)) {
+					return date1.compareTo(date2);
+				}
+				
+				return m1.toString().compareTo(date2.toString());
+			}
+		});
 		currentAccountMessages = account;
 	}
 

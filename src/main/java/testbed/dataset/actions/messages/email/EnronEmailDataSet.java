@@ -18,7 +18,7 @@ import data.structures.AddressLists;
 public class EnronEmailDataSet extends
 		EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> {
 
-	public static final String[] DEFAULT_ACCOUNTS = { "allen-p",/* "arnold-j",
+	public static final String[] DEFAULT_ACCOUNTS = { "allen-p", "arnold-j",
 			"arora-h", "badeer-r", "bailey-s", "baughman-d", "beck-s",
 			"blair-l", "buy-r", "campbell-l", "carson-m", "cash-m",
 			"causholli-m", "corman-s", "cuilla-m", "davis-d", "dean-c",
@@ -43,7 +43,7 @@ public class EnronEmailDataSet extends
 			"storey-g", "sturm-f", "swerzbin-m", "symes-k", "tholt-j",
 			"townsend-j", "tycholiz-b", "ward-k", "watson-k", "white-s",
 			"whitt-m", "williams-w3", "wolfe-j", "ybarbo-p", "zipper-a",
-			"zufferli-j"*/ };
+			"zufferli-j" };
 
 	private final String messageListName;
 	private String currentAccountMessages = null;

@@ -40,7 +40,7 @@ import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
 
 public class EmailBurstyGroupCreationTestBed {
-	static double percentTraining = 0.5;
+	static double percentTraining = 0.8;
 
 	static Collection<ActionsDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class EmailBurstyGroupCreationTestBed {
 				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
 
 		// Add seedless recommender factories
-		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
+		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>(false));
 		//seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
 
 		// Add graph builders
@@ -101,11 +101,12 @@ public class EmailBurstyGroupCreationTestBed {
 
 		// Add thresholds for seed and recommendation matchers
 		distanceThresholds.add(0.00);
-		distanceThresholds.add(0.05);
+//		distanceThresholds.add(0.05);
 		distanceThresholds.add(0.10);
-		distanceThresholds.add(0.15);
+//		distanceThresholds.add(0.15);
 		distanceThresholds.add(0.20);
-		distanceThresholds.add(0.25);
+//		distanceThresholds.add(0.25);
+		distanceThresholds.add(0.30);
 
 		// Add metrics
 		metricFactories.add(MessagesTriggeringGroupCreationMetric.factory(String.class, EmailMessage.class));
@@ -189,12 +190,14 @@ public class EmailBurstyGroupCreationTestBed {
 				seedlessRecommenderFactory, graphBuilder);
 		for (Double seedThreshold : distanceThresholds) {
 			for (Double recommendationThreshold : distanceThresholds) {
+				String label = graphBuilder.getName() + ",N/A,N/A,N/A";
+				label += "," + seedThreshold + "," + recommendationThreshold;
+				System.out.println("\t"+label);
+				
 				Collection<MetricResult> results = collectResults(
 						trainMessages, testMessages, seedThreshold,
 						recommendationThreshold, recommender);
 
-				String label = graphBuilder.getName() + ",N/A,N/A,N/A";
-				label += "," + seedThreshold + "," + recommendationThreshold;
 				resultCollection.addResults(label, account, results);
 			}
 		}
@@ -217,14 +220,16 @@ public class EmailBurstyGroupCreationTestBed {
 
 			for (Double seedThreshold : distanceThresholds) {
 				for (Double recommendationThreshold : distanceThresholds) {
-					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, seedThreshold,
-							recommendationThreshold, recommender);
-
 					String label = graphBuilder.getName() + ",N/A,N/A,"
 							+ getHalfLifeName(timeThreshold);
 					label += "," + seedThreshold + ","
 							+ recommendationThreshold;
+					System.out.println("\t"+label);
+					
+					Collection<MetricResult> results = collectResults(
+							trainMessages, testMessages, seedThreshold,
+							recommendationThreshold, recommender);
+
 					resultCollection.addResults(label, account, results);
 				}
 			}
@@ -250,15 +255,18 @@ public class EmailBurstyGroupCreationTestBed {
 
 					for (Double seedThreshold : distanceThresholds) {
 						for (Double recommendationThreshold : distanceThresholds) {
-							Collection<MetricResult> results = collectResults(
-									trainMessages, testMessages, seedThreshold,
-									recommendationThreshold, recommender);
 
 							String label = graphBuilder.getName() + ","
 									+ getHalfLifeName(halfLife) + "," + wOut
 									+ "," + scoreThreshold;
 							label += "," + seedThreshold + ","
 									+ recommendationThreshold;
+							System.out.println("\t"+label);
+							
+							Collection<MetricResult> results = collectResults(
+									trainMessages, testMessages, seedThreshold,
+									recommendationThreshold, recommender);
+
 							resultCollection
 									.addResults(label, account, results);
 						}

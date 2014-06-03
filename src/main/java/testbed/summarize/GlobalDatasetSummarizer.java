@@ -8,6 +8,7 @@ import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.group.MixedInitiativeDataSet;
+import testbed.dataset.group.SnapGroupDataSet;
 
 public class GlobalDatasetSummarizer {
 
@@ -33,6 +34,11 @@ public class GlobalDatasetSummarizer {
 		MixedInitiativeDataSet mixedInitiativeDataset = new MixedInitiativeDataSet(
 				"mixed_initiative", MixedInitiativeDataSet.DEFAULT_ACCOUNT_SET, new File("data/kelli"));
 		GroupDatasetSummarizer.create(mixedInitiativeDataset).summarize();
+		
+		//Stanford SNAP Facebook study
+		SnapGroupDataSet snapDataset = new SnapGroupDataSet("snap_facebook",
+				SnapGroupDataSet.DEFAULT_ACCOUNT_SET, new File("data/Stanford_snap/facebook"));
+		GroupDatasetSummarizer.create(snapDataset).summarize();
 
 	}
 

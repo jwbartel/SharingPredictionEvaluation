@@ -8,13 +8,17 @@ import java.util.Collection;
 import testbed.dataset.group.GroupDataSet;
 import testbed.summarize.SortableColumn.Order;
 
-public class GroupDatasetSummarizer<AccountType> extends
-		DatasetSummarizer<AccountType> {
-	
+public class GroupDatasetSummarizer<AccountType> extends DatasetSummarizer<AccountType> {
+
 	GroupDataSet<AccountType> dataset;
-	
+
 	private GroupDatasetSummarizer(GroupDataSet<AccountType> dataset) {
 		this.dataset = dataset;
+	}
+
+	public static <AccountType> GroupDatasetSummarizer<AccountType> create(
+			GroupDataSet<AccountType> dataset) {
+		return new GroupDatasetSummarizer<>(dataset);
 	}
 
 	@Override

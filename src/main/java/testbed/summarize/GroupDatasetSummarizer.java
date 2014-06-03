@@ -26,7 +26,9 @@ public class GroupDatasetSummarizer<AccountType> extends DatasetSummarizer<Accou
 		if (dataset.getSeedlessMetricsFile().exists()) {
 			summarizeMetricResults(dataset.getSeedlessMetricsFile(), dataset.getAccountIds());
 		}
-		// TOD summarize evolution taking into account multiple tests
+		if (dataset.getEvolutionMetricsFile().exists()) {
+			summarizeMetricResults(dataset.getEvolutionMetricsFile(), dataset.getAccountIds());
+		}
 	}
 
 	@Override
@@ -34,6 +36,23 @@ public class GroupDatasetSummarizer<AccountType> extends DatasetSummarizer<Accou
 		return new GroupedRowSummarizer(resultsFile, "account", "account");
 	}
 
+	private GroupedRowSummarizer getCrossTestSummarizer(File resultsFile) {
+		return new GroupedRowSummarizer(resultsFile, "test", "account");
+	}
+	
+	@Override
+	public void summarizeMetricResults(File resultsFile, AccountType[] accounts) throws IOException {
+		if(resultsFile.getName().equals(dataset.getEvolutionMetricsFile().getName())) {
+			File crossTestSummarizedFile = new File(resultsFile.getParent(), "summarized by test - " + resultsFile.getName());
+			getCrossTestSummarizer(resultsFile).summarize(crossTestSummarizedFile);
+			
+			File summarizedFile = new File(crossTestSummarizedFile.getParent(), "summarized - "+crossTestSummarizedFile.getName());
+			new GroupedRowSummarizer(crossTestSummarizedFile, "account", "account", 1).summarize(summarizedFile);
+		} else {
+			super.summarizeMetricResults(resultsFile, accounts);
+		}
+	}
+	
 	@Override
 	public BestColumnsSummarizer getBestColumnsSummarizer(File resultsFile) {
 		if (resultsFile.getName().endsWith(dataset.getSeedlessMetricsFile().getName())) {

@@ -17,12 +17,22 @@ public class GroupedRowSummarizer implements Summarizer {
 	private final File resultsFile;
 	private final String ungroupedPrefixColumn;
 	private final String lastPrefixColumn;
+	private final int offset;
 
 	public GroupedRowSummarizer(File resultsFile, String ungroupedPrefixColumn,
 			String lastPrefixColumn) {
 		this.resultsFile = resultsFile;
 		this.ungroupedPrefixColumn = ungroupedPrefixColumn;
 		this.lastPrefixColumn = lastPrefixColumn;
+		this.offset = 0;
+	}
+
+	public GroupedRowSummarizer(File resultsFile, String ungroupedPrefixColumn,
+			String lastPrefixColumn, int offset) {
+		this.resultsFile = resultsFile;
+		this.ungroupedPrefixColumn = ungroupedPrefixColumn;
+		this.lastPrefixColumn = lastPrefixColumn;
+		this.offset = offset;
 	}
 
 	private int columnOfLabel(String header, String headerLabel) {
@@ -54,7 +64,11 @@ public class GroupedRowSummarizer implements Summarizer {
 
 		Map<String, Collection<String[]>> retVal = new TreeMap<>();
 
-		for (int i = 1; i < lines.size(); i++) {
+		int i=1;
+		if (offset > 0) {
+			i++;
+		}
+		for (; i < lines.size(); i++) {
 			String line = lines.get(i);
 			String[] lineColumns = line.split(",");
 			String prefix = getPrefix(lineColumns, ignoredColumn,
@@ -72,10 +86,10 @@ public class GroupedRowSummarizer implements Summarizer {
 	}
 
 	private ArrayList<String> getCleanedHeader(String[] header,
-			int ignoredColumn) {
+			int lastPrefixColumnPos) {
 		ArrayList<String> cleanedHeader = new ArrayList<>();
 
-		for (int i = ignoredColumn + 1; i < header.length; i++) {
+		for (int i = lastPrefixColumnPos + 1; i < header.length; i++) {
 			String headerLabel = header[i];
 			if (headerLabel.startsWith("stdev-")) {
 				headerLabel = null;
@@ -83,7 +97,9 @@ public class GroupedRowSummarizer implements Summarizer {
 				headerLabel = headerLabel
 						.substring(headerLabel.indexOf("-") + 1);
 			}
-			cleanedHeader.add(headerLabel);
+			if(headerLabel != null && headerLabel.length() > 0) {
+				cleanedHeader.add(headerLabel);
+			}
 		}
 
 		return cleanedHeader;
@@ -105,7 +121,7 @@ public class GroupedRowSummarizer implements Summarizer {
 
 				DescriptiveStatistics stats = new DescriptiveStatistics();
 				for (String[] row : groupedRows.get(rowPrefix)) {
-					String dataPoint = row[i + ignoredColumn + 1];
+					String dataPoint = row[i + ignoredColumn + 1 + offset];
 					if (!dataPoint.equalsIgnoreCase("nan")) {
 						stats.addValue(Double.parseDouble(dataPoint));
 					}
@@ -183,7 +199,7 @@ public class GroupedRowSummarizer implements Summarizer {
 				ignoredColumn, lastPrefixColumnPos, lines);
 
 		ArrayList<String> cleanedHeaders = getCleanedHeader(header.split(","),
-				ignoredColumn);
+				lastPrefixColumnPos);
 		Map<String, Map<Integer, DescriptiveStatistics>> rowsStats = calculateStats(
 				ignoredColumn, cleanedHeaders, groupedRows);
 

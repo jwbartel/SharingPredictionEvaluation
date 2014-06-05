@@ -19,13 +19,17 @@ public class PercentMissedCreatedIdeals<V> extends GroupEvolutionMetric<V> {
 	}
 
 	@Override
-	public MetricResult evaluate(Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
+	public MetricResult evaluate(Set<Integer> newMembers, Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
 
+		if (newlyCreatedIdealGroups.size() == 0) {
+			return new DoubleResult(0.0);
+		}
+		
 		Collection<Set<V>> uncreatedIdeals = new HashSet<>(newlyCreatedIdealGroups);
 		uncreatedIdeals.removeAll(groupCreationToIdeal.values());
 

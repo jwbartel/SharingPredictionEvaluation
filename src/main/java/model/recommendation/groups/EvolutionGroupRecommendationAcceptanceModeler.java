@@ -17,16 +17,19 @@ import metrics.groups.evolution.GroupEvolutionMetric;
 public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 		GroupRecommendationAcceptanceModeler {
 
+	Set<Integer> newMembers;
 	GroupDistanceMetric<V> distanceMetric;
 	Collection<RecommendedEvolution<V>> recommendations;
 	Map<Set<V>,Collection<Set<V>>> oldToNewIdealGroups;
 	Collection<Set<V>> newlyCreatedIdealGroups;
 	Collection<GroupEvolutionMetric<V>> metrics;
 
-	public EvolutionGroupRecommendationAcceptanceModeler(GroupDistanceMetric<V> distanceMetric,
+	public EvolutionGroupRecommendationAcceptanceModeler(Set<Integer> newMembers,
+			GroupDistanceMetric<V> distanceMetric,
 			Collection<RecommendedEvolution<V>> recommendations,
 			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,	Collection<GroupEvolutionMetric<V>> metrics) {
+		this.newMembers = newMembers;
 		this.distanceMetric = distanceMetric;
 		this.recommendations = recommendations;
 		this.oldToNewIdealGroups = oldToNewIdealGroups;
@@ -96,7 +99,7 @@ public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 
 		Collection<MetricResult> results = new ArrayList<MetricResult>();
 		for (GroupEvolutionMetric<V> metric : metrics) {
-			results.add(metric.evaluate(oldToNewIdealGroups, unusedIdealGroups,
+			results.add(metric.evaluate(newMembers, oldToNewIdealGroups, newlyCreatedIdealGroups,
 					groupChangeToIdeal, groupCreationToIdeal,
 					unusedRecommendations, unusedIdealGroups));
 		}

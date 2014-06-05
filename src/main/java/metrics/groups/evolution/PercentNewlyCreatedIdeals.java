@@ -11,11 +11,11 @@ import recommendation.groups.evolution.recommendations.RecommendedGroupCreationE
 import metrics.DoubleResult;
 import metrics.MetricResult;
 
-public class PercentUnusedChangeRecommendations<V> extends GroupEvolutionMetric<V> {
+public class PercentNewlyCreatedIdeals<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "percent unused change recommendations";
+		return "percent newly created ideals";
 	}
 
 	@Override
@@ -23,18 +23,17 @@ public class PercentUnusedChangeRecommendations<V> extends GroupEvolutionMetric<
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,
-			Collection<RecommendedEvolution<V>> unusedRecommendations, Collection<Set<V>> unusedIdeals) {
-		
-		Collection<RecommendedGroupChangeEvolution<V>> unusedChangeRecommendations = new HashSet<>();
-		for (RecommendedEvolution<V> recommendation : unusedRecommendations) {
-			if (recommendation instanceof RecommendedGroupChangeEvolution) {
-				unusedChangeRecommendations
-						.add((RecommendedGroupChangeEvolution<V>) recommendation);
-			}
+			Collection<RecommendedEvolution<V>> unusedRecommendations,
+			Collection<Set<V>> unusedIdeals) {
+
+		Collection<Set<V>> ideals = new HashSet<>(newlyCreatedIdealGroups);
+		for (Collection<Set<V>> mappedNewIdeals : oldToNewIdealGroups.values()) {
+			ideals.addAll(mappedNewIdeals);
+			newlyCreatedIdealGroups.removeAll(mappedNewIdeals);
 		}
-		
-		return new DoubleResult(((double) unusedChangeRecommendations.size())
-				/ (unusedChangeRecommendations.size() + groupChangeToIdeal.keySet().size()));
+		ideals.addAll(newlyCreatedIdealGroups);
+
+		return new DoubleResult(((double) newlyCreatedIdealGroups.size()) / ideals.size());
 	}
 
 }

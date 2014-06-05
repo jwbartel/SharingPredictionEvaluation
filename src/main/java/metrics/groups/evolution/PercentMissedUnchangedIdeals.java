@@ -11,11 +11,11 @@ import recommendation.groups.evolution.recommendations.RecommendedGroupCreationE
 import metrics.DoubleResult;
 import metrics.MetricResult;
 
-public class PercentMissedEvolvedIdeals<V> extends GroupEvolutionMetric<V> {
+public class PercentMissedUnchangedIdeals<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "percent missed evolutions";
+		return "percent missed unchanged evolutions";
 	}
 
 	@Override
@@ -26,20 +26,26 @@ public class PercentMissedEvolvedIdeals<V> extends GroupEvolutionMetric<V> {
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
 
-		Collection<Set<V>> intendedEvolvedIdeals = new HashSet<>();
+		Collection<Set<V>> intendedUnchangedIdeals = new HashSet<>();
 		for (Set<V> oldIdeal : oldToNewIdealGroups.keySet()) {
 			Collection<Set<V>> mappedNewIdeals = oldToNewIdealGroups.get(oldIdeal);
 			for (Set<V> newIdeal : mappedNewIdeals) {
-				if (!oldIdeal.equals(newIdeal)) {
-					intendedEvolvedIdeals.add(newIdeal);
+				if (oldIdeal.equals(newIdeal)) {
+					intendedUnchangedIdeals.add(newIdeal);
 				}
 			}
 		}
 
-		Collection<Set<V>> unevolvedIdeals = new HashSet<>(intendedEvolvedIdeals);
-		unevolvedIdeals.removeAll(groupChangeToIdeal.values());
+		Collection<Set<V>> missedUnchangedIdeals = new HashSet<>(intendedUnchangedIdeals);
+		missedUnchangedIdeals.retainAll(groupChangeToIdeal.values());
+		for (RecommendedGroupChangeEvolution<V> recommendation : groupChangeToIdeal.keySet()) {
+			if (!recommendation.getOldGroup().equals(recommendation.getMerging())
+					&& missedUnchangedIdeals.contains(groupChangeToIdeal.get(recommendation))) {
+				missedUnchangedIdeals.remove(groupChangeToIdeal.get(recommendation));
+			}
+		}
 
-		return new DoubleResult(((double) unevolvedIdeals.size()) / intendedEvolvedIdeals.size());
+		return new DoubleResult(((double) missedUnchangedIdeals.size()) / intendedUnchangedIdeals.size());
 	}
 
 }

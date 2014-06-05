@@ -15,24 +15,33 @@ import metrics.groups.distance.AddsAndDeletesGroupDistance;
 import metrics.groups.distance.GoodnessGroupDistance;
 import metrics.groups.distance.GroupDistanceMetric;
 import metrics.groups.distance.JaccardGroupDistance;
+import metrics.groups.evolution.Additions;
+import metrics.groups.evolution.AdditionsRelativeToManual;
+import metrics.groups.evolution.Deletions;
+import metrics.groups.evolution.DeletionsRelativeToManual;
+import metrics.groups.evolution.EvolutionAdditions;
+import metrics.groups.evolution.EvolutionAdditionsRelativeToManual;
+import metrics.groups.evolution.EvolutionDeletions;
+import metrics.groups.evolution.EvolutionDeletionsRelativeToManual;
 import metrics.groups.evolution.GroupEvolutionMetric;
+import metrics.groups.evolution.ManualAdditions;
+import metrics.groups.evolution.ManualDeletions;
 import metrics.groups.evolution.MissedIdealSizes;
+import metrics.groups.evolution.NumIdeals;
+import metrics.groups.evolution.NumNewMembers;
+import metrics.groups.evolution.PercentEvolvedIdeals;
 import metrics.groups.evolution.PercentMissedCreatedIdeals;
 import metrics.groups.evolution.PercentMissedEvolvedIdeals;
 import metrics.groups.evolution.PercentMissedIdeals;
+import metrics.groups.evolution.PercentMissedUnchangedIdeals;
+import metrics.groups.evolution.PercentNewlyCreatedIdeals;
+import metrics.groups.evolution.PercentUnchangedIdeals;
 import metrics.groups.evolution.PercentUnusedChangeRecommendations;
 import metrics.groups.evolution.PercentUnusedCreationRecommendations;
 import metrics.groups.evolution.PercentUnusedRecommendations;
-import metrics.groups.evolution.RelativeAdditions;
-import metrics.groups.evolution.RelativeChangeAdditions;
-import metrics.groups.evolution.RelativeChangeDeletions;
-import metrics.groups.evolution.RelativeCreationAdditions;
-import metrics.groups.evolution.RelativeCreationDeletions;
-import metrics.groups.evolution.RelativeDeletions;
 import model.recommendation.groups.EvolutionGroupRecommendationAcceptanceModeler;
 import model.tools.evolution.MembershipChangeFinder;
 
-import org.apache.commons.io.FileUtils;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
@@ -44,7 +53,6 @@ import recommendation.groups.evolution.fullrecommendation.FullRecommendationGrou
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.seedless.SeedlessGroupRecommender;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
-import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.group.GroupDataSet;
 import testbed.dataset.group.MixedInitiativeDataSet;
@@ -81,22 +89,32 @@ public class GroupEvolutionRecommendationTestBed {
 		
 		//Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<Integer>());
-		seedlessRecommenderFactories.add(new FellowsRecommenderFactory<Integer>());
+//		seedlessRecommenderFactories.add(new FellowsRecommenderFactory<Integer>());
 		
 		//Add metrics
+		metrics.add(new NumNewMembers<Integer>());
+		metrics.add(new NumIdeals<Integer>());
+		metrics.add(new PercentUnchangedIdeals<Integer>());
+		metrics.add(new PercentNewlyCreatedIdeals<Integer>());
+		metrics.add(new PercentEvolvedIdeals<Integer>());
+		metrics.add(new ManualAdditions<Integer>());
+		metrics.add(new ManualDeletions<Integer>());
+		metrics.add(new Additions<Integer>());
+		metrics.add(new Deletions<Integer>());
+		metrics.add(new AdditionsRelativeToManual<Integer>());
+		metrics.add(new DeletionsRelativeToManual<Integer>());
+		metrics.add(new EvolutionAdditions<Integer>());
+		metrics.add(new EvolutionDeletions<Integer>());
+		metrics.add(new EvolutionAdditionsRelativeToManual<Integer>());
+		metrics.add(new EvolutionDeletionsRelativeToManual<Integer>());
 		metrics.add(new PercentMissedIdeals<Integer>());
 		metrics.add(new MissedIdealSizes<Integer>());
+		metrics.add(new PercentMissedUnchangedIdeals<Integer>());
 		metrics.add(new PercentMissedEvolvedIdeals<Integer>());
 		metrics.add(new PercentMissedCreatedIdeals<Integer>());
 		metrics.add(new PercentUnusedRecommendations<Integer>());
 		metrics.add(new PercentUnusedChangeRecommendations<Integer>());
 		metrics.add(new PercentUnusedCreationRecommendations<Integer>());
-		metrics.add(new RelativeAdditions<Integer>());
-		metrics.add(new RelativeDeletions<Integer>());
-		metrics.add(new RelativeChangeAdditions<Integer>());
-		metrics.add(new RelativeChangeDeletions<Integer>());
-		metrics.add(new RelativeCreationAdditions<Integer>());
-		metrics.add(new RelativeCreationDeletions<Integer>());
 	}
 	
 	private static Collection<Set<Integer>> getNewlyCreatedGroups(
@@ -167,7 +185,7 @@ public class GroupEvolutionRecommendationTestBed {
 								for (GroupDistanceMetric<Integer> distanceMetric : distanceMetrics) {
 
 									EvolutionGroupRecommendationAcceptanceModeler<Integer> modeler = new EvolutionGroupRecommendationAcceptanceModeler<Integer>(
-											distanceMetric, evolutionRecommendations, oldToNewIdeals, newlyCreatedIdealGroups, metrics);
+											newMembers, distanceMetric, evolutionRecommendations, oldToNewIdeals, newlyCreatedIdealGroups, metrics);
 									
 									Collection<MetricResult> results = modeler.modelRecommendationAcceptance();
 									String rowLabel = evolutionRecommender.getTypeOfRecommender() + "-" + seedlessRecommender.getTypeOfRecommender();

@@ -1,15 +1,14 @@
 package metrics.groups.evolution;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import metrics.DoubleResult;
+import metrics.MetricResult;
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
-import metrics.DoubleResult;
-import metrics.MetricResult;
 
 public class PercentUnusedRecommendations<V> extends GroupEvolutionMetric<V> {
 
@@ -19,7 +18,7 @@ public class PercentUnusedRecommendations<V> extends GroupEvolutionMetric<V> {
 	}
 
 	@Override
-	public MetricResult evaluate(Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
+	public MetricResult evaluate(Set<Integer> newMembers, Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,
@@ -28,7 +27,8 @@ public class PercentUnusedRecommendations<V> extends GroupEvolutionMetric<V> {
 
 		int usedRecommendations = groupChangeToIdeal.size() + groupCreationToIdeal.size() + unusedRecommendations.size();
 
-		return new DoubleResult(((double) unusedRecommendations.size()) / usedRecommendations);
+		return new DoubleResult(((double) unusedRecommendations.size())
+				/ (usedRecommendations + unusedRecommendations.size()));
 	}
 
 }

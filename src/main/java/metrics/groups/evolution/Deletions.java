@@ -1,21 +1,21 @@
 package metrics.groups.evolution;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import metrics.DoubleResult;
+import metrics.MetricResult;
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
-import metrics.DoubleResult;
-import metrics.MetricResult;
 
-public class PercentMissedIdeals<V> extends GroupEvolutionMetric<V> {
+public class Deletions<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "percent missed ideals";
+		return "deletions";
 	}
 
 	@Override
@@ -26,13 +26,18 @@ public class PercentMissedIdeals<V> extends GroupEvolutionMetric<V> {
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
 
-		Collection<Set<V>> ideals = new HashSet<>(newlyCreatedIdealGroups);
-		for (Collection<Set<V>> mappedNewIdeals : oldToNewIdealGroups.values()) {
-			ideals.addAll(mappedNewIdeals);
+		int deletions = 0;
+		for (Entry<RecommendedGroupChangeEvolution<V>, Set<V>> entry : groupChangeToIdeal
+				.entrySet()) {
+			deletions += requiredDeletions(entry.getKey().getMerging(), entry.getValue());
 		}
-		ideals.addAll(newlyCreatedIdealGroups);
+		for (Entry<RecommendedGroupCreationEvolution<V>, Set<V>> entry : groupCreationToIdeal
+				.entrySet()) {
+			deletions += requiredDeletions(entry.getKey().getRecommenderEngineResult(),
+					entry.getValue());
+		}
 
-		return new DoubleResult(((double) unusedIdeals.size()) / ideals.size());
+		return new DoubleResult(deletions);
 	}
 
 }

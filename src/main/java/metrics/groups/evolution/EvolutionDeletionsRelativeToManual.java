@@ -7,36 +7,39 @@ import java.util.Set;
 
 import metrics.DoubleResult;
 import metrics.MetricResult;
-import metrics.StatisticsResult;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
 
-public class RelativeChangeAdditions<V> extends GroupEvolutionMetric<V> {
+public class EvolutionDeletionsRelativeToManual<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "avg-change additions,stdev-change additions";
+		return "evolution deletions relative to manual";
 	}
 
 	@Override
-	public MetricResult evaluate(Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
+	public MetricResult evaluate(Set<Integer> newMembers, Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
 
-		DescriptiveStatistics stats = new DescriptiveStatistics();
+		int deletions = 0;
 		for (Entry<RecommendedGroupChangeEvolution<V>, Set<V>> entry : groupChangeToIdeal
 				.entrySet()) {
-			stats.addValue(requiredRelativeAdditions(entry.getKey().getMerging(), entry.getValue()));
+			deletions += requiredDeletions(entry.getKey().getMerging(), entry.getValue());
+		}
+		
+		int manualDeletions = 0;
+		for (Set<V> oldIdeal : oldToNewIdealGroups.keySet()) {
+			for (Set<V> evolvedIdeal : oldToNewIdealGroups.get(oldIdeal)) {
+				manualDeletions += (int) requiredDeletions(oldIdeal, evolvedIdeal);
+			}
 		}
 
-		return new StatisticsResult(stats);
+		return new DoubleResult(((double) deletions)/manualDeletions);
 	}
 
 }

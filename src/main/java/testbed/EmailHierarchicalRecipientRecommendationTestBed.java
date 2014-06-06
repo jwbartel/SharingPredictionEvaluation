@@ -46,8 +46,9 @@ import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 
 public class EmailHierarchicalRecipientRecommendationTestBed {
 
-	static double percentTraining = 0.5;
+	static double percentTraining = 0.8;
 	static int listSize = 4;
+	static int minTestableMessages = 5;
 
 	static Collection<EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<GroupBasedRecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
@@ -137,6 +138,23 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 		halfLife /= 365;
 		return halfLife + " years";
 	}
+	
+	private static boolean underTestableThreshold(Collection<EmailMessage<String>> testMessages) {
+		if (testMessages.size() < minTestableMessages) {
+			return false;
+		}
+		
+		int testableMessages = 0;
+		for (EmailMessage<String> message : testMessages) {
+			if (message.wasSent() && message.getCollaborators().size() > 2) {
+				testableMessages++;
+				if (testableMessages >= minTestableMessages) {
+					return false;
+				}
+			}
+		}
+		return testableMessages < minTestableMessages;
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -158,6 +176,10 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 						.getTrainMessages(account, percentTraining);
 				Collection<EmailMessage<String>> testMessages = dataset
 						.getTestMessages(account, percentTraining);
+				
+				if (underTestableThreshold(testMessages)) {
+					continue;
+				}
 				
 				for (GroupScorerFactory<String> scorerFactory : groupScorerFactories) {
 					

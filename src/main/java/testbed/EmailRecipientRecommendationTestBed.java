@@ -45,8 +45,9 @@ import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 
 public class EmailRecipientRecommendationTestBed {
 
-	static double percentTraining = 0.5;
+	static double percentTraining = 0.8;
 	static int listSize = 4;
+	static int minTestableMessages = 5;
 
 	static Collection<EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<RecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
@@ -108,6 +109,23 @@ public class EmailRecipientRecommendationTestBed {
 		metricFactories.add(RelativeSwitchesMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, EmailMessage.class));
+	}
+	
+	private static boolean underTestableThreshold(Collection<EmailMessage<String>> testMessages) {
+		if (testMessages.size() < minTestableMessages) {
+			return false;
+		}
+		
+		int testableMessages = 0;
+		for (EmailMessage<String> message : testMessages) {
+			if (message.wasSent() && message.getCollaborators().size() > 2) {
+				testableMessages++;
+				if (testableMessages >= minTestableMessages) {
+					return false;
+				}
+			}
+		}
+		return testableMessages < minTestableMessages;
 	}
 	
 	private static String getHalfLifeName(double halfLife) {

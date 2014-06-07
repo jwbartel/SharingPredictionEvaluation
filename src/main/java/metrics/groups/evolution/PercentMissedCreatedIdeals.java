@@ -31,7 +31,7 @@ public class PercentMissedCreatedIdeals<V> extends GroupEvolutionMetric<V> {
 		}
 		
 		Collection<Set<V>> uncreatedIdeals = new HashSet<>(newlyCreatedIdealGroups);
-		uncreatedIdeals.removeAll(groupCreationToIdeal.values());
+		uncreatedIdeals.removeAll(unusedIdeals);
 
 		return new DoubleResult(((double) uncreatedIdeals.size()) / newlyCreatedIdealGroups.size());
 	}

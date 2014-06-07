@@ -37,13 +37,7 @@ public class PercentMissedUnchangedIdeals<V> extends GroupEvolutionMetric<V> {
 		}
 
 		Collection<Set<V>> missedUnchangedIdeals = new HashSet<>(intendedUnchangedIdeals);
-		missedUnchangedIdeals.retainAll(groupChangeToIdeal.values());
-		for (RecommendedGroupChangeEvolution<V> recommendation : groupChangeToIdeal.keySet()) {
-			if (!recommendation.getOldGroup().equals(recommendation.getMerging())
-					&& missedUnchangedIdeals.contains(groupChangeToIdeal.get(recommendation))) {
-				missedUnchangedIdeals.remove(groupChangeToIdeal.get(recommendation));
-			}
-		}
+		missedUnchangedIdeals.retainAll(unusedIdeals);
 
 		return new DoubleResult(((double) missedUnchangedIdeals.size()) / intendedUnchangedIdeals.size());
 	}

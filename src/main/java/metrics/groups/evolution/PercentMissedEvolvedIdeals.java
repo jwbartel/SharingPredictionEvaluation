@@ -35,9 +35,13 @@ public class PercentMissedEvolvedIdeals<V> extends GroupEvolutionMetric<V> {
 				}
 			}
 		}
+		
+		if (intendedEvolvedIdeals.size() == 0) {
+			return new DoubleResult(0.0);
+		}
 
 		Collection<Set<V>> unevolvedIdeals = new HashSet<>(intendedEvolvedIdeals);
-		unevolvedIdeals.removeAll(groupChangeToIdeal.values());
+		unevolvedIdeals.retainAll(unusedIdeals);
 
 		return new DoubleResult(((double) unevolvedIdeals.size()) / intendedEvolvedIdeals.size());
 	}

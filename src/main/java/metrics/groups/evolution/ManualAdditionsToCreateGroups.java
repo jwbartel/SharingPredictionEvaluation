@@ -1,21 +1,20 @@
 package metrics.groups.evolution;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import metrics.DoubleResult;
+import metrics.MetricResult;
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
-import metrics.DoubleResult;
-import metrics.MetricResult;
 
-public class PercentNewlyCreatedIdeals<V> extends GroupEvolutionMetric<V> {
+public class ManualAdditionsToCreateGroups<V> extends GroupEvolutionMetric<V> {
 
 	@Override
 	public String getHeader() {
-		return "percent newly created ideals";
+		return "manual additions to create groups";
 	}
 
 	@Override
@@ -25,17 +24,13 @@ public class PercentNewlyCreatedIdeals<V> extends GroupEvolutionMetric<V> {
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,
 			Collection<RecommendedEvolution<V>> unusedRecommendations,
 			Collection<Set<V>> unusedIdeals) {
-
-		newlyCreatedIdealGroups = new HashSet<>(newlyCreatedIdealGroups);
 		
-		Collection<Set<V>> ideals = new HashSet<>(newlyCreatedIdealGroups);
-		for (Collection<Set<V>> mappedNewIdeals : oldToNewIdealGroups.values()) {
-			ideals.addAll(mappedNewIdeals);
-			newlyCreatedIdealGroups.removeAll(mappedNewIdeals);
+		int additions = 0;
+		for (Set<V> newlyCreatedIdeal : newlyCreatedIdealGroups) {
+			additions += newlyCreatedIdeal.size();
 		}
-		ideals.addAll(newlyCreatedIdealGroups);
 
-		return new DoubleResult(((double) newlyCreatedIdealGroups.size()) / ideals.size());
+		return new DoubleResult(additions);
 	}
 
 }

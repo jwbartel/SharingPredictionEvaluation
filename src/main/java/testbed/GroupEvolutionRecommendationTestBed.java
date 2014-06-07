@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import metrics.Metric;
@@ -25,6 +26,7 @@ import metrics.groups.evolution.EvolutionDeletions;
 import metrics.groups.evolution.EvolutionDeletionsRelativeToManual;
 import metrics.groups.evolution.GroupEvolutionMetric;
 import metrics.groups.evolution.ManualAdditions;
+import metrics.groups.evolution.ManualAdditionsToCreateGroups;
 import metrics.groups.evolution.ManualDeletions;
 import metrics.groups.evolution.MissedIdealSizes;
 import metrics.groups.evolution.NumIdeals;
@@ -99,6 +101,7 @@ public class GroupEvolutionRecommendationTestBed {
 		metrics.add(new PercentEvolvedIdeals<Integer>());
 		metrics.add(new ManualAdditions<Integer>());
 		metrics.add(new ManualDeletions<Integer>());
+		metrics.add(new ManualAdditionsToCreateGroups<Integer>());
 		metrics.add(new Additions<Integer>());
 		metrics.add(new Deletions<Integer>());
 		metrics.add(new AdditionsRelativeToManual<Integer>());
@@ -122,8 +125,19 @@ public class GroupEvolutionRecommendationTestBed {
 			Map<Set<Integer>, Collection<Set<Integer>>> oldToNewIdeals) {
 		
 		Collection<Set<Integer>> newlyCreatedGroups = new HashSet<>(idealGroups);
-		for(Collection<Set<Integer>> evolvedGroups : oldToNewIdeals.values()) {
-			newlyCreatedGroups.retainAll(evolvedGroups);
+		Collection<Set<Integer>> evolvedGroups = new HashSet<>();
+		Collection<Set<Integer>> emptyOldGroups = new ArrayList<>();
+		for(Entry<Set<Integer>,Collection<Set<Integer>>> entry : oldToNewIdeals.entrySet()) {
+			Set<Integer> oldGroup = entry.getKey();
+			if (oldGroup.size() == 0) {
+				emptyOldGroups.add(oldGroup);
+			} else {
+				evolvedGroups.addAll(entry.getValue());
+			}
+		}
+		newlyCreatedGroups.removeAll(evolvedGroups);
+		for (Set<Integer> emptyOldGroup : emptyOldGroups) {
+			oldToNewIdeals.remove(emptyOldGroup);
 		}
 		return newlyCreatedGroups;
 	}
@@ -178,9 +192,9 @@ public class GroupEvolutionRecommendationTestBed {
 								Map<Set<Integer>,Collection<Set<Integer>>> oldToNewIdeals = changeFinder.getUnmaintainedToMaintainedGroups(idealGroups, newMembers);
 
 								UndirectedGraph<Integer, DefaultEdge> oldGraph = createOldGraph(graph, newMembers);
+								Collection<Set<Integer>> newlyCreatedIdealGroups = getNewlyCreatedGroups(idealGroups, oldToNewIdeals);
 								Collection<RecommendedEvolution<Integer>> evolutionRecommendations =
 										evolutionRecommender.generateRecommendations(oldGraph, graph, oldToNewIdeals.keySet());
-								Collection<Set<Integer>> newlyCreatedIdealGroups = getNewlyCreatedGroups(idealGroups, oldToNewIdeals);
 								
 								for (GroupDistanceMetric<Integer> distanceMetric : distanceMetrics) {
 

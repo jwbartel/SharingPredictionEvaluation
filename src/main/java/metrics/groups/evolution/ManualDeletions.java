@@ -31,9 +31,6 @@ public class ManualDeletions<V> extends GroupEvolutionMetric<V> {
 				deletions = (int) requiredDeletions(oldIdeal, evolvedIdeal);
 			}
 		}
-		for (Set<V> newlyCreatedIdeal : newlyCreatedIdealGroups) {
-			deletions += newlyCreatedIdeal.size();
-		}
 
 		return new DoubleResult(deletions);
 	}

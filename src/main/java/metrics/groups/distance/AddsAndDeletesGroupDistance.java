@@ -22,7 +22,7 @@ public class AddsAndDeletesGroupDistance<V> implements GroupDistanceMetric<V>{
 
 	@Override
 	public String getDistanceName() {
-		return "adds and deletes";
+		return "Adds and Deletes";
 	}
 
 }

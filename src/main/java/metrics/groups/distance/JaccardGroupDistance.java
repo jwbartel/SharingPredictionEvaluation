@@ -21,7 +21,7 @@ public class JaccardGroupDistance<V> implements GroupDistanceMetric<V>{
 
 	@Override
 	public String getDistanceName() {
-		return "jaccard";
+		return "Jaccard";
 	}
 
 }

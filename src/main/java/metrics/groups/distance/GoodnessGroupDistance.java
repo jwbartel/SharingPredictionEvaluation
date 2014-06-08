@@ -18,7 +18,7 @@ public class GoodnessGroupDistance<V> implements GroupDistanceMetric<V>{
 
 	@Override
 	public String getDistanceName() {
-		return "goodness";
+		return "Goodness";
 	}
 
 }

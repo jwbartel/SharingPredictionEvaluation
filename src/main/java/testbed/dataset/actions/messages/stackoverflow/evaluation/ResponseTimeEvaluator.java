@@ -28,7 +28,7 @@ public abstract class ResponseTimeEvaluator<Recipient, Message extends StackOver
 	}
 	
 	protected StackOverflowDataset<Recipient, Message, ThreadType> dataset;
-	private Collection<ResponseTimeMetric> metrics;
+	protected Collection<ResponseTimeMetric> metrics;
 	protected File resultsFolder;
 	protected File timeFolder;
 

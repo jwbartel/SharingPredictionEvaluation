@@ -51,7 +51,7 @@ public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflo
 		if (timeStr.equals("Inf")) {
 			return Double.POSITIVE_INFINITY;
 		} else {
-			return Double.parseDouble(timeStr);
+			return Double.parseDouble(timeStr)*60*60;
 		}
 	}
 

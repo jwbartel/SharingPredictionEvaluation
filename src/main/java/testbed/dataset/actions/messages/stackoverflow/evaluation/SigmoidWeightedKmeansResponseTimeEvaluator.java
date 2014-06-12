@@ -52,7 +52,7 @@ public class SigmoidWeightedKmeansResponseTimeEvaluator<Recipient, Message exten
 		if (timeStr.equals("Inf")) {
 			return Double.POSITIVE_INFINITY;
 		} else {
-			return Double.parseDouble(timeStr);
+			return Double.parseDouble(timeStr)*60*60;
 		}
 	}
 	

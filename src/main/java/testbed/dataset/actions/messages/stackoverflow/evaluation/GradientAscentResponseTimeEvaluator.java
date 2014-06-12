@@ -60,7 +60,7 @@ public class GradientAscentResponseTimeEvaluator<Recipient, Message extends Stac
 		List<String> lines = FileUtils.readLines(iterationFiles[iterationFiles.length - 1]);
 		List<ResponseTimeRange> predictions = new ArrayList<>();
 		for (String line : lines) {
-			predictions.add(new ResponseTimeRange(Double.parseDouble(line), null));
+			predictions.add(new ResponseTimeRange(Double.parseDouble(line)*60*60, null));
 		}
 		return predictions;
 	}

@@ -95,7 +95,7 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 			if (line.equals("Inf")) {
 				retVal.add(Double.POSITIVE_INFINITY);
 			} else {
-				retVal.add(Double.parseDouble(line));
+				retVal.add(Double.parseDouble(line)*60*60);
 			}
 		}
 		return retVal;

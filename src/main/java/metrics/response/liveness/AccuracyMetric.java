@@ -11,6 +11,16 @@ public class AccuracyMetric implements ResponseLivenessMetric {
 
 	DescriptiveStatistics stats = new DescriptiveStatistics();
 	
+	public static ResponseLivenessMetricFactory factory() {
+		return new ResponseLivenessMetricFactory() {
+			
+			@Override
+			public ResponseLivenessMetric create() {
+				return new AccuracyMetric();
+			}
+		};
+	}
+	
 	@Override
 	public String getHeader() {
 		return "mean-accuracy,stdev-accuracy";

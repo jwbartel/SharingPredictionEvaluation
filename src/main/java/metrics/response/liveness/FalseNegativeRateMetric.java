@@ -8,12 +8,22 @@ import metrics.MetricResult;
 import metrics.StatisticsResult;
 
 public class FalseNegativeRateMetric implements ResponseLivenessMetric {
-
+	
+	public static ResponseLivenessMetricFactory factory() {
+		return new ResponseLivenessMetricFactory() {
+			
+			@Override
+			public ResponseLivenessMetric create() {
+				return new FalseNegativeRateMetric();
+			}
+		};
+	}
+	
 	DescriptiveStatistics stats = new DescriptiveStatistics();
 	
 	@Override
 	public String getHeader() {
-		return "mean-accuracy,stdev-accuracy";
+		return "mean-false negative rate,stdev-false positive rate";
 	}
 
 	@Override

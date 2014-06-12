@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.io.FileUtils;
-
 import metrics.MetricResult;
 import metrics.response.time.ResponseTimeMetric;
+
+import org.apache.commons.io.FileUtils;
+
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeRange;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class CollaborativeFilteringResponsTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		extends ResponseTimeEvaluator<Recipient, Message, ThreadType> {
 
 	public static class DataPoint<V> {
@@ -31,13 +31,15 @@ public class CollaborativeFilteringResponsTimeEvaluator<Recipient, Message exten
 	}
 
 	private File collaborativeFilteringResultsFolder;
+	private String featureType;
 	private String collaborativeFilteringType;
 
-	public CollaborativeFilteringResponsTimeEvaluator(String featureType,
+	public CollaborativeFilteringResponseTimeEvaluator(String featureType,
 			String collaborativeFilteringType,
 			StackOverflowDataset<Recipient, Message, ThreadType> dataset,
 			Collection<ResponseTimeMetric> metrics) {
 		super(dataset, metrics);
+		this.featureType = featureType;
 		this.collaborativeFilteringType = collaborativeFilteringType;
 		this.collaborativeFilteringResultsFolder = new File(resultsFolder, featureType);
 	}
@@ -116,5 +118,10 @@ public class CollaborativeFilteringResponsTimeEvaluator<Recipient, Message exten
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public String getType() {
+		return "collaborative filtering " + featureType + "-" + collaborativeFilteringType;
 	}
 }

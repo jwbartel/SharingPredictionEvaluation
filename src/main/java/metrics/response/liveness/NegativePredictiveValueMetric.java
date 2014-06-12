@@ -7,14 +7,14 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import metrics.MetricResult;
 import metrics.StatisticsResult;
 
-public class FalsePositiveRateMetric implements ResponseLivenessMetric {
+public class NegativePredictiveValueMetric implements ResponseLivenessMetric {
 	
 	public static ResponseLivenessMetricFactory factory() {
 		return new ResponseLivenessMetricFactory() {
 			
 			@Override
 			public ResponseLivenessMetric create() {
-				return new FalsePositiveRateMetric();
+				return new NegativePredictiveValueMetric();
 			}
 		};
 	}
@@ -23,28 +23,26 @@ public class FalsePositiveRateMetric implements ResponseLivenessMetric {
 	
 	@Override
 	public String getHeader() {
-		return "mean-false positive rate,stdev-false positive rate";
+		return "mean-negative predictive value,stdev-negative predictive value";
 	}
 
 	@Override
 	public void addTestResult(List<Double> trueTimes, List<Double> livenessPredictions) {
-		int truePositives = 0;
+		int trueNegatives = 0;
 		int falseNegatives = 0;
 		for (int i=0; i<trueTimes.size(); i++) {
 			Double trueTime = trueTimes.get(i);
 			Double livenessPrediction = livenessPredictions.get(i);
 			
-			if (livenessPrediction >= 0.5 ) {
-				if (trueTime != Double.POSITIVE_INFINITY) {
-					truePositives++;
-				}
-			} else {
+			if (livenessPrediction < 0.5 ) {
 				if (trueTime == Double.POSITIVE_INFINITY) {
+					trueNegatives++;
+				} else {
 					falseNegatives++;
 				}
 			}
 		}
-		stats.addValue(((double) falseNegatives)/(falseNegatives + truePositives));
+		stats.addValue(((double) trueNegatives)/(falseNegatives + trueNegatives));
 
 	}
 

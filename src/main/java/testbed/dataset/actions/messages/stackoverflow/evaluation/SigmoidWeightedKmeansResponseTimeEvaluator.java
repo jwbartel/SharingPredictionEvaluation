@@ -83,4 +83,9 @@ public class SigmoidWeightedKmeansResponseTimeEvaluator<Recipient, Message exten
 		}
 		return predictions;
 	}
+
+	@Override
+	public String getType() {
+		return "sigmoid weighted k-means";
+	}
 }

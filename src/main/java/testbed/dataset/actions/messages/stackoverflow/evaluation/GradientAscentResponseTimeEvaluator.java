@@ -48,4 +48,9 @@ public class GradientAscentResponseTimeEvaluator<Recipient, Message extends Stac
 		}
 		return predictions;
 	}
+
+	@Override
+	public String getType() {
+		return "gradient ascent";
+	}
 }

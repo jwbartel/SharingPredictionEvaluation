@@ -6,5 +6,7 @@ import metrics.MetricResult;
 
 public interface Evaluator {
 
+	public String getType();
+	
 	public List<MetricResult> evaluate();
 }

@@ -53,4 +53,9 @@ public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflo
 		}
 		return predictions;
 	}
+
+	@Override
+	public String getType() {
+		return "k-means";
+	}
 }

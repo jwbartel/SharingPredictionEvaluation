@@ -26,9 +26,9 @@ import metrics.response.time.ScaleDifferenceMetric;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.CollaborativeFilteringResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.LivenessEvaluator.LivenessEvaluatorFactory;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
@@ -71,6 +71,12 @@ public class PreviousResultsResponseTimeTestBed {
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 hour", 3600.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 day", 3600.0*24));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 week", 3600.0*24*7));
+		
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "1 minute", 60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "3 minutes", 3*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "5 minutes", 5*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "10 minutes", 10*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "20 minutes", 20*60.0));
 		
 		evaluatorFactories.add(GradientAscentResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		for (int k=2; k<=25; k++) {

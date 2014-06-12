@@ -21,11 +21,27 @@ public class GradientAscentResponseTimeEvaluator<Recipient, Message extends Stac
 
 	private File gradientAscentFolder;
 	
+	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+	ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType> factory(
+			Class<Recipient> recipientClass,
+			Class<Message> messageClass,
+			Class<ThreadType> threadClass) {
+		return new ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType>() {
+
+			@Override
+			public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
+					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+					Collection<ResponseTimeMetric> metrics) {
+				return new GradientAscentResponseTimeEvaluator<>(dataset, metrics);
+			}
+		};
+	}
+	
 	public GradientAscentResponseTimeEvaluator(
 			StackOverflowDataset<Recipient, Message, ThreadType> dataset,
 			Collection<ResponseTimeMetric> metrics) {
 		super(dataset, metrics);
-		this.gradientAscentFolder = new File(timeFolder, "gradient ascent");
+		this.gradientAscentFolder = new File(new File(timeFolder, "gradient ascent"),"expected times");
 	}
 
 	@Override
@@ -51,6 +67,6 @@ public class GradientAscentResponseTimeEvaluator<Recipient, Message extends Stac
 
 	@Override
 	public String getType() {
-		return "gradient ascent";
+		return "gradient ascent,N/A";
 	}
 }

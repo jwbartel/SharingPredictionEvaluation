@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import metrics.MetricResult;
+import metrics.response.liveness.ResponseLivenessMetric;
 import metrics.response.time.ResponseTimeMetric;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
@@ -25,6 +26,13 @@ public abstract class ResponseTimeEvaluator<Recipient, Message extends StackOver
 			this.minResponseTime = minResponseTime;
 			this.maxResponseTime = maxResponseTime;
 		}
+	}
+	
+	public static interface ResponseTimeEvaluatorFactory<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>> {
+
+		public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
+				StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+				Collection<ResponseTimeMetric> metrics);
 	}
 	
 	protected StackOverflowDataset<Recipient, Message, ThreadType> dataset;

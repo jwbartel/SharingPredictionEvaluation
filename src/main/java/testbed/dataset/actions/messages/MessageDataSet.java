@@ -29,6 +29,11 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 				"liveness prediction results.csv");
 	}
 
+	public File getResponseTimeMetricsFile() {
+		return new File(getMetricsFolder(),
+				"response time prediction results.csv");
+	}
+
 	public File getRecipientRecommendationMetricsFile() {
 		return new File(getMetricsFolder(),
 				"recipient recommendation results.csv");

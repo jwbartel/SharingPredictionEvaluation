@@ -3,9 +3,7 @@ package testbed.dataset.actions.messages.stackoverflow.evaluation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,6 +18,23 @@ import data.representation.actionbased.messages.stackoverflow.StackOverflowThrea
 
 public class SigmoidWeightedKmeansResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		extends ResponseTimeEvaluator<Recipient, Message, ThreadType> {
+	
+	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+	ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType> factory(
+			Class<Recipient> recipientClass,
+			Class<Message> messageClass,
+			Class<ThreadType> threadClass,
+			final int k) {
+		return new ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType>() {
+
+			@Override
+			public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
+					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+					Collection<ResponseTimeMetric> metrics) {
+				return new SigmoidWeightedKmeansResponseTimeEvaluator<>(dataset, k, metrics);
+			}
+		};
+	}
 
 	private int k;
 	private File kmeansFolder;
@@ -61,7 +76,7 @@ public class SigmoidWeightedKmeansResponseTimeEvaluator<Recipient, Message exten
 	
 	private List<Integer> getPredictedLabels(Integer test) throws IOException {
 		File labelsFolder = new File(kmeansFolder, "test labels");
-		File labelsFile = new File(new File(labelsFolder, ""+test), ""+k);
+		File labelsFile = new File(new File(labelsFolder, ""+test), k + ".csv");
 		
 		List<Integer> retVal = new ArrayList<>();
 		List<String> lines = FileUtils.readLines(labelsFile);
@@ -86,6 +101,6 @@ public class SigmoidWeightedKmeansResponseTimeEvaluator<Recipient, Message exten
 
 	@Override
 	public String getType() {
-		return "sigmoid weighted k-means";
+		return "sigmoid weighted k-means,"+k;
 	}
 }

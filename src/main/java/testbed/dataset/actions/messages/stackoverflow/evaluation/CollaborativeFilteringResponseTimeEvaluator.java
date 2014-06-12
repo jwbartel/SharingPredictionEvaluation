@@ -19,6 +19,24 @@ import data.representation.actionbased.messages.stackoverflow.StackOverflowThrea
 
 public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		extends ResponseTimeEvaluator<Recipient, Message, ThreadType> {
+	
+	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+	ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType> factory(
+			Class<Recipient> recipientClass,
+			Class<Message> messageClass,
+			Class<ThreadType> threadClass,
+			final String featureType,
+			final String collaborativeFilteringType) {
+		return new ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType>() {
+
+			@Override
+			public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
+					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+					Collection<ResponseTimeMetric> metrics) {
+				return new CollaborativeFilteringResponseTimeEvaluator<>(featureType, collaborativeFilteringType, dataset, metrics);
+			}
+		};
+	}
 
 	public static class DataPoint<V> {
 		public final List<V> vector;
@@ -41,7 +59,7 @@ public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message exte
 		super(dataset, metrics);
 		this.featureType = featureType;
 		this.collaborativeFilteringType = collaborativeFilteringType;
-		this.collaborativeFilteringResultsFolder = new File(resultsFolder, featureType);
+		this.collaborativeFilteringResultsFolder = new File(new File(timeFolder, "collaborative filtering"), featureType);
 	}
 
 	private Map<Integer,List<DataPoint<Integer>>> getTestPoints() throws IOException {
@@ -61,7 +79,8 @@ public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message exte
 				for (int i=0; i<splitLine.length-1; i++) {
 					vector.add(Integer.parseInt(splitLine[i]));
 				}
-				Long responseTime = Long.parseLong(splitLine[splitLine.length-1]);
+				double dblresponseTime = Double.parseDouble(splitLine[splitLine.length-1]);
+				Long responseTime = (long) dblresponseTime;
 				dataPoints.add(new DataPoint<>(vector, responseTime));
 			}
 			retVal.put(testId, dataPoints);
@@ -122,6 +141,6 @@ public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message exte
 
 	@Override
 	public String getType() {
-		return "collaborative filtering " + featureType + "-" + collaborativeFilteringType;
+		return "collaborative filtering " + featureType + "-" + collaborativeFilteringType+",N/A";
 	}
 }

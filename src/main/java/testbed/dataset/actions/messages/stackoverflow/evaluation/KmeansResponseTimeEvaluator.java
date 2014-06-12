@@ -11,11 +11,29 @@ import metrics.response.time.ResponseTimeMetric;
 import org.apache.commons.io.FileUtils;
 
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
 public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		extends ResponseTimeEvaluator<Recipient, Message, ThreadType> {
+	
+	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+	ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType> factory(
+			Class<Recipient> recipientClass,
+			Class<Message> messageClass,
+			Class<ThreadType> threadClass,
+			final int k) {
+		return new ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType>() {
+
+			@Override
+			public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
+					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+					Collection<ResponseTimeMetric> metrics) {
+				return new KmeansResponseTimeEvaluator<>(dataset, k, metrics);
+			}
+		};
+	}
 
 	private int k;
 	private File weightedKmeansFolder;
@@ -41,7 +59,7 @@ public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflo
 	protected List<ResponseTimeRange> getPredictedResponseTimes(Integer test) throws IOException {
 		
 		File predictionsFolder = new File(weightedKmeansFolder, "predictions");
-		File predictionsFile = new File(new File(predictionsFolder, ""+test), ""+k);
+		File predictionsFile = new File(new File(predictionsFolder, ""+test), k+".csv");
 		
 		List<ResponseTimeRange> predictions = new ArrayList<>();
 		List<String> lines = FileUtils.readLines(predictionsFile);
@@ -56,6 +74,6 @@ public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflo
 
 	@Override
 	public String getType() {
-		return "k-means";
+		return "k-means,"+k;
 	}
 }

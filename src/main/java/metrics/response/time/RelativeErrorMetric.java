@@ -24,7 +24,7 @@ public class RelativeErrorMetric extends MinOrMaxResponseTimeMetric {
 
 	@Override
 	public String getTitle() {
-		return "Accuracy of "+type.toString();
+		return "Relative Error of "+type.toString();
 	}
 
 	@Override

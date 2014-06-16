@@ -24,7 +24,7 @@ public class ScaleDifferenceMetric extends MinOrMaxResponseTimeMetric {
 
 	@Override
 	public String getTitle() {
-		return "Accuracy of "+type.toString();
+		return "Scale Difference "+type.toString();
 	}
 
 	@Override

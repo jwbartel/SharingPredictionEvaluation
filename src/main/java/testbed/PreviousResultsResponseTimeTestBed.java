@@ -30,11 +30,11 @@ import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredict
 import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.InverseGaussianDistribution;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.LogNormalDistribution;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
@@ -70,7 +70,7 @@ public class PreviousResultsResponseTimeTestBed {
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "3 minutes", 60*3.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "5 minutes", 60*5.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "10 minutes", 60*10.0));
-		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "20 minutes", 60*10.0));
+		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "20 minutes", 60*20.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 hour", 3600.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 day", 3600.0*24));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 week", 3600.0*24*7));

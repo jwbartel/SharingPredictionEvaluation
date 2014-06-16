@@ -75,6 +75,6 @@ public class ConstantPredictionResponseTimeEvaluator<Recipient, Message extends 
 
 	@Override
 	public String getType() {
-		return "constant prediction of "+",N/A";
+		return "constant prediction of " + label + ",N/A";
 	}
 }

@@ -25,6 +25,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		Date lastActiveDate;
 		Collection<V> collaborators;
 		boolean wasSent;
+		String title;
 
 		public ReplayedMessage(SingleMessage<V> message) {
 			this.creators = message.getCreators();
@@ -32,7 +33,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			this.lastActiveDate = message.getLastActiveDate();
 			this.collaborators = new ArrayList<V>();
 			this.wasSent = message.wasSent();
-
+			this.title = message.getTitle();
 		}
 
 		@Override
@@ -58,6 +59,11 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		@Override
 		public boolean wasSent() {
 			return wasSent;
+		}
+		
+		@Override
+		public String getTitle() {
+			return title;
 		}
 
 		public void addCollaborator(V collaborator) {

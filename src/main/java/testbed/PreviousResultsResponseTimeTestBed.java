@@ -27,8 +27,11 @@ import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDatase
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.CollaborativeFilteringResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.InverseGaussianDistribution;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.LogNormalDistribution;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
@@ -77,6 +80,9 @@ public class PreviousResultsResponseTimeTestBed {
 		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "5 minutes", 5*60.0));
 		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "10 minutes", 10*60.0));
 		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "20 minutes", 20*60.0));
+		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, new InverseGaussianDistribution(867.482, 571.108)));
+		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, new LogNormalDistribution(6.35702, 0.927127)));
+		
 		
 		evaluatorFactories.add(GradientAscentResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		for (int k=2; k<=25; k++) {

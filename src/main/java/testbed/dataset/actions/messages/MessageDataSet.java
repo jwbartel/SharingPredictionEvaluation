@@ -24,14 +24,14 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 		return new File(getRootFolder(), "metric statistics");
 	}
 
-	public File getLivenessMetricsFile() {
+	public File getPreviousResultsLivenessMetricsFile() {
 		return new File(getMetricsFolder(),
-				"liveness prediction results.csv");
+				"previous results liveness prediction results.csv");
 	}
 
-	public File getResponseTimeMetricsFile() {
+	public File getPreviousResultsResponseTimeMetricsFile() {
 		return new File(getMetricsFolder(),
-				"response time prediction results.csv");
+				"previous results response time prediction results.csv");
 	}
 
 	public File getRecipientRecommendationMetricsFile() {

@@ -116,7 +116,7 @@ public class PreviousResultsResponseTimeTestBed {
 			String headerPrefix = "type,k,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
-					dataset.getResponseTimeMetricsFile());
+					dataset.getPreviousResultsResponseTimeMetricsFile());
 			for (ResponseTimeEvaluatorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluatorFactory : evaluatorFactories) {
 				Collection<ResponseTimeMetric> metrics = new ArrayList<>();
 				for (ResponseTimeMetricFactory metricFactory : metricFactories) {

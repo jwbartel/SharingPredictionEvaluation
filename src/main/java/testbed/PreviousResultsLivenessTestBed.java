@@ -67,7 +67,7 @@ public class PreviousResultsLivenessTestBed {
 			String headerPrefix = "type,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
-					dataset.getLivenessMetricsFile());
+					dataset.getPreviousResultsLivenessMetricsFile());
 			for (LivenessEvaluatorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluatorFactory : evaluatorFactories) {
 				Collection<ResponseLivenessMetric> metrics = new ArrayList<>();
 				for (ResponseLivenessMetricFactory metricFactory : metricFactories) {

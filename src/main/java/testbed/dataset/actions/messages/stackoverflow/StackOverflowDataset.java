@@ -2,9 +2,9 @@ package testbed.dataset.actions.messages.stackoverflow;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,7 +33,7 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 
 	@Override
 	public Collection<ThreadType> getAllThreads(Long account) {
-		return new TreeSet<>(threads.values());
+		return new HashSet<>(threads.values());
 	}
 
 	public static <Recipient, MessageType extends StackOverflowMessage<Recipient>> Collection<MessageType> getQuestions(
@@ -62,7 +62,7 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 	public abstract ThreadType createThread();
 
 	protected void addToThread(MessageType message) {
-		Long id = message.getId();
+		Long id = message.getThreadId();
 		ThreadType thread = threads.get(id);
 		if (thread == null) {
 			thread = createThread();

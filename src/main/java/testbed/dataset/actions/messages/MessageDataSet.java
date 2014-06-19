@@ -24,6 +24,25 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 		return new File(getRootFolder(), "metric statistics");
 	}
 
+	public File getLivenessModelsFolder() {
+		return new File(getRootFolder(), "liveness models");
+	}
+	
+	public File getLivenessModelsFile(String type, Integer testNum) {
+		return new File(getLivenessModelsFolder(),
+				type + "_" + testNum + ".txt");
+	}
+
+	public File getLivenessMetricsFile() {
+		return new File(getMetricsFolder(),
+				"liveness prediction results.csv");
+	}
+
+	public File getResponseTimeMetricsFile() {
+		return new File(getMetricsFolder(),
+				"response time prediction results.csv");
+	}
+
 	public File getPreviousResultsLivenessMetricsFile() {
 		return new File(getMetricsFolder(),
 				"previous results liveness prediction results.csv");

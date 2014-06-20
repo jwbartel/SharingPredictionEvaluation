@@ -86,7 +86,7 @@ public class StackOverflowResponseTimeTestBed {
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "10 minutes", 10*60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "20 minutes", 20*60.0));
 		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new InverseGaussianDistribution(867.482, 571.108), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new LogNormalDistribution(6.35702, 0.927127), String.class, StackOverflowMessage.class, StackOverflowThread.class))
+		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new LogNormalDistribution(6.35702, 0.927127), String.class, StackOverflowMessage.class, StackOverflowThread.class));
 //		predictorFactories.add(MessageRandomLivenessPredictor.factory(0.5, String.class, StackOverflowMessage.class, StackOverflowThread.class));
 //		predictorFactories.add(MessageTrainingRateLivenessPredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
 //		predictorFactories.add(MessageWekaLivenessPredictor.factory("logistic_regression - num collaborators and title length", new WekaLogisticRegressionModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));

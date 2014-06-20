@@ -2,12 +2,13 @@ package metrics.response.time;
 
 import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.StatisticsResult;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeRange;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import prediction.response.time.ResponseTimeRange;
 
 public abstract class ResponseTimeMetric implements Metric {
 

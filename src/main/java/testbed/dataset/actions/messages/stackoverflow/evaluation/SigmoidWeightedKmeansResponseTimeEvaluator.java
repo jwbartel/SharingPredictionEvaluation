@@ -10,8 +10,8 @@ import metrics.response.time.ResponseTimeMetric;
 
 import org.apache.commons.io.FileUtils;
 
+import prediction.response.time.ResponseTimeRange;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 

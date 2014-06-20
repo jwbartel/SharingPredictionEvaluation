@@ -33,6 +33,15 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 				type + "_" + testNum + ".txt");
 	}
 
+	public File getResponseTimesModelsFolder() {
+		return new File(getRootFolder(), "response time models");
+	}
+	
+	public File getResponseTimeModelsFile(String type, Integer testNum) {
+		return new File(getResponseTimesModelsFolder(),
+				type + "_" + testNum + ".txt");
+	}
+
 	public File getLivenessMetricsFile() {
 		return new File(getMetricsFolder(),
 				"liveness prediction results.csv");

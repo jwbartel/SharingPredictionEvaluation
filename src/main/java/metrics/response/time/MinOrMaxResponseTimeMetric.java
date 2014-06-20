@@ -1,6 +1,6 @@
 package metrics.response.time;
 
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeRange;
+import prediction.response.time.ResponseTimeRange;
 
 public abstract class MinOrMaxResponseTimeMetric extends ResponseTimeMetric {
 	

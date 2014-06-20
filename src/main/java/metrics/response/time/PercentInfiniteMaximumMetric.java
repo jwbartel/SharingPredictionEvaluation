@@ -2,7 +2,7 @@ package metrics.response.time;
 
 import java.util.List;
 
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeRange;
+import prediction.response.time.ResponseTimeRange;
 
 public class PercentInfiniteMaximumMetric extends ResponseTimeMetric {
 

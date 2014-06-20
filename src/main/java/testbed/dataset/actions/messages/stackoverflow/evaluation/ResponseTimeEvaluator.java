@@ -8,25 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import metrics.MetricResult;
-import metrics.response.liveness.ResponseLivenessMetric;
 import metrics.response.time.ResponseTimeMetric;
+import prediction.response.time.ResponseTimeRange;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
 public abstract class ResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		implements Evaluator {
-
-	public static class ResponseTimeRange {
-		public final Double minResponseTime;
-		public final Double maxResponseTime;
-		
-		public ResponseTimeRange(Double minResponseTime,
-				Double maxResponseTime) {
-			this.minResponseTime = minResponseTime;
-			this.maxResponseTime = maxResponseTime;
-		}
-	}
 	
 	public static interface ResponseTimeEvaluatorFactory<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>> {
 

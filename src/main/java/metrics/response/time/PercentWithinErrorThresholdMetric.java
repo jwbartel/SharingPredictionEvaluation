@@ -2,9 +2,7 @@ package metrics.response.time;
 
 import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeRange;
+import prediction.response.time.ResponseTimeRange;
 
 public class PercentWithinErrorThresholdMetric extends MinOrMaxResponseTimeMetric {
 

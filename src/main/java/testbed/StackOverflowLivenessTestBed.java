@@ -30,13 +30,13 @@ import prediction.features.messages.MessageCreatorIdRule;
 import prediction.features.messages.MessageTitleLengthRule;
 import prediction.features.messages.MessageTitleWordIdsRule;
 import prediction.features.messages.ThreadSetProperties;
-import prediction.response.liveness.message.MessageConstantLivenessPredictor;
-import prediction.response.liveness.message.MessageConstantLivenessPredictor.LivenessPrediction;
+import prediction.response.liveness.message.ConstantMessageLivenessPredictor;
+import prediction.response.liveness.message.ConstantMessageLivenessPredictor.LivenessPrediction;
 import prediction.response.liveness.message.MessageLivenessPredictor;
 import prediction.response.liveness.message.MessageLivenessPredictorFactory;
-import prediction.response.liveness.message.MessageRandomLivenessPredictor;
-import prediction.response.liveness.message.MessageTrainingRateLivenessPredictor;
-import prediction.response.liveness.message.MessageWekaLivenessPredictor;
+import prediction.response.liveness.message.RandomMessageLivenessPredictor;
+import prediction.response.liveness.message.TrainingRateMessageLivenessPredictor;
+import prediction.response.liveness.message.WekaMessageLivenessPredictor;
 import snml.rule.basicfeature.IBasicFeatureRule;
 import snml.rule.superfeature.model.weka.WekaDecisionTreeModelRule;
 import snml.rule.superfeature.model.weka.WekaLogisticRegressionModelRule;
@@ -70,12 +70,12 @@ public class StackOverflowLivenessTestBed {
 		featureFactories.add(MessageTitleLengthRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleLength"));
 		featureFactories.add(MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords"));
 		
-		predictorFactories.add(MessageConstantLivenessPredictor.factory(LivenessPrediction.Live, String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(MessageConstantLivenessPredictor.factory(LivenessPrediction.Dead, String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(MessageRandomLivenessPredictor.factory(0.5, String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(MessageTrainingRateLivenessPredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(MessageWekaLivenessPredictor.factory("decision_tree", new WekaDecisionTreeModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-		predictorFactories.add(MessageWekaLivenessPredictor.factory("logistic_regression", new WekaLogisticRegressionModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(ConstantMessageLivenessPredictor.factory(LivenessPrediction.Live, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(ConstantMessageLivenessPredictor.factory(LivenessPrediction.Dead, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(RandomMessageLivenessPredictor.factory(0.5, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(TrainingRateMessageLivenessPredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(WekaMessageLivenessPredictor.factory("decision_tree", new WekaDecisionTreeModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(WekaMessageLivenessPredictor.factory("logistic_regression", new WekaLogisticRegressionModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		
 		
 		metricFactories.add(AccuracyMetric.factory());

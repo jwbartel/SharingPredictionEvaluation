@@ -24,6 +24,7 @@ import metrics.response.time.RecallMetric;
 import metrics.response.time.RelativeErrorMetric;
 import metrics.response.time.ResponseTimeMetric;
 import metrics.response.time.ResponseTimeMetricFactory;
+import metrics.response.time.RootMeanSquareErrorMetric;
 import metrics.response.time.ScaleDifferenceMetric;
 import model.prediction.responsetime.ResponseTimePredictionEvaluationModeler;
 
@@ -108,6 +109,7 @@ public class StackOverflowResponseTimeTestBed {
 		metricFactories.add(RelativeErrorMetric.factory(MinOrMaxType.Maximum));
 		metricFactories.add(ScaleDifferenceMetric.factory(MinOrMaxType.Minimum));
 		metricFactories.add(ScaleDifferenceMetric.factory(MinOrMaxType.Maximum));
+		metricFactories.add(RootMeanSquareErrorMetric.factory(MinOrMaxType.Minimum));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 minute", 60.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "3 minutes", 60*3.0));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "5 minutes", 60*5.0));

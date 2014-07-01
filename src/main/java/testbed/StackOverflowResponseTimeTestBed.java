@@ -53,16 +53,34 @@ import snml.rule.superfeature.model.weka.WekaSGDRegressionModelRule;
 import testbed.dataset.actions.ActionsDataSet.ThreadFold;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
 public class StackOverflowResponseTimeTestBed {
 	
-	static int numFolds = 10;
+	static class UserItemFeatureFactories<Collaborator, Message extends SingleMessage<Collaborator>, ThreadType extends MessageThread<Collaborator, Message>> {
+		FeatureRuleFactory<Collaborator,Message,ThreadType> userFactory;
+		FeatureRuleFactory<Collaborator,Message,ThreadType> itemFactory;
+		
+		public UserItemFeatureFactories(
+				FeatureRuleFactory<Collaborator,Message,ThreadType> userFactory,
+				FeatureRuleFactory<Collaborator,Message,ThreadType> itemFactory) {
+			
+			this.userFactory = userFactory;
+			this.itemFactory = itemFactory;
+			
+		}
+
+	}
 	
+	static int numFolds = 10;
+
 	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<MessageResponseTimePredictorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> predictorFactories = new ArrayList<>();
 	static Collection<FeatureRuleFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> featureFactories = new ArrayList<>();
+	static Collection<UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> userItemFeatures = new ArrayList<>();
 	static Collection<ResponseTimeMetricFactory> metricFactories = new ArrayList<>();
 
 	static {
@@ -80,6 +98,16 @@ public class StackOverflowResponseTimeTestBed {
 		featureFactories.add(MessageTitleLengthRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleLength"));
 		featureFactories.add(MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords"));
 
+		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
+				MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
+				MessageCollaboratorsIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators")));
+		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
+				MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
+				MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
+		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
+				MessageCollaboratorsIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators"),
+				MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
+		
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "1 minute", 60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "3 minutes", 3*60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "5 minutes", 5*60.0));
@@ -145,6 +173,7 @@ public class StackOverflowResponseTimeTestBed {
 				
 						ThreadFold<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> fold = folds.get(foldId);
 						Collection<StackOverflowThread<String, StackOverflowMessage<String>>> trainThreads = fold.trainThreads;
+						Collection<StackOverflowThread<String, StackOverflowMessage<String>>> validationThreads = fold.validationThreads;
 						Collection<StackOverflowThread<String, StackOverflowMessage<String>>> testThreads = fold.testThreads;
 
 						ThreadSetProperties<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> threadsProperties = 
@@ -171,6 +200,7 @@ public class StackOverflowResponseTimeTestBed {
 						for (StackOverflowThread<String, StackOverflowMessage<String>> thread : trainThreads) {
 							predictor.addPastThread(thread);
 						}
+						predictor.validate(validationThreads);
 						
 						Collection<ResponseTimeMetric> metrics = new ArrayList<>();
 						for (ResponseTimeMetricFactory metricFactory : metricFactories) {

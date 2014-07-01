@@ -35,24 +35,22 @@ import prediction.features.messages.MessageCollaboratorsIdsRule;
 import prediction.features.messages.MessageTitleLengthRule;
 import prediction.features.messages.MessageTitleWordIdsRule;
 import prediction.features.messages.ThreadSetProperties;
-import prediction.response.time.DistributionResponseTimePredictor;
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
 import prediction.response.time.message.ConstantMessageResponseTimePredictor;
 import prediction.response.time.message.DistributionBasedMessageResponseTimePredictor;
 import prediction.response.time.message.MessageResponseTimePredictor;
 import prediction.response.time.message.MessageResponseTimePredictorFactory;
+import prediction.response.time.message.SigmoidWeightedKmeansMessageResponseTimePredictor;
 import prediction.response.time.message.WekaClusteringMessageResponseTimePredictor;
 import prediction.response.time.message.WekaRegressionMessageResponseTimePredictor;
-import prediction.response.time.message.SigmoidWeightedKmeansMessageResponseTimePredictor;
 import snml.rule.basicfeature.IBasicFeatureRule;
 import snml.rule.superfeature.model.weka.WekaKmeansModelRule;
 import snml.rule.superfeature.model.weka.WekaLinearRegressionModelRule;
+import snml.rule.superfeature.model.weka.WekaSGDRegressionModelRule;
 import testbed.dataset.actions.ActionsDataSet.ThreadFold;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
@@ -87,14 +85,11 @@ public class StackOverflowResponseTimeTestBed {
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "20 minutes", 20*60.0));
 		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new InverseGaussianDistribution(867.482, 571.108), String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new LogNormalDistribution(6.35702, 0.927127), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		predictorFactories.add(MessageRandomLivenessPredictor.factory(0.5, String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		predictorFactories.add(MessageTrainingRateLivenessPredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		predictorFactories.add(MessageWekaLivenessPredictor.factory("logistic_regression - num collaborators and title length", new WekaLogisticRegressionModelRule("hasResponse", 2), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		predictorFactories.add(MessageWekaRegressionResponseTimePredictor.factory("sgd - num collaborators and title length", new WekaSGDRegressionModelRule("responseTime"), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		predictorFactories.add(MessageWekaRegressionResponseTimePredictor.factory("linear regression - num collaborators and title length", new WekaLinearRegressionModelRule("responseTime"), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		for (int k = 2; k <= 25; k++) {
-//			predictorFactories.add(MessageWekaClusteringResponseTimePredictor.factory("k-means_k"+k, new WekaKmeansModelRule("responseTime",k), String.class, StackOverflowMessage.class, StackOverflowThread.class));
-//		}
+		predictorFactories.add(WekaRegressionMessageResponseTimePredictor.factory("sgd - num collaborators and title length", new WekaSGDRegressionModelRule("responseTime"), String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(WekaRegressionMessageResponseTimePredictor.factory("linear regression - num collaborators and title length", new WekaLinearRegressionModelRule("responseTime"), String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		for (int k = 2; k <= 25; k++) {
+			predictorFactories.add(WekaClusteringMessageResponseTimePredictor.factory("k-means_k"+k, new WekaKmeansModelRule("responseTime",k), String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		}
 		for (int k = 2; k <= 25; k++) {
 			predictorFactories.add(SigmoidWeightedKmeansMessageResponseTimePredictor.factory("weighted k-means_k"+k, new WekaKmeansModelRule("responseTime",k), String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		}

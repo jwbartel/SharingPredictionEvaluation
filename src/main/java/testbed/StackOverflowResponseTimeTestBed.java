@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import prediction.features.messages.FeatureRuleFactory;
 import prediction.features.messages.MessageCollaboratorNumRule;
 import prediction.features.messages.MessageCollaboratorsIdsRule;
+import prediction.features.messages.MessageCreatorIdRule;
 import prediction.features.messages.MessageTitleLengthRule;
 import prediction.features.messages.MessageTitleWordIdsRule;
 import prediction.features.messages.ThreadSetProperties;
@@ -74,7 +75,7 @@ public class StackOverflowResponseTimeTestBed {
 		
 		featureFactories.add(MessageCollaboratorNumRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "numCollaborators"));
 		featureFactories.add(MessageCollaboratorsIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators"));
-//		featureFactories.add(MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"));
+		featureFactories.add(MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"));
 		featureFactories.add(MessageTitleLengthRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleLength"));
 		featureFactories.add(MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords"));
 

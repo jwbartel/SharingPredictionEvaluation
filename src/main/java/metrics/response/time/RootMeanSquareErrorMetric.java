@@ -1,10 +1,10 @@
 package metrics.response.time;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
 import prediction.response.time.ResponseTimeRange;
+import prediction.response.time.ScoringMethods;
 
 public class RootMeanSquareErrorMetric extends MinOrMaxResponseTimeMetric {
 
@@ -31,24 +31,16 @@ public class RootMeanSquareErrorMetric extends MinOrMaxResponseTimeMetric {
 	public void addTestResult(List<Double> trueTimes,
 			List<ResponseTimeRange> responseTimePredictions) {
 		
-		int totalPredictions = 0;
-		double meanSquareError = 0;
-		DescriptiveStatistics resultStats = new DescriptiveStatistics();
+		List<Double> predictions = new ArrayList<Double>(trueTimes.size());
 		
-		for (int i = 0; i < trueTimes.size(); i++) {
-			Double trueTime = trueTimes.get(i);
+		for (int i = 0; i < responseTimePredictions.size(); i++) {
 			ResponseTimeRange predictedRange = responseTimePredictions.get(i);
 			Double prediction = getPredictionValue(predictedRange);
-			if (prediction != null && trueTime != null && trueTime != 0 && trueTime != Double.POSITIVE_INFINITY
-					&& prediction != Double.POSITIVE_INFINITY) {
-				
-				totalPredictions++;
-				meanSquareError += Math.pow(prediction-trueTime, 2.0);
-			}
+			predictions.add(prediction);
 		}
-		meanSquareError = meanSquareError/((double) totalPredictions);
 		
-		stats.addValue(Math.sqrt(meanSquareError));
+		double rmse = ScoringMethods.rootMeanSquareError(trueTimes, predictions);
+		stats.addValue(rmse);
 	}
 
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -190,7 +191,7 @@ public class StackOverflowResponseTimeTestBed {
 //							System.exit(0);
 //						}
 					
-						Collection<IBasicFeatureRule> features = new ArrayList<>();
+						List<IBasicFeatureRule> features = new ArrayList<>();
 						for (FeatureRuleFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> featureFactory : featureFactories) {
 							features.add(featureFactory.create(threadsProperties));
 						}

@@ -17,11 +17,14 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 
 	public static class ThreadFold<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>, ThreadType extends CollaborativeActionThread<CollaboratorType, ActionType>> {
 		public final Collection<ThreadType> trainThreads;
+		public final Collection<ThreadType> validationThreads;
 		public final Collection<ThreadType> testThreads;
 
 		public ThreadFold(Collection<ThreadType> trainThreads,
+				Collection<ThreadType> validationThreads,
 				Collection<ThreadType> testThreads) {
 			this.trainThreads = trainThreads;
+			this.validationThreads = validationThreads;
 			this.testThreads = testThreads;
 		}
 	}
@@ -60,19 +63,28 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 
 		Map<Integer, ThreadFold<CollaboratorType, ActionType, ThreadType>> retVal =
 				new TreeMap<>();
-		for (int foldId = 0; foldId < folds.size(); foldId++) {
+		int validationPosition = folds.size() - 2;
+		int testPostion = folds.size()-1;
+		for (int foldId=0; foldId<folds.size(); foldId++) {
 
 			Collection<ThreadType> trainThreads = new ArrayList<>();
+			Collection<ThreadType> validationThreads = new ArrayList<>(
+					folds.get(validationPosition));
 			Collection<ThreadType> testThreads = new ArrayList<>(
-					folds.get(foldId));
+					folds.get(testPostion));
+			
 
-			for (int i = 0; i < folds.size(); i++) {
-				if (i != foldId) {
-					trainThreads.addAll(folds.get(i));
+			for (int j = 0; j < folds.size(); j++) {
+				if (j != validationPosition && j != testPostion) {
+					trainThreads.addAll(folds.get(j));
 				}
 			}
 			
-			retVal.put(foldId, new ThreadFold<>(trainThreads, testThreads));
+			validationPosition = (validationPosition + 1) % folds.size();
+			testPostion = (testPostion + 1) % folds.size();
+			
+
+			retVal.put(foldId, new ThreadFold<>(trainThreads, validationThreads, testThreads));
 		}
 		return retVal;
 	}

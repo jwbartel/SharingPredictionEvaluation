@@ -64,7 +64,7 @@ public class PreviousResultsLivenessTestBed {
 			for (ResponseLivenessMetricFactory metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "type,account";
+			String headerPrefix = "type,test,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
 					dataset.getPreviousResultsLivenessMetricsFile());
@@ -76,9 +76,12 @@ public class PreviousResultsLivenessTestBed {
 				LivenessEvaluator<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluator = 
 						evaluatorFactory.create(dataset, metrics);
 				
-				List<MetricResult> results = evaluator.evaluate();
-				resultCollection.addResults(evaluator.getType(), null, results);
-						
+				for (Integer testId : evaluator.getTestIds()) {
+					List<MetricResult> results = evaluator.evaluate(testId);
+					String label = evaluator.getType()+","+testId;
+					System.out.println(label);
+					resultCollection.addResults(label, null, results);
+				}
 			}
 		}
 	}

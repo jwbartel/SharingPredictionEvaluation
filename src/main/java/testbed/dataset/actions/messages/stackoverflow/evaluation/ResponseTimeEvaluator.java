@@ -40,15 +40,18 @@ public abstract class ResponseTimeEvaluator<Recipient, Message extends StackOver
 	protected abstract List<ResponseTimeRange> getPredictedResponseTimes(Integer test) throws IOException;
 	
 	@Override
-	public List<MetricResult> evaluate() {
+	public Collection<Integer> getTestIds() throws IOException {
+		return dataset.getResponesTimesTestingTimes().keySet();
+	}
+	
+	@Override
+	public List<MetricResult> evaluate(Integer testId) {
 		try {
 			Map<Integer, List<Double>> testingTimes = dataset.getResponesTimesTestingTimes();
-			for (Integer test : testingTimes.keySet()) {
-				List<Double> trueTimes = testingTimes.get(test);
-				List<ResponseTimeRange> predictedResponseTimes = getPredictedResponseTimes(test);
-				for (ResponseTimeMetric metric : metrics) {
-					metric.addTestResult(trueTimes, predictedResponseTimes);
-				}
+			List<Double> trueTimes = testingTimes.get(testId);
+			List<ResponseTimeRange> predictedResponseTimes = getPredictedResponseTimes(testId);
+			for (ResponseTimeMetric metric : metrics) {
+				metric.addTestResult(trueTimes, predictedResponseTimes);
 			}
 			List<MetricResult> results = new ArrayList<>();
 			for (ResponseTimeMetric metric : metrics) {

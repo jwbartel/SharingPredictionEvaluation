@@ -1,6 +1,7 @@
 package testbed.dataset.actions.messages.stackoverflow.evaluation;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import metrics.response.liveness.ResponseLivenessMetric;
@@ -21,6 +22,11 @@ public abstract class LivenessEvaluator<Recipient, Message extends StackOverflow
 	protected StackOverflowDataset<Recipient, Message, ThreadType> dataset;
 	protected File resultsFolder;
 	protected File livenessFolder;
+	
+	@Override
+	public Collection<Integer> getTestIds() throws IOException {
+		return dataset.getResponesTimesTestingTimes().keySet();
+	}
 
 	public LivenessEvaluator(StackOverflowDataset<Recipient, Message, ThreadType> dataset) {
 		this.dataset = dataset;

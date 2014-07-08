@@ -117,17 +117,20 @@ public class CollaborativeFilteringResponseTimeEvaluator<Recipient, Message exte
 		}
 		return ranges;
 	}
+	
+	@Override
+	public Collection<Integer> getTestIds() throws IOException {
+		return getTrueTimes().keySet();
+	}
 
 	@Override
-	public List<MetricResult> evaluate() {
+	public List<MetricResult> evaluate(Integer testId) {
 		try {
 			Map<Integer, List<Double>> testingTimes = getTrueTimes();
-			for (Integer test : testingTimes.keySet()) {
-				List<Double> trueTimes = testingTimes.get(test);
-				List<ResponseTimeRange> predictedResponseTimes = getPredictedResponseTimes(test);
-				for (ResponseTimeMetric metric : metrics) {
-					metric.addTestResult(trueTimes, predictedResponseTimes);
-				}
+			List<Double> trueTimes = testingTimes.get(testId);
+			List<ResponseTimeRange> predictedResponseTimes = getPredictedResponseTimes(testId);
+			for (ResponseTimeMetric metric : metrics) {
+				metric.addTestResult(trueTimes, predictedResponseTimes);
 			}
 			List<MetricResult> results = new ArrayList<>();
 			for (ResponseTimeMetric metric : metrics) {

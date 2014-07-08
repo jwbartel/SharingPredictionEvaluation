@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import prediction.response.time.InverseGaussianDistribution;
+import prediction.response.time.LogNormalDistribution;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -32,6 +34,7 @@ import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredict
 import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
+import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
@@ -98,11 +101,6 @@ public class PreviousResultsResponseTimeTestBed {
 				evaluatorFactories.add(CollaborativeFilteringResponseTimeEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, featureType, algorithmType));
 			}
 		}
-		
-//		evaluatorFactories.add(ConstantPredictionLivenessEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "all dead", 0.0));
-//		evaluatorFactories.add(ConstantPredictionLivenessEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "all live", 1.0));
-//		evaluatorFactories.add(RandomPredictionLivenessEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "random", 0.5));
-//		evaluatorFactories.add(RandomPredictionLivenessEvaluator.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "distribution based", 0.8575));
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -113,7 +111,7 @@ public class PreviousResultsResponseTimeTestBed {
 			for (ResponseTimeMetricFactory metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "type,k,account";
+			String headerPrefix = "type,k,test,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
 					dataset.getPreviousResultsResponseTimeMetricsFile());
@@ -125,9 +123,12 @@ public class PreviousResultsResponseTimeTestBed {
 				ResponseTimeEvaluator<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluator = 
 						evaluatorFactory.create(dataset, metrics);
 				
-				List<MetricResult> results = evaluator.evaluate();
-				resultCollection.addResults(evaluator.getType(), null, results);
-						
+				for (Integer testId : evaluator.getTestIds()) {
+					List<MetricResult> results = evaluator.evaluate(testId);
+					String label = evaluator.getType()+","+testId;
+					System.out.println(evaluator.getType()+","+testId);
+					resultCollection.addResults(label, null, results);
+				}
 			}
 		}
 	}

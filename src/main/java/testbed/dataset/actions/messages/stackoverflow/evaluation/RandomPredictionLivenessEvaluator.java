@@ -58,15 +58,13 @@ public class RandomPredictionLivenessEvaluator<Recipient, Message extends StackO
 	}
 
 	@Override
-	public List<MetricResult> evaluate() {
+	public List<MetricResult> evaluate(Integer testId) {
 		try {
 			Map<Integer, List<Double>> testingTimes = dataset.getResponesTimesTestingTimes();
-			for (Integer test : testingTimes.keySet()) {
-				List<Double> trueTimes = testingTimes.get(test);
-				List<Double> predictedLiveness = getPredictedLiveness(trueTimes);
-				for (ResponseLivenessMetric metric : metrics) {
-					metric.addTestResult(trueTimes, predictedLiveness);
-				}
+			List<Double> trueTimes = testingTimes.get(testId);
+			List<Double> predictedLiveness = getPredictedLiveness(trueTimes);
+			for (ResponseLivenessMetric metric : metrics) {
+				metric.addTestResult(trueTimes, predictedLiveness);
 			}
 			List<MetricResult> results = new ArrayList<>();
 			for (ResponseLivenessMetric metric : metrics) {

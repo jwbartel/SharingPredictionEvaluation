@@ -33,8 +33,9 @@ import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 
-public class ActionBasedSeedlessGroupRecommendationTestBed {
+public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 
 	static double percentTraining = 0.8;
 

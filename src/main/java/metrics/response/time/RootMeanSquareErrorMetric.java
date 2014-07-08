@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prediction.response.time.ResponseTimeRange;
-import prediction.response.time.ScoringMethods;
+import prediction.response.time.ScoringMethod;
 
 public class RootMeanSquareErrorMetric extends MinOrMaxResponseTimeMetric {
 
@@ -39,7 +39,7 @@ public class RootMeanSquareErrorMetric extends MinOrMaxResponseTimeMetric {
 			predictions.add(prediction);
 		}
 		
-		double rmse = ScoringMethods.rootMeanSquareError(trueTimes, predictions);
+		double rmse = ScoringMethod.rootMeanSquareError().score(trueTimes, predictions);
 		stats.addValue(rmse);
 	}
 

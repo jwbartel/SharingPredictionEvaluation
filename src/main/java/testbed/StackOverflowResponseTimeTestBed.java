@@ -33,21 +33,29 @@ import org.apache.commons.io.FileUtils;
 
 import prediction.features.messages.FeatureRuleFactory;
 import prediction.features.messages.MessageCollaboratorNumRule;
+import prediction.features.messages.MessageCollaboratorsIdSetRule;
 import prediction.features.messages.MessageCollaboratorsIdsRule;
 import prediction.features.messages.MessageCreatorIdRule;
+import prediction.features.messages.MessageCreatorIdSetRule;
 import prediction.features.messages.MessageTitleLengthRule;
+import prediction.features.messages.MessageTitleWordIdSetRule;
 import prediction.features.messages.MessageTitleWordIdsRule;
 import prediction.features.messages.ThreadSetProperties;
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
+import prediction.response.time.message.ALSWRCollaborativeFilterResponseTimePredictor;
 import prediction.response.time.message.ConstantMessageResponseTimePredictor;
 import prediction.response.time.message.DistributionBasedMessageResponseTimePredictor;
+import prediction.response.time.message.MahoutCollaborativeFilteringResponseTimePredictor.MahoutCollaborativeFilteringPredictorFactory;
 import prediction.response.time.message.MessageResponseTimePredictor;
 import prediction.response.time.message.MessageResponseTimePredictorFactory;
 import prediction.response.time.message.SigmoidWeightedKmeansMessageResponseTimePredictor;
+import prediction.response.time.message.SlopeOneResponseTimePredictor;
+import prediction.response.time.message.UserBasedCollaborativeFilterResponseTimePredictor;
 import prediction.response.time.message.WekaClusteringMessageResponseTimePredictor;
 import prediction.response.time.message.WekaRegressionMessageResponseTimePredictor;
 import snml.rule.basicfeature.IBasicFeatureRule;
+import snml.rule.superfeature.model.mahout.SimilarityMeasure;
 import snml.rule.superfeature.model.weka.WekaKmeansModelRule;
 import snml.rule.superfeature.model.weka.WekaLinearRegressionModelRule;
 import snml.rule.superfeature.model.weka.WekaSGDRegressionModelRule;
@@ -87,7 +95,7 @@ public class StackOverflowResponseTimeTestBed {
 	static {
 		try {
 			dataSets.add(new SampledStackOverflowDataset("Sampled StackOverflow", new File(
-								"data/Stack Overflow/100 Random Questions")));
+								"data/Stack Overflow/10000 Random Questions")));
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 			System.exit(0);
@@ -100,14 +108,14 @@ public class StackOverflowResponseTimeTestBed {
 		featureFactories.add(MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords"));
 
 		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
-				MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
-				MessageCollaboratorsIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators")));
+				MessageCreatorIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
+				MessageCollaboratorsIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators")));
 		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
-				MessageCreatorIdRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
-				MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
+				MessageCreatorIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "creators"),
+				MessageTitleWordIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
 		userItemFeatures.add(new UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(
-				MessageCollaboratorsIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators"),
-				MessageTitleWordIdsRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
+				MessageCollaboratorsIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "collaborators"),
+				MessageTitleWordIdSetRule.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "titleWords")));
 		
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "1 minute", 60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(String.class, StackOverflowMessage.class, StackOverflowThread.class, "3 minutes", 3*60.0));
@@ -124,6 +132,16 @@ public class StackOverflowResponseTimeTestBed {
 		for (int k = 2; k <= 25; k++) {
 			predictorFactories.add(SigmoidWeightedKmeansMessageResponseTimePredictor.factory("weighted k-means_k"+k, new WekaKmeansModelRule("responseTime",k), String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		}
+		
+		int[] numFeaturesForALSWR = {50, 150, 300, 400, 500, 1000};
+		double[] lambdasForALSWR = {0.03, 0.04, 0.05, 0.06, 0.065, 0.075};
+		
+		predictorFactories.add(SlopeOneResponseTimePredictor.factory("slope one", String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(UserBasedCollaborativeFilterResponseTimePredictor.factory("user-based-euclidean", SimilarityMeasure.EuclideanDistance, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(UserBasedCollaborativeFilterResponseTimePredictor.factory("user-based-cosine", SimilarityMeasure.CosineSimilarity, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(UserBasedCollaborativeFilterResponseTimePredictor.factory("user-based-pearson", SimilarityMeasure.PearsonCorrelation, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(UserBasedCollaborativeFilterResponseTimePredictor.factory("user-based-spearman", SimilarityMeasure.SpearmanCorrelation, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		predictorFactories.add(ALSWRCollaborativeFilterResponseTimePredictor.factory("ALS-WR", numFeaturesForALSWR, lambdasForALSWR, 10, String.class, StackOverflowMessage.class, StackOverflowThread.class));
 		
 		
 		metricFactories.add(RecallMetric.factory());
@@ -149,6 +167,92 @@ public class StackOverflowResponseTimeTestBed {
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 week", 3600.0*24*7));
 	}
 	
+	public static void runCollaborativeFilteringTests(
+			StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset,
+			MetricResultCollection<Long> resultCollection,
+			Long account,
+			MessageResponseTimePredictorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> predictorFactory,
+			Integer foldId,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> trainThreads,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> validationThreads,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> testThreads,
+			ThreadSetProperties<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> threadsProperties
+			) throws Exception {
+		
+		for (UserItemFeatureFactories<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> userItemFeatureFactory : userItemFeatures) {
+			
+			IBasicFeatureRule userFeature = userItemFeatureFactory.userFactory.create(threadsProperties);
+			IBasicFeatureRule itemFeature = userItemFeatureFactory.itemFactory.create(threadsProperties);
+			List<IBasicFeatureRule> features = new ArrayList<>();
+			features.add(userFeature);
+			features.add(itemFeature);
+			
+			MessageResponseTimePredictor<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> predictor = predictorFactory.create(features, threadsProperties);
+	
+			for (StackOverflowThread<String, StackOverflowMessage<String>> thread : trainThreads) {
+				predictor.addPastThread(thread);
+			}
+			predictor.validate(validationThreads);
+			
+			Collection<ResponseTimeMetric> metrics = new ArrayList<>();
+			for (ResponseTimeMetricFactory metricFactory : metricFactories) {
+				metrics.add(metricFactory.create());
+			}
+
+			String label = predictor.getTitle() + ","
+					+ userFeature.getDestFeatureName() + ","
+					+ itemFeature.getDestFeatureName() + "," + foldId;
+			System.out.println(label);
+			
+			FileUtils.write(dataset.getResponseTimeModelsFile(predictor.getTitle(), foldId), predictor.getModelInfo());
+			
+			ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> modeler =
+					new ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(testThreads, predictor, metrics);
+			Collection<MetricResult> results = modeler.modelPredictionEvaluation();
+			resultCollection.addResults(label, account, results);
+		}
+	}
+	
+	public static void runNonCollaborativeFilteringTests(
+			StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset,
+			MetricResultCollection<Long> resultCollection,
+			Long account,
+			MessageResponseTimePredictorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> predictorFactory,
+			Integer foldId,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> trainThreads,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> validationThreads,
+			Collection<StackOverflowThread<String, StackOverflowMessage<String>>> testThreads,
+			ThreadSetProperties<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> threadsProperties
+			) throws Exception {
+		
+		List<IBasicFeatureRule> features = new ArrayList<>();
+		for (FeatureRuleFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> featureFactory : featureFactories) {
+			features.add(featureFactory.create(threadsProperties));
+		}
+
+		MessageResponseTimePredictor<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> predictor = predictorFactory.create(features, threadsProperties);
+
+		for (StackOverflowThread<String, StackOverflowMessage<String>> thread : trainThreads) {
+			predictor.addPastThread(thread);
+		}
+		predictor.validate(validationThreads);
+		
+		Collection<ResponseTimeMetric> metrics = new ArrayList<>();
+		for (ResponseTimeMetricFactory metricFactory : metricFactories) {
+			metrics.add(metricFactory.create());
+		}
+		
+		String label = predictor.getTitle() + ",N/A,N/A," + foldId;
+		System.out.println(label);
+		
+		FileUtils.write(dataset.getResponseTimeModelsFile(predictor.getTitle(), foldId), predictor.getModelInfo());
+		
+		ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> modeler =
+				new ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(testThreads, predictor, metrics);
+		Collection<MetricResult> results = modeler.modelPredictionEvaluation();
+		resultCollection.addResults(label, account, results);
+	}
+	
 	
 	public static void main(String[] args) throws Exception {
 	
@@ -160,7 +264,7 @@ public class StackOverflowResponseTimeTestBed {
 			for (ResponseTimeMetricFactory metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "type,fold,account";
+			String headerPrefix = "type,user type,item type,fold,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
 					dataset.getResponseTimeMetricsFile());
@@ -191,32 +295,12 @@ public class StackOverflowResponseTimeTestBed {
 //							System.exit(0);
 //						}
 					
-						List<IBasicFeatureRule> features = new ArrayList<>();
-						for (FeatureRuleFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> featureFactory : featureFactories) {
-							features.add(featureFactory.create(threadsProperties));
-						}
-
-						MessageResponseTimePredictor<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> predictor = predictorFactory.create(features, threadsProperties);
-
-						for (StackOverflowThread<String, StackOverflowMessage<String>> thread : trainThreads) {
-							predictor.addPastThread(thread);
-						}
-						predictor.validate(validationThreads);
-						
-						Collection<ResponseTimeMetric> metrics = new ArrayList<>();
-						for (ResponseTimeMetricFactory metricFactory : metricFactories) {
-							metrics.add(metricFactory.create());
+						if (predictorFactory instanceof MahoutCollaborativeFilteringPredictorFactory) {
+							runCollaborativeFilteringTests(dataset, resultCollection, account, predictorFactory, foldId, trainThreads, validationThreads, testThreads, threadsProperties);
+						} else {
+							runNonCollaborativeFilteringTests(dataset, resultCollection, account, predictorFactory, foldId, trainThreads, validationThreads, testThreads, threadsProperties);
 						}
 						
-						String label = predictor.getTitle() + "," + foldId;
-						System.out.println(label);
-						
-						FileUtils.write(dataset.getResponseTimeModelsFile(predictor.getTitle(), foldId), predictor.getModelInfo());
-						
-						ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> modeler =
-								new ResponseTimePredictionEvaluationModeler<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>(testThreads, predictor, metrics);
-						Collection<MetricResult> results = modeler.modelPredictionEvaluation();
-						resultCollection.addResults(label, account, results);
 					}
 				}
 			}

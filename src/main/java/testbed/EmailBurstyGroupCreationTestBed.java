@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import metrics.Metric;
@@ -47,9 +49,7 @@ public class EmailBurstyGroupCreationTestBed {
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
 
-	static Collection<Double> wOuts = new ArrayList<>();
-	static Collection<Double> halfLives = new ArrayList<>();
-	static Collection<Double> scoreThresholds = new ArrayList<>();
+	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constantValues = new HashMap<>();
 
 	static Collection<Double> distanceThresholds = new ArrayList<>();
 
@@ -70,43 +70,38 @@ public class EmailBurstyGroupCreationTestBed {
 		graphBuilderFactories.add(TimeThresholdActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 
-		// Add w_outs
-		wOuts.add(0.25);
-		wOuts.add(0.5);
-		wOuts.add(1.0);
-		wOuts.add(2.0);
-		wOuts.add(4.0);
-
-		// Add half lives
-		halfLives.add(1000.0*60); // 1 minute
-		halfLives.add(1000.0*60*60); // 1 hour
-		halfLives.add(1000.0*60*60*24); // 1 day
-		halfLives.add(1000.0*60*60*24*7); // 1 week
-		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
-		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-		halfLives.add(1000.0*60*60*24*365); // 1 year
-		halfLives.add(1000.0*60*60*24*365*2); // 2 years
-
-		// Add score thresholds
-		scoreThresholds.add(0.05);
-		scoreThresholds.add(0.10);
-		scoreThresholds.add(0.15);
-		scoreThresholds.add(0.20);
-		scoreThresholds.add(0.25);
-		scoreThresholds.add(0.30);
-		scoreThresholds.add(0.35);
-		scoreThresholds.add(0.40);
-		scoreThresholds.add(0.45);
-		scoreThresholds.add(0.50);
+		
+		// Add constants for simple graph builder
+		Collection<ConstantValues> simpleConstants = new ArrayList<>();
+		simpleConstants.add(new ConstantValues(new Object[0]));
+		constantValues.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
+		
+		// Add constants for time threshold graph builder
+		Collection<ConstantValues> thresholdConstants = new ArrayList<>();
+		Object[] thresholdConstantSet1 = {1000L*60*60}; // 1 hour
+		Object[] thresholdConstantSet2 = {1000L*60*60*24}; // 1 day
+		Object[] thresholdConstantSet3 = {1000L*60*60*24*7*4}; // 4 weeks
+		thresholdConstants.add((new ConstantValues(thresholdConstantSet1)));
+		thresholdConstants.add((new ConstantValues(thresholdConstantSet2)));
+		thresholdConstants.add((new ConstantValues(thresholdConstantSet3)));
+		
+		// Add constants for interaction rank graph builder
+		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
+		Object[] interactionRankSet1 = {4.0, 1000.0*60*60, 0.1}; // w_out=4.0, half-life=1 hour, threshold=0.1
+		Object[] interactionRankSet2 = {0.25, 1000.0*60*60, 0.4}; // w_out=0.24, half-life=1 hour, threshold=0.4
+		Object[] interactionRankSet3 = {4.0, 1000.0*60*60*24*7*4, 0.25}; // wout=4.0, half-life=4 weeks, threshold=0.25
+		interactionRankConstants.add((new ConstantValues(interactionRankSet1)));
+		interactionRankConstants.add((new ConstantValues(interactionRankSet2)));
+		interactionRankConstants.add((new ConstantValues(interactionRankSet3)));
 
 		// Add thresholds for seed and recommendation matchers
 		distanceThresholds.add(0.00);
-//		distanceThresholds.add(0.05);
+		//distanceThresholds.add(0.05);
 		distanceThresholds.add(0.10);
-//		distanceThresholds.add(0.15);
+		//distanceThresholds.add(0.15);
 		distanceThresholds.add(0.20);
-//		distanceThresholds.add(0.25);
-		distanceThresholds.add(0.30);
+		//distanceThresholds.add(0.25);
+		//distanceThresholds.add(0.30);
 
 		// Add metrics
 		metricFactories.add(MessagesTriggeringGroupCreationMetric.factory(String.class, EmailMessage.class));
@@ -188,19 +183,26 @@ public class EmailBurstyGroupCreationTestBed {
 
 		GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 				seedlessRecommenderFactory, graphBuilder);
-		for (Double seedThreshold : distanceThresholds) {
-			for (Double recommendationThreshold : distanceThresholds) {
-				String label = graphBuilder.getName() + ",N/A,N/A,N/A";
-				label += "," + seedThreshold + "," + recommendationThreshold;
-				System.out.println("\t"+label);
-				
-				Collection<MetricResult> results = collectResults(
-						trainMessages, testMessages, seedThreshold,
-						recommendationThreshold, recommender);
+		
+		Collection<ConstantValues> constantSets = constantValues.get(graphBuilder.getClass());
+		for (ConstantValues constantSet : constantSets) {
+			for (Double seedThreshold : distanceThresholds) {
+				for (Double recommendationThreshold : distanceThresholds) {
+					String label = graphBuilder.getName() + ",";
+					label += seedThreshold + ","
+							+ recommendationThreshold + ",";
+					label += "N/A,N/A,N/A";
+					System.out.println("\t"+label);
+					
+					Collection<MetricResult> results = collectResults(
+							trainMessages, testMessages, seedThreshold,
+							recommendationThreshold, recommender);
 
-				resultCollection.addResults(label, account, results);
+					resultCollection.addResults(label, account, results);
+				}
 			}
 		}
+
 	}
 
 	private static void useGraphBuilderTimeThreshold(
@@ -211,19 +213,28 @@ public class EmailBurstyGroupCreationTestBed {
 			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
-		for (double timeThreshold : halfLives) {
+		
+
+		ActionBasedGraphBuilder<String, CollaborativeAction<String>> tempGraphBuilder = graphBuilderFactory
+				.create(0L);
+		
+		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
+		for (ConstantValues constantSet : constantSets) {
+			Long timeThreshold = (Long) constantSet.constants[0];
+			
 			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
-					.create((long) timeThreshold);
+					.create(timeThreshold);
 
 			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 					seedlessRecommenderFactory, graphBuilder);
-
+			
 			for (Double seedThreshold : distanceThresholds) {
 				for (Double recommendationThreshold : distanceThresholds) {
-					String label = graphBuilder.getName() + ",N/A,N/A,"
+					String label = graphBuilder.getName() + ",";
+					label += seedThreshold + ","
+							+ recommendationThreshold + ",";
+					label += "N/A,N/A,"
 							+ getHalfLifeName(timeThreshold);
-					label += "," + seedThreshold + ","
-							+ recommendationThreshold;
 					System.out.println("\t"+label);
 					
 					Collection<MetricResult> results = collectResults(
@@ -233,6 +244,7 @@ public class EmailBurstyGroupCreationTestBed {
 					resultCollection.addResults(label, account, results);
 				}
 			}
+			
 		}
 	}
 
@@ -244,33 +256,38 @@ public class EmailBurstyGroupCreationTestBed {
 			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
-		for (double halfLife : halfLives) {
-			for (double wOut : wOuts) {
-				for (double scoreThreshold : scoreThresholds) {
-					ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
-							.create((long) halfLife, wOut, scoreThreshold);
+		ActionBasedGraphBuilder<String, CollaborativeAction<String>> tempGraphBuilder = graphBuilderFactory
+				.create(0L, 0.0, 0.0);
+		
+		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
+		for (ConstantValues constantSet : constantSets) {
+			
+			Double wOut = (Double) constantSet.constants[0];
+			Long halfLife = (Long) constantSet.constants[1];
+			Double scoreThreshold = (Double) constantSet.constants[2];
+			
+			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
+					.create((long) halfLife, wOut, scoreThreshold);
 
-					GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
-							seedlessRecommenderFactory, graphBuilder);
+			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
+					seedlessRecommenderFactory, graphBuilder);
 
-					for (Double seedThreshold : distanceThresholds) {
-						for (Double recommendationThreshold : distanceThresholds) {
+			for (Double seedThreshold : distanceThresholds) {
+				for (Double recommendationThreshold : distanceThresholds) {
 
-							String label = graphBuilder.getName() + ","
-									+ getHalfLifeName(halfLife) + "," + wOut
-									+ "," + scoreThreshold;
-							label += "," + seedThreshold + ","
-									+ recommendationThreshold;
-							System.out.println("\t"+label);
-							
-							Collection<MetricResult> results = collectResults(
-									trainMessages, testMessages, seedThreshold,
-									recommendationThreshold, recommender);
+					String label = graphBuilder.getName() + ",";
+					label += seedThreshold + ","
+							+ recommendationThreshold + ",";
+					label += getHalfLifeName(halfLife) + "," + wOut
+							+ "," + scoreThreshold;
+					System.out.println("\t"+label);
+					
+					Collection<MetricResult> results = collectResults(
+							trainMessages, testMessages, seedThreshold,
+							recommendationThreshold, recommender);
 
-							resultCollection
-									.addResults(label, account, results);
-						}
-					}
+					resultCollection
+							.addResults(label, account, results);
 				}
 			}
 		}
@@ -284,8 +301,8 @@ public class EmailBurstyGroupCreationTestBed {
 			for (BurstyGroupMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 				tempMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "graph builder,half_life,w_out,edge threshold"
-					+ ",seed threshold,recommendation threshold,account";
+			String headerPrefix = "graph builder,seed threshold,recommendation threshold,"
+					+ "account,half_life,w_out,edge threshold";
 			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
 					headerPrefix, tempMetrics,
 					dataset.getBurstyGroupsMetricsFile());

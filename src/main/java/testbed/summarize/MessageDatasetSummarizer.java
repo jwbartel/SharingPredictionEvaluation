@@ -49,11 +49,13 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 				Collection<SortableColumn> columnsToRankBy = new ArrayList<>();
 				columnsToRankBy.add(new SortableColumn("deletions required for test action", Order.Ascending));
 				columnsToRankBy.add(new SortableColumn("additions required for test action", Order.Ascending));
+				columnsToRankBy.add(new SortableColumn("test actions matched to recommendations", Order.Descending));
 				return new BestColumnsSummarizer(resultsFile, "graph builder", columnsToRankBy, 1);
 			} else {
 				Collection<SortableColumn> columnsToRankBy = new ArrayList<>();
 				columnsToRankBy.add(new SortableColumn("avg-deletions required for test action", Order.Ascending));
 				columnsToRankBy.add(new SortableColumn("avg-additions required for test action", Order.Ascending));
+				columnsToRankBy.add(new SortableColumn("test actions matched to recommendations", Order.Descending));
 				return new BestColumnsSummarizer(resultsFile, "graph builder", columnsToRankBy);
 			}
 		}

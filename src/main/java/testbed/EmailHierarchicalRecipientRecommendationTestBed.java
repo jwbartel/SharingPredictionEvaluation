@@ -43,6 +43,7 @@ import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeight
 import recommendation.recipients.groupbased.interactionrank.scoring.TopContactScore;
 import testbed.dataset.actions.messages.email.EmailDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 
 public class EmailHierarchicalRecipientRecommendationTestBed {
 
@@ -63,6 +64,8 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 		// Add data sets
 		dataSets.add(new EnronEmailDataSet("enron",
 				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+		dataSets.add(new ResponseTimeStudyDataSet("response time", new File(
+				"data/Email Response Study")));
 
 		// Add recommender factories
 		recommenderFactories

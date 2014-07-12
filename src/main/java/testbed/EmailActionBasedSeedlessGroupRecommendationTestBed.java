@@ -33,6 +33,7 @@ import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 
 public class EmailActionBasedSeedlessGroupRecommendationTestBed {
@@ -55,6 +56,8 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		// Add data sets
 		dataSets.add(new EnronEmailDataSet("enron",
 				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+		dataSets.add(new ResponseTimeStudyDataSet("response time", new File(
+				"data/Email Response Study")));
 		
 		// Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
@@ -245,6 +248,10 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 				
 				Collection<EmailMessage<String>> trainMessages = dataset.getTrainMessages(account, percentTraining);
 				Collection<EmailMessage<String>> testMessages = dataset.getTestMessages(account, percentTraining);
+				
+				if (trainMessages.size() + testMessages.size() < 10) {
+					continue;
+				}
 				
 				for (SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory : seedlessRecommenderFactories) {
 					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {

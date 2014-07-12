@@ -84,15 +84,17 @@ public class EmailBurstyGroupCreationTestBed {
 		thresholdConstants.add((new ConstantValues(thresholdConstantSet1)));
 		thresholdConstants.add((new ConstantValues(thresholdConstantSet2)));
 		thresholdConstants.add((new ConstantValues(thresholdConstantSet3)));
+		constantValues.put(TimeThresholdActionBasedGraphBuilder.class, thresholdConstants);
 		
 		// Add constants for interaction rank graph builder
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankSet1 = {4.0, 1000.0*60*60, 0.1}; // w_out=4.0, half-life=1 hour, threshold=0.1
-		Object[] interactionRankSet2 = {0.25, 1000.0*60*60, 0.4}; // w_out=0.24, half-life=1 hour, threshold=0.4
-		Object[] interactionRankSet3 = {4.0, 1000.0*60*60*24*7*4, 0.25}; // wout=4.0, half-life=4 weeks, threshold=0.25
+		Object[] interactionRankSet1 = {4.0, 1000L*60*60, 0.1}; // w_out=4.0, half-life=1 hour, threshold=0.1
+		Object[] interactionRankSet2 = {0.25, 1000L*60*60, 0.4}; // w_out=0.24, half-life=1 hour, threshold=0.4
+		Object[] interactionRankSet3 = {4.0, 1000L*60*60*24*7*4, 0.25}; // wout=4.0, half-life=4 weeks, threshold=0.25
 		interactionRankConstants.add((new ConstantValues(interactionRankSet1)));
 		interactionRankConstants.add((new ConstantValues(interactionRankSet2)));
 		interactionRankConstants.add((new ConstantValues(interactionRankSet3)));
+		constantValues.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
 
 		// Add thresholds for seed and recommendation matchers
 		distanceThresholds.add(0.00);

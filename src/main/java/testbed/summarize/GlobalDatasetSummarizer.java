@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.group.MixedInitiativeDataSet;
@@ -23,6 +24,11 @@ public class GlobalDatasetSummarizer {
 		EnronEmailDataSet enronDataset = new EnronEmailDataSet("enron",
 				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron"));
 		MessageDatasetSummarizer.create(enronDataset).summarize();
+
+		//Response time email data set
+		ResponseTimeStudyDataSet responseTimeDataset = new ResponseTimeStudyDataSet(
+				"response time", new File("data/Email Response Study"));
+		MessageDatasetSummarizer.create(responseTimeDataset).summarize();
 
 		//Stack Overflow public data dump
 		SampledStackOverflowDataset stackOverflowDataset = new SampledStackOverflowDataset(

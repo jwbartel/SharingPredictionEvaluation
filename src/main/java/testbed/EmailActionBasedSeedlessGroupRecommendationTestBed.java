@@ -8,6 +8,10 @@ import java.util.Set;
 
 import javax.imageio.stream.FileImageOutputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -145,11 +149,21 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		return halfLife + " years";
 	}
 	
+	private static void printGraph(File output,
+			UndirectedGraph<String, DefaultEdge> graph) throws IOException {
+		for (DefaultEdge edge : graph.edgeSet()) {
+			String source = graph.getEdgeSource(edge);
+			String target = graph.getEdgeTarget(edge);
+			FileUtils.write(output, target + "\t" + source + "\n", true);
+		}
+	}
+	
 	private static Collection<MetricResult> collectResults(
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender,
-			File groupOutputFile) {
+			File groupOutputFile,
+			File graphOutputFile) {
 		
 		for (EmailMessage<String> pastAction : trainMessages) {
 			recommender.addPastAction(pastAction);
@@ -163,6 +177,15 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		}
 		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
 		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
+		
+		if (!graphOutputFile.getParentFile().exists()) {
+			graphOutputFile.getParentFile().mkdirs();
+		}
+		try {
+			printGraph(graphOutputFile, recommender.getGraph());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>>(
 				recommendations, new ArrayList<Set<String>>(),
@@ -191,8 +214,10 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 
 		File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(
 				account, graphBuilder.getName());
+		File graphFile = dataset.getArgumentlessGraphBasedGraphFile(
+				account, graphBuilder.getName());
 		Collection<MetricResult> results = collectResults(trainMessages,
-				testMessages, recommender, groupsFile);
+				testMessages, recommender, groupsFile, graphFile);
 		
 		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
 		resultCollection.addResults(label, account, results);
@@ -218,8 +243,11 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			File groupsFile = dataset.getTimeThresholdGraphBasedGroupsFile(
 					account, graphBuilder.getName(),
 					getHalfLifeName(timeThreshold));
+			File graphFile = dataset.getTimeThresholdGraphBasedGraphFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
 			Collection<MetricResult> results = collectResults(trainMessages,
-					testMessages, recommender, groupsFile);
+					testMessages, recommender, groupsFile, graphFile);
 
 			String label = graphBuilder.getName() + ",N/A,N/A," + getHalfLifeName(timeThreshold);
 			resultCollection.addResults(label, account, results);
@@ -251,8 +279,14 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 									getHalfLifeName(halfLife),
 									wOut,
 									scoreThreshold);
+					File graphFile = dataset
+							.getScoredEdgesGraphBasedGraphFile(account,
+									graphBuilder.getName(),
+									getHalfLifeName(halfLife),
+									wOut,
+									scoreThreshold);
 					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, recommender, groupsFile);
+							trainMessages, testMessages, recommender, groupsFile, graphFile);
 
 					String label = graphBuilder.getName() +
 							"," + getHalfLifeName(halfLife) +

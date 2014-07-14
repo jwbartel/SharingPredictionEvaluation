@@ -98,11 +98,32 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		}
 	}
 	
-	public File getArgumentlessGraphBasedGroupsFile(IdType account,
+	private File getArgumentlessGraphBasedFolder(IdType account,
 			String graphBuilderType) {
 		File groupsFolder = getGroupsFolder(account);
 		groupsFolder = new File(groupsFolder, graphBuilderType);
+		return groupsFolder;
+	}
+	
+	public File getArgumentlessGraphBasedGroupsFile(IdType account,
+			String graphBuilderType) {
+		File groupsFolder = getArgumentlessGraphBasedFolder(account,
+				graphBuilderType);
 		return new File(groupsFolder, "groups.txt");
+	}
+	
+	public File getArgumentlessGraphBasedGraphFile(IdType account,
+			String graphBuilderType) {
+		File groupsFolder = getArgumentlessGraphBasedFolder(account,
+				graphBuilderType);
+		return new File(groupsFolder, "graph.txt");
+	}
+	
+	public File getTimeThresholdGraphBasedFolder(IdType account,
+			String graphBuilderType, String timeThreshold) {
+		File groupsFolder = getTimeThresholdGraphBasedFolder(account,
+				graphBuilderType, timeThreshold);
+		return groupsFolder;
 	}
 
 	public File getTimeThresholdGraphBasedGroupsFile(IdType account,
@@ -113,7 +134,16 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		return new File(groupsFolder, "groups.txt");
 	}
 
-	public File getScoredEdgesGraphBasedGroupsFile(IdType account,
+	public File getTimeThresholdGraphBasedGraphFile(IdType account,
+			String graphBuilderType, String timeThreshold) {
+		File groupsFolder = getGroupsFolder(account);
+		groupsFolder = new File(groupsFolder, graphBuilderType);
+		groupsFolder = new File(groupsFolder, timeThreshold);
+		return new File(groupsFolder, "graph.txt");
+	}
+
+
+	public File getScoredEdgesGraphBasedFolder(IdType account,
 			String graphBuilderType,
 			String halfLife,
 			double wOut,
@@ -123,6 +153,26 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		groupsFolder = new File(groupsFolder, "halfLife-" + halfLife);
 		groupsFolder = new File(groupsFolder, "wOut-" + wOut);
 		groupsFolder = new File(groupsFolder, "scoreThreshold-" + scoreThreshold);
+		return groupsFolder;
+	}
+
+	public File getScoredEdgesGraphBasedGraphFile(IdType account,
+			String graphBuilderType,
+			String halfLife,
+			double wOut,
+			double scoreThreshold) {
+		File groupsFolder = getScoredEdgesGraphBasedFolder(account,
+				graphBuilderType, halfLife, wOut, scoreThreshold);
+		return new File(groupsFolder, "graph.txt");
+	}
+
+	public File getScoredEdgesGraphBasedGroupsFile(IdType account,
+			String graphBuilderType,
+			String halfLife,
+			double wOut,
+			double scoreThreshold) {
+		File groupsFolder = getScoredEdgesGraphBasedFolder(account,
+				graphBuilderType, halfLife, wOut, scoreThreshold);
 		return new File(groupsFolder, "groups.txt");
 	}
 	

@@ -89,6 +89,43 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		return retVal;
 	}
 	
+	private File getGroupsFolder(IdType account) {
+		File folder = new File(getRootFolder(), "groups");
+		if (account != null) {
+			return new File(folder, account.toString());
+		} else {
+			return folder;
+		}
+	}
+	
+	public File getArgumentlessGraphBasedGroupsFile(IdType account,
+			String graphBuilderType) {
+		File groupsFolder = getGroupsFolder(account);
+		groupsFolder = new File(groupsFolder, graphBuilderType);
+		return new File(groupsFolder, "groups.txt");
+	}
+
+	public File getTimeThresholdGraphBasedGroupsFile(IdType account,
+			String graphBuilderType, String timeThreshold) {
+		File groupsFolder = getGroupsFolder(account);
+		groupsFolder = new File(groupsFolder, graphBuilderType);
+		groupsFolder = new File(groupsFolder, timeThreshold);
+		return new File(groupsFolder, "groups.txt");
+	}
+
+	public File getScoredEdgesGraphBasedGroupsFile(IdType account,
+			String graphBuilderType,
+			String halfLife,
+			double wOut,
+			double scoreThreshold) {
+		File groupsFolder = getGroupsFolder(account);
+		groupsFolder = new File(groupsFolder, graphBuilderType);
+		groupsFolder = new File(groupsFolder, "halfLife-" + halfLife);
+		groupsFolder = new File(groupsFolder, "wOut-" + wOut);
+		groupsFolder = new File(groupsFolder, "scoreThreshold-" + scoreThreshold);
+		return new File(groupsFolder, "groups.txt");
+	}
+	
 	public abstract Collection<ActionType> getAllMessages(IdType account);
 	public abstract Collection<ActionType> getTrainMessages(IdType account, double percentTrain);
 	public abstract Collection<ActionType> getTestMessages(IdType account, double percentTrain);

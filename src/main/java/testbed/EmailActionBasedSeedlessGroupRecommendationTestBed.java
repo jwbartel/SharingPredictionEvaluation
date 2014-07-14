@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.imageio.stream.FileImageOutputStream;
+
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -31,6 +33,7 @@ import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
 import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
+import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
@@ -54,8 +57,8 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	static {
 
 		// Add data sets
-		dataSets.add(new EnronEmailDataSet("enron",
-				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+//		dataSets.add(new EnronEmailDataSet("enron",
+//				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
 		dataSets.add(new ResponseTimeStudyDataSet("response time", new File(
 				"data/Email Response Study")));
 		
@@ -69,33 +72,35 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		
 		// Add w_outs
-		wOuts.add(0.25);
-		wOuts.add(0.5);
+//		wOuts.add(0.25);
+//		wOuts.add(0.5);
 		wOuts.add(1.0);
-		wOuts.add(2.0);
-		wOuts.add(4.0);
+//		wOuts.add(2.0);
+//		wOuts.add(4.0);
 		
 		// Add half lives
-		halfLives.add(1000.0*60); // 1 minute
-		halfLives.add(1000.0*60*60); // 1 hour
-		halfLives.add(1000.0*60*60*24); // 1 day
+//		halfLives.add(1000.0*60); // 1 minute
+//		halfLives.add(1000.0*60*60); // 1 hour
+//		halfLives.add(1000.0*60*60*24); // 1 day
 		halfLives.add(1000.0*60*60*24*7); // 1 week
-		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
-		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-		halfLives.add(1000.0*60*60*24*365); // 1 year
-		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+		halfLives.add(1000.0*60*60*24*7*2); // 2 weeks
+		halfLives.add(1000.0*60*60*24*7*4); // 1 month
+		halfLives.add(1000.0*60*60*24*7*4*2); // 2 months
+//		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+//		halfLives.add(1000.0*60*60*24*365); // 1 year
+//		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
-		scoreThresholds.add(0.05);
-		scoreThresholds.add(0.10);
-		scoreThresholds.add(0.15);
-		scoreThresholds.add(0.20);
+//		scoreThresholds.add(0.05);
+//		scoreThresholds.add(0.10);
+//		scoreThresholds.add(0.15);
+//		scoreThresholds.add(0.20);
 		scoreThresholds.add(0.25);
-		scoreThresholds.add(0.30);
-		scoreThresholds.add(0.35);
-		scoreThresholds.add(0.40);
-		scoreThresholds.add(0.45);
-		scoreThresholds.add(0.50);
+//		scoreThresholds.add(0.30);
+//		scoreThresholds.add(0.35);
+//		scoreThresholds.add(0.40);
+//		scoreThresholds.add(0.45);
+//		scoreThresholds.add(0.50);
 		
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<String, EmailMessage<String>>());
@@ -129,8 +134,12 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		if (halfLife < 7) {
 			return halfLife + " days";
 		}
-		if (halfLife <= 28) {
+		if (halfLife < 28) {
 			return halfLife/7 + " weeks";
+		}
+		if (halfLife < 365/2) {
+			halfLife = halfLife/28;
+			return halfLife + " months";
 		}
 		halfLife /= 365;
 		return halfLife + " years";
@@ -139,7 +148,8 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	private static Collection<MetricResult> collectResults(
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender) {
+			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender,
+			File groupOutputFile) {
 		
 		for (EmailMessage<String> pastAction : trainMessages) {
 			recommender.addPastAction(pastAction);
@@ -147,6 +157,13 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 
 		Collection<Set<String>> recommendations = recommender
 				.getRecommendations();
+		
+		if (!groupOutputFile.getParentFile().exists()) {
+			groupOutputFile.getParentFile().mkdirs();
+		}
+		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
+		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
+		
 		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, EmailMessage<String>>(
 				recommendations, new ArrayList<Set<String>>(),
 				testMessages, metrics);
@@ -157,6 +174,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	}
 	
 	private static void useGraphBuilderNoArgs(
+			ActionsDataSet<String,String,EmailMessage<String>,EmailThread<String, EmailMessage<String>>> dataset,
 			String account,
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
@@ -171,14 +189,17 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 				new GraphFormingActionBasedSeedlessGroupRecommender<>(
 						seedlessRecommenderFactory, graphBuilder);
 
+		File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(
+				account, graphBuilder.getName());
 		Collection<MetricResult> results = collectResults(trainMessages,
-				testMessages, recommender);
+				testMessages, recommender, groupsFile);
 		
 		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
 		resultCollection.addResults(label, account, results);
 	}
 	
 	private static void useGraphBuilderTimeThreshold(
+			ActionsDataSet<String,String,EmailMessage<String>,EmailThread<String, EmailMessage<String>>> dataset,
 			String account,
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
@@ -194,8 +215,11 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 
+			File groupsFile = dataset.getTimeThresholdGraphBasedGroupsFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
 			Collection<MetricResult> results = collectResults(trainMessages,
-					testMessages, recommender);
+					testMessages, recommender, groupsFile);
 
 			String label = graphBuilder.getName() + ",N/A,N/A," + getHalfLifeName(timeThreshold);
 			resultCollection.addResults(label, account, results);
@@ -203,6 +227,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	}
 	
 	private static void useGraphBuilderScoredEdges(
+			ActionsDataSet<String,String,EmailMessage<String>,EmailThread<String, EmailMessage<String>>> dataset,
 			String account,
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
@@ -220,8 +245,14 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 							new GraphFormingActionBasedSeedlessGroupRecommender<>(
 									seedlessRecommenderFactory, graphBuilder);
 
+					File groupsFile = dataset
+							.getScoredEdgesGraphBasedGroupsFile(account,
+									graphBuilder.getName(),
+									getHalfLifeName(halfLife),
+									wOut,
+									scoreThreshold);
 					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, recommender);
+							trainMessages, testMessages, recommender, groupsFile);
 
 					String label = graphBuilder.getName() +
 							"," + getHalfLifeName(halfLife) +
@@ -257,22 +288,25 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {
 						
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
-							useGraphBuilderScoredEdges(account, trainMessages,
-									testMessages, seedlessRecommenderFactory,
+							useGraphBuilderScoredEdges(dataset, account,
+									trainMessages, testMessages,
+									seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else if (graphBuilderFactory.takesTime()) {
-							useGraphBuilderTimeThreshold(account,
+							useGraphBuilderTimeThreshold(dataset, account,
 									trainMessages, testMessages,
 									seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else {
-							useGraphBuilderNoArgs(account, trainMessages,
-									testMessages, seedlessRecommenderFactory,
+							useGraphBuilderNoArgs(dataset, account,
+									trainMessages, testMessages,
+									seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						}
 
 					}
 				}
+				break;
 			}
 		}
 	}

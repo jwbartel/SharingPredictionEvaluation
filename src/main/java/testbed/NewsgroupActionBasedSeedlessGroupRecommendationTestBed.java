@@ -2,26 +2,16 @@ package testbed;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
-import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
-import data.representation.actionbased.CollaborativeAction;
-import data.representation.actionbased.messages.ComparableAddress;
-import data.representation.actionbased.messages.email.EmailMessage;
-import data.representation.actionbased.messages.email.EmailThread;
-import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
-import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
+import metrics.groups.actionbased.GroupCenteredPercentAddedMetric;
+import metrics.groups.actionbased.GroupCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.MessageCenteredPercentAddedMetric;
 import metrics.groups.actionbased.MessageCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.RecommendationsMatchedToTestActionMetric;
@@ -33,12 +23,19 @@ import metrics.groups.actionbased.TotalTestActionsMetric;
 import model.recommendation.groups.ActionBasedSeedlessGroupRecommendationAcceptanceModeler;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
-import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
-import testbed.dataset.actions.ActionsDataSet;
-import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.newsgroups.NewsgroupDataset;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
+import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
+import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.messages.ComparableAddress;
+import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
+import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 
 public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 
@@ -102,6 +99,8 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new TotalRecommendedGroupsMetric<ComparableAddress, JavaMailNewsgroupPost>());
+		metrics.add(new GroupCenteredPercentDeletedMetric<ComparableAddress, JavaMailNewsgroupPost>());
+		metrics.add(new GroupCenteredPercentAddedMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new MessageCenteredPercentDeletedMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new MessageCenteredPercentAddedMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new TestActionsMatchedToRecommendationMetric<ComparableAddress, JavaMailNewsgroupPost>());

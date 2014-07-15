@@ -11,6 +11,8 @@ import java.util.Set;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.groups.actionbased.GroupCenteredPercentAddedMetric;
+import metrics.groups.actionbased.GroupCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.MessageCenteredPercentAddedMetric;
 import metrics.groups.actionbased.MessageCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.RecommendationsMatchedToTestActionMetric;
@@ -110,6 +112,8 @@ public class EmailBurstyGroupCreationTestBed {
 		metricFactories.add(RecommendationsCreatedPerBurstMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalTestActionsMetric<String, EmailMessage<String>>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalRecommendedGroupsMetric<String, EmailMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentDeletedMetric<String, EmailMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentAddedMetric<String, EmailMessage<String>>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentDeletedMetric<String, EmailMessage<String>>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentAddedMetric<String, EmailMessage<String>>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsMatchedToRecommendationMetric<String, EmailMessage<String>>()));

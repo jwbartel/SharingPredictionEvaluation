@@ -22,8 +22,8 @@ import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
-import metrics.groups.actionbased.AdditionsToUseRecommendationsWithTestActionsMetric;
-import metrics.groups.actionbased.DeletionsToUseRecommendationsWithTestActionsMetric;
+import metrics.groups.actionbased.MessageCenteredPercentAddedMetric;
+import metrics.groups.actionbased.MessageCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.RecommendationsMatchedToTestActionMetric;
 import metrics.groups.actionbased.RecommendationsToTestActionPerfectMatchesMetric;
 import metrics.groups.actionbased.TestActionsMatchedToRecommendationMetric;
@@ -102,8 +102,8 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new TotalRecommendedGroupsMetric<ComparableAddress, JavaMailNewsgroupPost>());
-		metrics.add(new DeletionsToUseRecommendationsWithTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
-		metrics.add(new AdditionsToUseRecommendationsWithTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
+		metrics.add(new MessageCenteredPercentDeletedMetric<ComparableAddress, JavaMailNewsgroupPost>());
+		metrics.add(new MessageCenteredPercentAddedMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new TestActionsMatchedToRecommendationMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new TestActionsToRecommendationPerfectMatchesMetric<ComparableAddress, JavaMailNewsgroupPost>());
 		metrics.add(new RecommendationsMatchedToTestActionMetric<ComparableAddress, JavaMailNewsgroupPost>());

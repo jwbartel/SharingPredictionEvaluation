@@ -24,8 +24,8 @@ import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
-import metrics.groups.actionbased.AdditionsToUseRecommendationsWithTestActionsMetric;
-import metrics.groups.actionbased.DeletionsToUseRecommendationsWithTestActionsMetric;
+import metrics.groups.actionbased.MessageCenteredPercentAddedMetric;
+import metrics.groups.actionbased.MessageCenteredPercentDeletedMetric;
 import metrics.groups.actionbased.RecommendationsMatchedToTestActionMetric;
 import metrics.groups.actionbased.RecommendationsToTestActionPerfectMatchesMetric;
 import metrics.groups.actionbased.TestActionsMatchedToRecommendationMetric;
@@ -109,8 +109,8 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<String, EmailMessage<String>>());
 		metrics.add(new TotalRecommendedGroupsMetric<String, EmailMessage<String>>());
-		metrics.add(new DeletionsToUseRecommendationsWithTestActionsMetric<String, EmailMessage<String>>());
-		metrics.add(new AdditionsToUseRecommendationsWithTestActionsMetric<String, EmailMessage<String>>());
+		metrics.add(new MessageCenteredPercentDeletedMetric<String, EmailMessage<String>>());
+		metrics.add(new MessageCenteredPercentAddedMetric<String, EmailMessage<String>>());
 		metrics.add(new TestActionsMatchedToRecommendationMetric<String, EmailMessage<String>>());
 		metrics.add(new TestActionsToRecommendationPerfectMatchesMetric<String, EmailMessage<String>>());
 		metrics.add(new RecommendationsMatchedToTestActionMetric<String, EmailMessage<String>>());

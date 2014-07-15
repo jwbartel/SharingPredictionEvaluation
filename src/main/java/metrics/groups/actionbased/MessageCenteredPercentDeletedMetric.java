@@ -14,7 +14,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import data.representation.actionbased.CollaborativeAction;
 
-public class DeletionsToUseRecommendationsWithTestActionsMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
+public class MessageCenteredPercentDeletedMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
 		implements ActionBasedGroupMetric<CollaboratorType, ActionType> {
 	
 	@Override
@@ -57,7 +57,7 @@ public class DeletionsToUseRecommendationsWithTestActionsMetric<CollaboratorType
 
 	@Override
 	public String getHeader() {
-		return "avg-deletions required for test action,stdev-deletions required for test action";
+		return "avg-message-centered percent deleted,stdev-message-centered percent deleted";
 	}
 
 }

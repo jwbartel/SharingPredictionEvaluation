@@ -14,7 +14,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import data.representation.actionbased.CollaborativeAction;
 
-public class AdditionsToUseRecommendationsWithTestActionsMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
+public class MessageCenteredPercentAddedMetric<CollaboratorType, ActionType extends CollaborativeAction<CollaboratorType>>
 		implements ActionBasedGroupMetric<CollaboratorType, ActionType> {
 	
 	@Override
@@ -45,7 +45,7 @@ public class AdditionsToUseRecommendationsWithTestActionsMetric<CollaboratorType
 
 	@Override
 	public String getHeader() {
-		return "avg-additions required for test action,stdev-additions required for test action";
+		return "avg-message-centered percent added,stdev-message-centered percent added";
 	}
 
 }

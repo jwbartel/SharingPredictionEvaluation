@@ -28,6 +28,9 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 	
 	@Override
 	public GroupedRowSummarizer getGroupRowSummarizer(File resultsFile) {
+		if (resultsFile.getName().endsWith(dataset.getResponseTimeMetricsFile().getName())) {
+			return new GroupedRowSummarizer(resultsFile, "fold", "account");
+		}
 		return new GroupedRowSummarizer(resultsFile, "account", "account");
 	}
 
@@ -59,7 +62,22 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 				return new BestColumnsSummarizer(resultsFile, "graph builder", columnsToRankBy);
 			}
 		}
+		if (resultsFile.getName().endsWith(dataset.getResponseTimeMetricsFile().getName())) {
+			Collection<SortableColumn> columnsToRankBy = new ArrayList<>();
+			columnsToRankBy.add(new SortableColumn("deletions required for test action", Order.Ascending));
+			columnsToRankBy.add(new SortableColumn("additions required for test action", Order.Ascending));
+		}
 		return null;
+	}
+	
+	@Override
+	public void summarizeMetricResults(File resultsFile, IdType[] accounts) throws IOException {
+		if (resultsFile.getName().endsWith(dataset.getResponseTimeMetricsFile().getName())) {
+			File summarizedFile = new File(resultsFile.getParent(), "summarized - " + resultsFile.getName());
+			getGroupRowSummarizer(resultsFile).summarize(summarizedFile);
+		} else {
+			super.summarizeMetricResults(resultsFile, accounts);
+		}
 	}
 
 	@Override
@@ -72,6 +90,9 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 		}
 		if (dataset.getActionBasedSeedlessGroupsMetricsFile().exists()) {
 			summarizeMetricResults(dataset.getActionBasedSeedlessGroupsMetricsFile(), dataset.getAccountIds());
+		}
+		if (dataset.getResponseTimeMetricsFile().exists()) {
+			summarizeMetricResults(dataset.getResponseTimeMetricsFile(), dataset.getAccountIds());
 		}
 		
 	}

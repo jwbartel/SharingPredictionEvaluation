@@ -147,15 +147,18 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<Collaborato
 		Set<CollaboratorType> adds = new HashSet<CollaboratorType>(
 				intendedGroup);
 		adds.removeAll(recommendation);
+		if (adds.size() == intendedGroup.size()) {
+			return null;
+		}
 
 		Set<CollaboratorType> deletes = new HashSet<CollaboratorType>(
 				recommendation);
 		deletes.removeAll(intendedGroup);
-
-		double distance = ((double) adds.size() + deletes.size());
-		if (distance >= intendedGroup.size()) {
+		if (deletes.size() == recommendation.size()) {
 			return null;
 		}
+
+		double distance = ((double) adds.size() + deletes.size());
 		return distance;
 	}
 

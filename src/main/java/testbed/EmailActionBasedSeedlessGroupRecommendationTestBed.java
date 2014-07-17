@@ -61,10 +61,10 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	static {
 
 		// Add data sets
-//		dataSets.add(new EnronEmailDataSet("enron",
-//				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
-		dataSets.add(new ResponseTimeStudyDataSet("response time", new File(
-				"data/Email Response Study")));
+		dataSets.add(new EnronEmailDataSet("enron",
+				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+//		dataSets.add(new ResponseTimeStudyDataSet("response time", new File(
+//				"data/Email Response Study")));
 		
 		// Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
@@ -76,30 +76,33 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		
 		// Add w_outs
-//		wOuts.add(0.25);
-//		wOuts.add(0.5);
+		wOuts.add(0.125);
+		wOuts.add(0.25);
+		wOuts.add(0.5);
 		wOuts.add(1.0);
-//		wOuts.add(2.0);
-//		wOuts.add(4.0);
+		wOuts.add(2.0);
+		wOuts.add(4.0);
+		wOuts.add(8.0);
 		
 		// Add half lives
 //		halfLives.add(1000.0*60); // 1 minute
-//		halfLives.add(1000.0*60*60); // 1 hour
-//		halfLives.add(1000.0*60*60*24); // 1 day
+		halfLives.add(1000.0*60*60); // 1 hour
+		halfLives.add(1000.0*60*60*24); // 1 day
 		halfLives.add(1000.0*60*60*24*7); // 1 week
 		halfLives.add(1000.0*60*60*24*7*2); // 2 weeks
 		halfLives.add(1000.0*60*60*24*7*4); // 1 month
 		halfLives.add(1000.0*60*60*24*7*4*2); // 2 months
-//		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-//		halfLives.add(1000.0*60*60*24*365); // 1 year
-//		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+		halfLives.add(1000.0*60*60*24*365); // 1 year
+		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
+		scoreThresholds.add(0.0);
 //		scoreThresholds.add(0.05);
 //		scoreThresholds.add(0.10);
 //		scoreThresholds.add(0.15);
 //		scoreThresholds.add(0.20);
-		scoreThresholds.add(0.25);
+//		scoreThresholds.add(0.25);
 //		scoreThresholds.add(0.30);
 //		scoreThresholds.add(0.35);
 //		scoreThresholds.add(0.40);
@@ -154,7 +157,8 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		for (DefaultEdge edge : graph.edgeSet()) {
 			String source = graph.getEdgeSource(edge);
 			String target = graph.getEdgeTarget(edge);
-			FileUtils.write(output, target + "\t" + source + "\n", true);
+			String edgeStr = target + "\t" + source + "\t" + graph.getEdgeWeight(edge);
+			FileUtils.write(output, edgeStr + "\n", true);
 		}
 	}
 	
@@ -169,14 +173,15 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			recommender.addPastAction(pastAction);
 		}
 
-		Collection<Set<String>> recommendations = recommender
-				.getRecommendations();
-		
-		if (!groupOutputFile.getParentFile().exists()) {
-			groupOutputFile.getParentFile().mkdirs();
-		}
+		Collection<Set<String>> recommendations = new ArrayList<>();
+//		Collection<Set<String>> recommendations = recommender
+//				.getRecommendations();
+//		
+//		if (!groupOutputFile.getParentFile().exists()) {
+//			groupOutputFile.getParentFile().mkdirs();
+//		}
 		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
-		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
+//		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
 		
 		if (!graphOutputFile.getParentFile().exists()) {
 			graphOutputFile.getParentFile().mkdirs();
@@ -340,7 +345,6 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 
 					}
 				}
-				break;
 			}
 		}
 	}

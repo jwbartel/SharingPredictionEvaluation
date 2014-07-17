@@ -7,19 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
-import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
-import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
-import data.representation.actionbased.CollaborativeAction;
-import data.representation.actionbased.messages.ComparableAddress;
-import data.representation.actionbased.messages.email.EmailMessage;
-import data.representation.actionbased.messages.email.EmailThread;
-import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
-import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -33,13 +20,25 @@ import metrics.groups.actionbased.TestActionsToRecommendationPerfectMatchesMetri
 import metrics.groups.actionbased.TotalRecommendedGroupsMetric;
 import metrics.groups.actionbased.TotalTestActionsMetric;
 import model.recommendation.groups.ActionBasedSeedlessGroupRecommendationAcceptanceModeler;
+
+import org.apache.commons.io.FileUtils;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
-import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.actions.ActionsDataSet;
-import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
+import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
+import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
+import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
+import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
 public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 
@@ -78,11 +77,11 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		
 		// Add w_outs
-		wOuts.add(0.25);
-		wOuts.add(0.5);
+//		wOuts.add(0.25);
+//		wOuts.add(0.5);
 		wOuts.add(1.0);
-		wOuts.add(2.0);
-		wOuts.add(4.0);
+//		wOuts.add(2.0);
+//		wOuts.add(4.0);
 		
 		// Add half lives
 		halfLives.add(1000.0*60); // 1 minute
@@ -95,16 +94,17 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
-		scoreThresholds.add(0.05);
-		scoreThresholds.add(0.10);
-		scoreThresholds.add(0.15);
-		scoreThresholds.add(0.20);
-		scoreThresholds.add(0.25);
-		scoreThresholds.add(0.30);
-		scoreThresholds.add(0.35);
-		scoreThresholds.add(0.40);
-		scoreThresholds.add(0.45);
-		scoreThresholds.add(0.50);
+		scoreThresholds.add(0.0);
+//		scoreThresholds.add(0.05);
+//		scoreThresholds.add(0.10);
+//		scoreThresholds.add(0.15);
+//		scoreThresholds.add(0.20);
+//		scoreThresholds.add(0.25);
+//		scoreThresholds.add(0.30);
+//		scoreThresholds.add(0.35);
+//		scoreThresholds.add(0.40);
+//		scoreThresholds.add(0.45);
+//		scoreThresholds.add(0.50);
 		
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<String, StackOverflowMessage<String>>());
@@ -145,17 +145,46 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 		return halfLife + " years";
 	}
 	
+	private static void printGraph(File output,
+			UndirectedGraph<String, DefaultEdge> graph) throws IOException {
+		for (DefaultEdge edge : graph.edgeSet()) {
+			String source = graph.getEdgeSource(edge);
+			String target = graph.getEdgeTarget(edge);
+			String edgeStr = target + "\t" + source + "\t" + graph.getEdgeWeight(edge);
+			FileUtils.write(output, edgeStr + "\n", true);
+		}
+	}
+	
 	private static Collection<MetricResult> collectResults(
 			Collection<StackOverflowMessage<String>> trainMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender) {
+			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender,
+			File groupOutputFile,
+			File graphOutputFile) {
 		
 		for (StackOverflowMessage<String> pastAction : trainMessages) {
 			recommender.addPastAction(pastAction);
 		}
 
-		Collection<Set<String>> recommendations = recommender
-				.getRecommendations();
+		Collection<Set<String>> recommendations = new ArrayList<>();
+//		Collection<Set<String>> recommendations = recommender
+//				.getRecommendations();
+//		
+//		if (!groupOutputFile.getParentFile().exists()) {
+//			groupOutputFile.getParentFile().mkdirs();
+//		}
+//		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
+//		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
+		
+		if (!graphOutputFile.getParentFile().exists()) {
+			graphOutputFile.getParentFile().mkdirs();
+		}
+		try {
+			printGraph(graphOutputFile, recommender.getGraph());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<String, StackOverflowMessage<String>>(recommendations, new ArrayList<Set<String>> (), testMessages, metrics);
 
 		Collection<MetricResult> results = modeler
@@ -164,6 +193,7 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 	}
 	
 	private static void useGraphBuilderNoArgs(
+			ActionsDataSet<Long,String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset,
 			Long account,
 			Collection<StackOverflowMessage<String>> trainMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
@@ -178,14 +208,20 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 				new GraphFormingActionBasedSeedlessGroupRecommender<>(
 						seedlessRecommenderFactory, graphBuilder);
 
+		File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(account,
+				graphBuilder.getName());
+		File graphFile = dataset.getArgumentlessGraphBasedGraphFile(account,
+				graphBuilder.getName());
 		Collection<MetricResult> results = collectResults(trainMessages,
-				testMessages, recommender);
+				testMessages, recommender, groupsFile, graphFile);
 		
 		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
+		System.out.println(label);
 		resultCollection.addResults(label, account, results);
 	}
 	
 	private static void useGraphBuilderTimeThreshold(
+			ActionsDataSet<Long,String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset,
 			Long account,
 			Collection<StackOverflowMessage<String>> trainMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
@@ -201,15 +237,23 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 
+			File groupsFile = dataset.getTimeThresholdGraphBasedGroupsFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
+			File graphFile = dataset.getTimeThresholdGraphBasedGraphFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
 			Collection<MetricResult> results = collectResults(trainMessages,
-					testMessages, recommender);
+					testMessages, recommender, groupsFile, graphFile);
 
 			String label = graphBuilder.getName() + ",N/A,N/A," + getHalfLifeName(timeThreshold);
+			System.out.println(label);
 			resultCollection.addResults(label, account, results);
 		}
 	}
 	
 	private static void useGraphBuilderScoredEdges(
+			ActionsDataSet<Long,String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset,
 			Long account,
 			Collection<StackOverflowMessage<String>> trainMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
@@ -227,13 +271,23 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 							new GraphFormingActionBasedSeedlessGroupRecommender<>(
 									seedlessRecommenderFactory, graphBuilder);
 
+					File groupsFile = dataset
+							.getScoredEdgesGraphBasedGroupsFile(account,
+									graphBuilder.getName(),
+									getHalfLifeName(halfLife), wOut,
+									scoreThreshold);
+					File graphFile = dataset.getScoredEdgesGraphBasedGraphFile(
+							account, graphBuilder.getName(),
+							getHalfLifeName(halfLife), wOut, scoreThreshold);
 					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, recommender);
+							trainMessages, testMessages, recommender,
+							groupsFile, graphFile);
 
 					String label = graphBuilder.getName() +
 							"," + getHalfLifeName(halfLife) +
 							"," + wOut +
 							"," + scoreThreshold;
+					System.out.println(label);
 					resultCollection.addResults(label, account, results);
 				}
 			}
@@ -269,16 +323,16 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {
 						
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
-							useGraphBuilderScoredEdges(account, trainMessages,
+							useGraphBuilderScoredEdges(dataset, account, trainMessages,
 									testMessages, seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else if (graphBuilderFactory.takesTime()) {
-							useGraphBuilderTimeThreshold(account,
+							useGraphBuilderTimeThreshold(dataset, account,
 									trainMessages, testMessages,
 									seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else {
-							useGraphBuilderNoArgs(account, trainMessages,
+							useGraphBuilderNoArgs(dataset, account, trainMessages,
 									testMessages, seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						}

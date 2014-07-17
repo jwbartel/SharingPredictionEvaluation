@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
+
 import testbed.dataset.DataSet;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.CollaborativeActionThread;
@@ -186,5 +189,4 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 	
 	public abstract File getActionBasedSeedlessGroupsMetricsFile();
 	public abstract File getBurstyGroupsMetricsFile();
-
 }

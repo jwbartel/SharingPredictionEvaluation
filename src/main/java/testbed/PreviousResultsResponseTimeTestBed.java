@@ -47,7 +47,7 @@ public class PreviousResultsResponseTimeTestBed {
 	static Collection<ResponseTimeMetricFactory> metricFactories = new ArrayList<>();
 	static Collection<ResponseTimeEvaluatorFactory<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> evaluatorFactories = new ArrayList<>();
 	
-	
+
 	static {
 		try {
 			dataSets.add(new SampledStackOverflowDataset("Sampled StackOverflow", new File(

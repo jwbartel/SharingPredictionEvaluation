@@ -103,4 +103,9 @@ public class SampledStackOverflowDataset extends
 		return new StackOverflowThread<>();
 	}
 
+	@Override
+	public String parseCollaborator(String collaboratorStr) {
+		return collaboratorStr;
+	}
+
 }

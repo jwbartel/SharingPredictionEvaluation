@@ -248,4 +248,9 @@ public class ResponseTimeStudyDataSet
 		return new ArrayList<>(threadMap.values());
 	}
 
+	@Override
+	public String parseCollaborator(String collaboratorStr) {
+		return collaboratorStr;
+	}
+
 }

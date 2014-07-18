@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
+import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.DataSet;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.CollaborativeActionThread;
@@ -174,6 +176,12 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		File groupsFolder = getScoredEdgesGraphBasedFolder(account,
 				graphBuilderType, halfLife, wOut, scoreThreshold);
 		return new File(groupsFolder, "groups.txt");
+	}
+	
+	public Collection<Set<CollaboratorType>> loadGroups(File groupsFile,
+			IOFunctions<CollaboratorType> ioHelp) {
+
+		return ioHelp.loadCliqueIDs(groupsFile.getAbsolutePath());
 	}
 	
 	public abstract Collection<ActionType> getAllMessages(IdType account);

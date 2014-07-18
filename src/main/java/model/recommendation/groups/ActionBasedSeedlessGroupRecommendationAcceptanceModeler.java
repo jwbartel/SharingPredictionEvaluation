@@ -159,6 +159,9 @@ public class ActionBasedSeedlessGroupRecommendationAcceptanceModeler<Collaborato
 		}
 
 		double distance = ((double) adds.size() + deletes.size());
+		if (distance >= intendedGroup.size()) {
+			return null;
+		}
 		return distance;
 	}
 

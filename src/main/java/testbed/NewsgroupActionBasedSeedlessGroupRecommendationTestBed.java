@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import metrics.Metric;
@@ -50,12 +52,14 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 
 	static Collection<NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>> dataSets = new ArrayList<>();
 	
+	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new TreeMap<>();
+	
 	static Collection<SeedlessGroupRecommenderFactory<ComparableAddress>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>>> graphBuilderFactories = new ArrayList<>();
 	
-	static Collection<Double> wOuts = new ArrayList<>();
-	static Collection<Double> halfLives = new ArrayList<>();
-	static Collection<Double> scoreThresholds = new ArrayList<>();
+//	static Collection<Double> wOuts = new ArrayList<>();
+//	static Collection<Double> halfLives = new ArrayList<>();
+//	static Collection<Double> scoreThresholds = new ArrayList<>();
 
 	static Collection<ActionBasedGroupMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
 
@@ -73,28 +77,55 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(SimpleActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		graphBuilderFactories.add(TimeThresholdActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
+
+		Collection<ConstantValues> simpleConstants = new ArrayList<>();
+		Object[] simpleConstantSet = {};
+		simpleConstants.add(new ConstantValues(simpleConstantSet));
+		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
+		
+		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
+		Object[] timeThresholdConstantSet1 = {1000.0*60*60*24*7*4}; //4 weeks
+		Object[] timeThresholdConstantSet2 = {1000.0*60*60*24*365/2}; //0.5 years
+		Object[] timeThresholdConstantSet3 = {1000.0*60*60*24*365}; //1 year
+		Object[] timeThresholdConstantSet4 = {1000.0*60*60*24*365*2}; //2 years
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet4));
+		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
+		
+		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
+		Object[] interactionRankConstantSet1 = {1.0, 1000.0*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
+		Object[] interactionRankConstantSet2 = {1.0, 1000.0*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
+		Object[] interactionRankConstantSet3 = {1.0, 1000.0*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
+		Object[] interactionRankConstantSet4 = {1.0, 1000.0*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
+		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
 		
 		// Add w_outs
-		wOuts.add(0.125);
-		wOuts.add(0.25);
-		wOuts.add(0.5);
-		wOuts.add(1.0);
-		wOuts.add(2.0);
-		wOuts.add(4.0);
-		wOuts.add(8.0);
+//		wOuts.add(0.125);
+//		wOuts.add(0.25);
+//		wOuts.add(0.5);
+//		wOuts.add(1.0);
+//		wOuts.add(2.0);
+//		wOuts.add(4.0);
+//		wOuts.add(8.0);
 		
-		// Add half lives
-		halfLives.add(1000.0*60); // 1 minute
-		halfLives.add(1000.0*60*60); // 1 hour
-		halfLives.add(1000.0*60*60*24); // 1 day
-		halfLives.add(1000.0*60*60*24*7); // 1 week
-		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
-		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-		halfLives.add(1000.0*60*60*24*365); // 1 year
-		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+//		// Add half lives
+//		halfLives.add(1000.0*60); // 1 minute
+//		halfLives.add(1000.0*60*60); // 1 hour
+//		halfLives.add(1000.0*60*60*24); // 1 day
+//		halfLives.add(1000.0*60*60*24*7); // 1 week
+//		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
+//		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+//		halfLives.add(1000.0*60*60*24*365); // 1 year
+//		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
-		scoreThresholds.add(0.0);
+//		scoreThresholds.add(0.0);
 //		scoreThresholds.add(0.05);
 //		scoreThresholds.add(0.10);
 //		scoreThresholds.add(0.15);
@@ -211,25 +242,27 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			SeedlessGroupRecommenderFactory<ComparableAddress> seedlessRecommenderFactory,
 			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
-		
-		ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
-				graphBuilderFactory.create();
-		
-		GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
-				new GraphFormingActionBasedSeedlessGroupRecommender<>(
-						seedlessRecommenderFactory, graphBuilder);
 
+		Collection<ConstantValues> constantSets = constants.get(SimpleActionBasedGraphBuilder.class);
+		for (ConstantValues constantSet : constantSets) {
+			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder = graphBuilderFactory
+					.create();
 
-		File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(account,
-				graphBuilder.getName());
-		File graphFile = dataset.getArgumentlessGraphBasedGraphFile(account,
-				graphBuilder.getName());
-		Collection<MetricResult> results = collectResults(trainMessages,
-				testMessages, recommender, groupsFile, graphFile);
-		
-		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
-		System.out.println(label);
-		resultCollection.addResults(label, account, results);
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender =
+					new GraphFormingActionBasedSeedlessGroupRecommender<>(
+							seedlessRecommenderFactory, graphBuilder);
+
+			File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(account,
+					graphBuilder.getName());
+			File graphFile = dataset.getArgumentlessGraphBasedGraphFile(account,
+					graphBuilder.getName());
+			Collection<MetricResult> results = collectResults(trainMessages, testMessages,
+					recommender, groupsFile, graphFile);
+
+			String label = graphBuilder.getName() + ",N/A,N/A,N/A";
+			System.out.println(label);
+			resultCollection.addResults(label, account, results);
+		}
 	}
 	
 	private static void useGraphBuilderTimeThreshold(
@@ -241,7 +274,10 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
 		
-		for (double timeThreshold : halfLives) {
+		Collection<ConstantValues> constantSets = constants.get(TimeThresholdActionBasedGraphBuilder.class);
+		for (ConstantValues constantSet : constantSets) {
+			double timeThreshold = (Double) constantSet.constants[0];
+			
 			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
 					graphBuilderFactory.create((long) timeThreshold);
 
@@ -273,39 +309,40 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
 		
-		for (double halfLife : halfLives) {
-			for (double wOut : wOuts) {
-				for (double scoreThreshold : scoreThresholds) {
-					ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
-							graphBuilderFactory.create( (long) halfLife, wOut, scoreThreshold);
+		Collection<ConstantValues> constantSets = constants.get(InteractionRankWeightedActionBasedGraphBuilder.class);
+		for (ConstantValues constantSet : constantSets) {
+			double wOut = (Double) constantSet.constants[0];
+			double halfLife = (Double) constantSet.constants[1];
+			double scoreThreshold = (Double) constantSet.constants[2];
+			
+			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
+					graphBuilderFactory.create( (long) halfLife, wOut, scoreThreshold);
 
-					GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
-							new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
-									seedlessRecommenderFactory, graphBuilder);
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
+					new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
+							seedlessRecommenderFactory, graphBuilder);
 
-					File groupsFile = dataset
-							.getScoredEdgesGraphBasedGroupsFile(account,
-									graphBuilder.getName(),
-									getHalfLifeName(halfLife),
-									wOut,
-									scoreThreshold);
-					File graphFile = dataset
-							.getScoredEdgesGraphBasedGraphFile(account,
-									graphBuilder.getName(),
-									getHalfLifeName(halfLife),
-									wOut,
-									scoreThreshold);
-					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, recommender, groupsFile, graphFile);
+			File groupsFile = dataset
+					.getScoredEdgesGraphBasedGroupsFile(account,
+							graphBuilder.getName(),
+							getHalfLifeName(halfLife),
+							wOut,
+							scoreThreshold);
+			File graphFile = dataset
+					.getScoredEdgesGraphBasedGraphFile(account,
+							graphBuilder.getName(),
+							getHalfLifeName(halfLife),
+							wOut,
+							scoreThreshold);
+			Collection<MetricResult> results = collectResults(
+					trainMessages, testMessages, recommender, groupsFile, graphFile);
 
-					String label = graphBuilder.getName() +
-							"," + getHalfLifeName(halfLife) +
-							"," + wOut +
-							"," + scoreThreshold;
-					System.out.println(label);
-					resultCollection.addResults(label, account, results);
-				}
-			}
+			String label = graphBuilder.getName() +
+					"," + getHalfLifeName(halfLife) +
+					"," + wOut +
+					"," + scoreThreshold;
+			System.out.println(label);
+			resultCollection.addResults(label, account, results);
 		}
 	}
 	

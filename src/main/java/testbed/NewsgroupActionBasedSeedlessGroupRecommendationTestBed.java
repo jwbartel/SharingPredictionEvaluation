@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 
 import metrics.Metric;
 import metrics.MetricResult;
@@ -21,9 +22,15 @@ import metrics.groups.actionbased.TestActionsToRecommendationPerfectMatchesMetri
 import metrics.groups.actionbased.TotalRecommendedGroupsMetric;
 import metrics.groups.actionbased.TotalTestActionsMetric;
 import model.recommendation.groups.ActionBasedSeedlessGroupRecommendationAcceptanceModeler;
+
+import org.apache.commons.io.FileUtils;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
+import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.actions.messages.newsgroups.NewsgroupDataset;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
@@ -68,11 +75,13 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		
 		// Add w_outs
+		wOuts.add(0.125);
 		wOuts.add(0.25);
 		wOuts.add(0.5);
 		wOuts.add(1.0);
 		wOuts.add(2.0);
 		wOuts.add(4.0);
+		wOuts.add(8.0);
 		
 		// Add half lives
 		halfLives.add(1000.0*60); // 1 minute
@@ -85,16 +94,17 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		halfLives.add(1000.0*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
-		scoreThresholds.add(0.05);
-		scoreThresholds.add(0.10);
-		scoreThresholds.add(0.15);
-		scoreThresholds.add(0.20);
-		scoreThresholds.add(0.25);
-		scoreThresholds.add(0.30);
-		scoreThresholds.add(0.35);
-		scoreThresholds.add(0.40);
-		scoreThresholds.add(0.45);
-		scoreThresholds.add(0.50);
+		scoreThresholds.add(0.0);
+//		scoreThresholds.add(0.05);
+//		scoreThresholds.add(0.10);
+//		scoreThresholds.add(0.15);
+//		scoreThresholds.add(0.20);
+//		scoreThresholds.add(0.25);
+//		scoreThresholds.add(0.30);
+//		scoreThresholds.add(0.35);
+//		scoreThresholds.add(0.40);
+//		scoreThresholds.add(0.45);
+//		scoreThresholds.add(0.50);
 		
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
@@ -137,17 +147,53 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		return halfLife + " years";
 	}
 	
+	private static void printGraph(File output,
+			UndirectedGraph<ComparableAddress, DefaultEdge> graph) throws IOException {
+		for (DefaultEdge edge : graph.edgeSet()) {
+			ComparableAddress source = graph.getEdgeSource(edge);
+			ComparableAddress target = graph.getEdgeTarget(edge);
+			String edgeStr = target + "\t" + source + "\t" + graph.getEdgeWeight(edge);
+			FileUtils.write(output, edgeStr + "\n", true);
+		}
+	}
+	
 	private static Collection<MetricResult> collectResults(
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
-			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender) {
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender,
+			File groupOutputFile,
+			File graphOutputFile) {
 		
 		for (JavaMailNewsgroupPost pastAction : trainMessages) {
 			recommender.addPastAction(pastAction);
 		}
 
-		Collection<Set<ComparableAddress>> recommendations = recommender
-				.getRecommendations();
+		Collection<Set<ComparableAddress>> recommendations = new ArrayList<>();
+//		Collection<Set<ComparableAddress>> recommendations = recommender
+//				.getRecommendations();
+		Collection<Set<String>> strRecommendations  = new ArrayList<Set<String>>();
+		for (Set<ComparableAddress> recommendation : recommendations) {
+			Set<String> strRecommendation = new TreeSet<>();
+			for (ComparableAddress member : recommendation) {
+				strRecommendation.add(member.toString());
+			}
+		}
+		
+//		if (!groupOutputFile.getParentFile().exists()) {
+//			groupOutputFile.getParentFile().mkdirs();
+//		}
+		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
+//		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), strRecommendations);
+		
+		if (!graphOutputFile.getParentFile().exists()) {
+			graphOutputFile.getParentFile().mkdirs();
+		}
+		try {
+			printGraph(graphOutputFile, recommender.getGraph());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<ComparableAddress, JavaMailNewsgroupPost> modeler = new ActionBasedSeedlessGroupRecommendationAcceptanceModeler<ComparableAddress, JavaMailNewsgroupPost>(
 				recommendations, new ArrayList<Set<ComparableAddress>>(),
 				testMessages, metrics);
@@ -158,6 +204,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 	}
 	
 	private static void useGraphBuilderNoArgs(
+			NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> dataset,
 			Integer account,
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
@@ -172,14 +219,21 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 				new GraphFormingActionBasedSeedlessGroupRecommender<>(
 						seedlessRecommenderFactory, graphBuilder);
 
+
+		File groupsFile = dataset.getArgumentlessGraphBasedGroupsFile(account,
+				graphBuilder.getName());
+		File graphFile = dataset.getArgumentlessGraphBasedGraphFile(account,
+				graphBuilder.getName());
 		Collection<MetricResult> results = collectResults(trainMessages,
-				testMessages, recommender);
+				testMessages, recommender, groupsFile, graphFile);
 		
 		String label = graphBuilder.getName() + ",N/A,N/A,N/A";
+		System.out.println(label);
 		resultCollection.addResults(label, account, results);
 	}
 	
 	private static void useGraphBuilderTimeThreshold(
+			NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> dataset,
 			Integer account,
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
@@ -194,16 +248,24 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
-
+					
+			File groupsFile = dataset.getTimeThresholdGraphBasedGroupsFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
+			File graphFile = dataset.getTimeThresholdGraphBasedGraphFile(
+					account, graphBuilder.getName(),
+					getHalfLifeName(timeThreshold));
 			Collection<MetricResult> results = collectResults(trainMessages,
-					testMessages, recommender);
+					testMessages, recommender, groupsFile, graphFile);
 
 			String label = graphBuilder.getName() + ",N/A,N/A," + getHalfLifeName(timeThreshold);
+			System.out.println(label);
 			resultCollection.addResults(label, account, results);
 		}
 	}
 	
 	private static void useGraphBuilderScoredEdges(
+			NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> dataset,
 			Integer account,
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
@@ -221,13 +283,26 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 							new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
 									seedlessRecommenderFactory, graphBuilder);
 
+					File groupsFile = dataset
+							.getScoredEdgesGraphBasedGroupsFile(account,
+									graphBuilder.getName(),
+									getHalfLifeName(halfLife),
+									wOut,
+									scoreThreshold);
+					File graphFile = dataset
+							.getScoredEdgesGraphBasedGraphFile(account,
+									graphBuilder.getName(),
+									getHalfLifeName(halfLife),
+									wOut,
+									scoreThreshold);
 					Collection<MetricResult> results = collectResults(
-							trainMessages, testMessages, recommender);
+							trainMessages, testMessages, recommender, groupsFile, graphFile);
 
 					String label = graphBuilder.getName() +
 							"," + getHalfLifeName(halfLife) +
 							"," + wOut +
 							"," + scoreThreshold;
+					System.out.println(label);
 					resultCollection.addResults(label, account, results);
 				}
 			}
@@ -263,16 +338,16 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 					for (ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory : graphBuilderFactories) {
 						
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
-							useGraphBuilderScoredEdges(account, trainMessages,
+							useGraphBuilderScoredEdges(dataset, account, trainMessages,
 									testMessages, seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else if (graphBuilderFactory.takesTime()) {
-							useGraphBuilderTimeThreshold(account,
+							useGraphBuilderTimeThreshold(dataset, account,
 									trainMessages, testMessages,
 									seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						} else {
-							useGraphBuilderNoArgs(account, trainMessages,
+							useGraphBuilderNoArgs(dataset, account, trainMessages,
 									testMessages, seedlessRecommenderFactory,
 									graphBuilderFactory, resultCollection);
 						}

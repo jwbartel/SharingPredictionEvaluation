@@ -167,4 +167,9 @@ public class EnronEmailDataSet extends
 		return null;
 	}
 
+	@Override
+	public String parseCollaborator(String collaboratorStr) {
+		return collaboratorStr;
+	}
+
 }

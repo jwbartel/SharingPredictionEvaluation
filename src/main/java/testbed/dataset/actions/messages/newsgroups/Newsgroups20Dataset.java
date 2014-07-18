@@ -13,6 +13,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.NewsAddress;
 
 import org.apache.commons.io.FileUtils;
 
@@ -131,6 +132,11 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 	public Collection<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> getAllThreads(
 			Integer account) {
 		return new ArrayList<>(threads);
+	}
+
+	@Override
+	public ComparableAddress parseCollaborator(String collaboratorStr) {
+		return new ComparableAddress(new NewsAddress(collaboratorStr));
 	}
 
 }

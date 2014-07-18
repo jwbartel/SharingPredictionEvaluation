@@ -1,12 +1,17 @@
 package testbed.dataset.actions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.apache.commons.io.FileUtils;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
 import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.DataSet;
@@ -143,6 +148,30 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		groupsFolder = new File(groupsFolder, timeThreshold);
 		return new File(groupsFolder, "graph.txt");
 	}
+	
+	private File getAnalysisFolder() {
+		return new File(getRootFolder(), "analysis");
+	}
+	
+	private File getEdgeWeightsAnalysisFolder() {
+		return new File(getAnalysisFolder(), "edge weights");
+	}
+	
+	private File getFixedWOutsEdgeWeightsAnalysisFolder() {
+		return new File(getEdgeWeightsAnalysisFolder(), "fixed wOut");
+	}
+	
+	private File getFixedWoutsEdgeWeightsAnalysisFile(String halfLife) {
+		return new File(getFixedWOutsEdgeWeightsAnalysisFolder(), halfLife + ".csv");
+	}
+	
+	private File getFixedHalfLivesEdgeWeightsAnalysisFolder(String halfLife) {
+		return new File(getEdgeWeightsAnalysisFolder(), "fixed halflife "+halfLife);
+	}
+	
+	private File getFixedHalfLivesEdgeWeightsAnalysisFile(String halfLife, String wOut) {
+		return new File(getFixedHalfLivesEdgeWeightsAnalysisFolder(halfLife), wOut);
+	}
 
 
 	public File getScoredEdgesGraphBasedFolder(IdType account,
@@ -177,11 +206,152 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 				graphBuilderType, halfLife, wOut, scoreThreshold);
 		return new File(groupsFolder, "groups.txt");
 	}
-	
+
 	public Collection<Set<CollaboratorType>> loadGroups(File groupsFile,
 			IOFunctions<CollaboratorType> ioHelp) {
 
 		return ioHelp.loadCliqueIDs(groupsFile.getAbsolutePath());
+	}
+
+	public List<Double> getEdgeWeights(SimpleWeightedGraph<CollaboratorType, DefaultWeightedEdge> graph) {
+		List<Double> weights = new ArrayList<>(graph.edgeSet().size());
+		for (DefaultWeightedEdge edge : graph.edgeSet()) {
+			Double weight = graph.getEdgeWeight(edge);
+			weights.add(weight);
+		}
+		return weights;
+	}
+
+	public SimpleWeightedGraph<CollaboratorType, DefaultWeightedEdge> loadGraph(
+			File graphFile) throws IOException {
+		SimpleWeightedGraph<CollaboratorType, DefaultWeightedEdge> graph = 
+				new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+
+		List<String> lines = FileUtils.readLines(graphFile);
+		for (String line : lines) {
+			String[] parts = line.split("\t");
+
+			CollaboratorType collaborator1 = parseCollaborator(parts[0]);
+			if (!graph.containsVertex(collaborator1)) {
+				if(!graph.addVertex(collaborator1)){
+					throw new RuntimeException(collaborator1+" not added");
+				}
+			}
+
+			CollaboratorType collaborator2 = parseCollaborator(parts[1]);
+			if (!graph.containsVertex(collaborator2)) {
+				if (!graph.addVertex(collaborator2)) {
+					throw new RuntimeException(collaborator2+" not added");
+				}
+			}
+
+			if (!graph.containsEdge(collaborator1, collaborator2)) {
+				double weight = Double.parseDouble(parts[2]);
+				DefaultWeightedEdge edge = new DefaultWeightedEdge();
+				if (!graph.addEdge(collaborator1, collaborator2, edge)) {
+					throw new RuntimeException("did not add edge between "
+							+ collaborator1 + " and " + collaborator2);
+				}
+				graph.setEdgeWeight(edge, weight);
+			}
+		}
+		return graph;
+	}
+	
+	public Map<String, List<Double>> getEdgeWeightsWithFixedHalfLife(String halfLife) throws IOException {
+		
+		Map<String, List<Double>> weightsMap = new TreeMap<>();
+		for (IdType account : getAccountIds()) {
+			File groupsFolder = getGroupsFolder(account);
+			File interactionRankFolder = new File(groupsFolder, "Interaction Rank");
+
+			File halfLifeFolder = new File(interactionRankFolder, "halfLife-"+halfLife);
+			if (!halfLifeFolder.exists()) {
+				continue;
+			}
+			for (File wOutFolder : halfLifeFolder.listFiles()) {
+				if (!wOutFolder.isDirectory()) {
+					continue;
+				}
+				
+				String wOut = wOutFolder.getName();
+				File graphFile = new File(new File(wOutFolder, "scoreThreshold-0.0"), "graph.txt");
+
+				if (graphFile.exists()) {
+					System.out.println("\t\t"+wOut);
+					List<Double> halfLifeWeights = weightsMap.get(halfLife);
+					if (halfLifeWeights == null) {
+						halfLifeWeights = new ArrayList<>();
+						weightsMap.put(wOut, halfLifeWeights);
+					}
+					
+					SimpleWeightedGraph<CollaboratorType, DefaultWeightedEdge> graph =
+							loadGraph(graphFile);
+					halfLifeWeights.addAll(getEdgeWeights(graph));
+				}
+			}
+		}
+		return weightsMap;
+	}
+	
+	public void writeEdgeWeightsWithFixedHalfLife(String halfLife) throws IOException {
+		Map<String, List<Double>> weightsMap = getEdgeWeightsWithFixedHalfLife(halfLife);
+		
+		for (String wOut : weightsMap.keySet()) {
+			List<Double> weights = weightsMap.get(wOut);
+			String outputStr = "";
+			for (Double weight : weights) {
+				outputStr += weight + "\n";
+			}
+			FileUtils.write(getFixedHalfLivesEdgeWeightsAnalysisFile(halfLife, wOut),
+					outputStr);
+		}
+	}
+	
+	public Map<String, List<Double>> getEdgeWeightsWithFixedWOut() throws IOException {
+		
+		Map<String, List<Double>> weightsMap = new TreeMap<>();
+		for (IdType account : getAccountIds()) {
+			File groupsFolder = getGroupsFolder(account);
+			File interactionRankFolder = new File(groupsFolder, "Interaction Rank");
+			for (File halfLifeFolder : interactionRankFolder.listFiles()) {
+				if (!halfLifeFolder.isDirectory()) {
+					continue;
+				}
+				
+				String halfLife = halfLifeFolder.getName();
+
+				File graphFile = new File(new File(new File(halfLifeFolder,
+						"wOut-1.0"), "scoreThreshold-0.0"), "graph.txt");
+				if (graphFile.exists()) {
+					System.out.println("\t"+halfLife);
+					List<Double> halfLifeWeights = weightsMap.get(halfLife);
+					if (halfLifeWeights == null) {
+						halfLifeWeights = new ArrayList<>();
+						weightsMap.put(halfLife, halfLifeWeights);
+					}
+					
+					SimpleWeightedGraph<CollaboratorType, DefaultWeightedEdge> graph =
+							loadGraph(graphFile);
+					halfLifeWeights.addAll(getEdgeWeights(graph));
+				}
+			}
+		}
+		return weightsMap;
+	}
+	
+	public void writeEdgeWeightsWithFixedWOut() throws IOException {
+		Map<String, List<Double>> weightsMap = getEdgeWeightsWithFixedWOut();
+		
+		for (String halfLife : weightsMap.keySet()) {
+			List<Double> weights = weightsMap.get(halfLife);
+			String outputStr = "";
+			for (Double weight : weights) {
+				outputStr += weight + "\n";
+			}
+			FileUtils.write(getFixedWoutsEdgeWeightsAnalysisFile(halfLife),
+					outputStr);
+		}
 	}
 	
 	public abstract Collection<ActionType> getAllMessages(IdType account);
@@ -195,4 +365,5 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 	public abstract File getActionBasedSeedlessGroupsMetricsFile();
 	public abstract File getBurstyGroupsMetricsFile();
 
+	public abstract CollaboratorType parseCollaborator(String collaboratorStr);
 }

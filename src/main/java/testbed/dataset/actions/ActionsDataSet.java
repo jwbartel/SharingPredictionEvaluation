@@ -3,11 +3,15 @@ package testbed.dataset.actions;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -258,9 +262,33 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		return graph;
 	}
 	
-	public void writeEdgeWeightsWithFixedHalfLife(String halfLife) throws IOException {
+	public List<IdType> sampleAccounts(int sampleSize) {
 		
-		for (IdType account : getAccountIds()) {
+		IdType[] accounts = getAccountIds();
+		if (accounts.length <= sampleSize) {
+			return new ArrayList<>(Arrays.asList(accounts));
+		}
+		
+		Set<Integer> usedIndexes = new TreeSet<>();
+		Random rand = new Random();
+		List<IdType> sampleAccounts = new ArrayList<>();
+		while(sampleAccounts.size() < sampleSize) {
+			int index = rand.nextInt(accounts.length);
+			while (usedIndexes.contains(index)) {
+				index = rand.nextInt(accounts.length);
+			}
+			
+			sampleAccounts.add(accounts[index]);
+			usedIndexes.add(index);
+		}
+		
+		return sampleAccounts;
+		
+	}
+	
+	public void writeEdgeWeightsWithFixedHalfLife(String halfLife, int sampleSize) throws IOException {
+		
+		for (IdType account : sampleAccounts(sampleSize)) {
 			File groupsFolder = getGroupsFolder(account);
 			File interactionRankFolder = new File(groupsFolder, "Interaction Rank");
 
@@ -293,9 +321,9 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		}
 	}
 	
-	public void writeEdgeWeightsWithFixedWOut() throws IOException {
+	public void writeEdgeWeightsWithFixedWOut(int sampleSize) throws IOException {
 		
-		for (IdType account : getAccountIds()) {
+		for (IdType account : sampleAccounts(sampleSize)) {
 			System.out.println(account);
 			File groupsFolder = getGroupsFolder(account);
 			File interactionRankFolder = new File(groupsFolder, "Interaction Rank");

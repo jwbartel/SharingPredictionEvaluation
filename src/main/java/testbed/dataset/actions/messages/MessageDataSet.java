@@ -3,10 +3,13 @@ package testbed.dataset.actions.messages;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeSet;
 
+import testbed.dataset.actions.ActionsDataSet;
 import data.representation.actionbased.messages.MessageThread;
 import data.representation.actionbased.messages.SingleMessage;
-import testbed.dataset.actions.ActionsDataSet;
 
 public abstract class MessageDataSet<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>
 		extends ActionsDataSet<IdType, RecipientType, MessageType, ThreadType> {
@@ -20,6 +23,13 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 	
 	public abstract Collection<ThreadType> getAllThreads(IdType account);
 
+	public List<ThreadType> getAllThreadsTimeSorted(IdType account) {
+		
+		List<ThreadType> sortedThreads = new ArrayList<>(new TreeSet<>(getAllThreads(account)));
+		Collections.sort(sortedThreads);
+		return sortedThreads;
+	}
+	
 	protected File getMetricsFolder() {
 		return new File(getRootFolder(), "metric statistics");
 	}
@@ -142,7 +152,7 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 	public Collection<ThreadType> getTrainThreads(
 			IdType account, double percentTrain) {
 		
-		Collection<ThreadType> allThreads = getAllThreads(account);
+		Collection<ThreadType> allThreads = getAllThreadsTimeSorted(account);
 		if (allThreads == null) {
 			return null;
 		}
@@ -162,7 +172,7 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 	public Collection<ThreadType> getTestThreads(
 			IdType account, double percentTrain) {
 		
-		Collection<ThreadType> allThreads = getAllThreads(account);
+		Collection<ThreadType> allThreads = getAllThreadsTimeSorted(account);
 		if (allThreads == null) {
 			return null;
 		}

@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 
+import data.representation.actionbased.messages.email.EmailMessage;
+import data.representation.actionbased.messages.email.EmailThread;
+import testbed.dataset.actions.messages.email.EmailDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
@@ -26,7 +29,7 @@ public class GlobalDatasetSummarizer {
 //		MessageDatasetSummarizer.create(enronDataset).summarize();
 
 		//Response time email data set
-		ResponseTimeStudyDataSet responseTimeDataset = new ResponseTimeStudyDataSet(
+		EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> responseTimeDataset = new ResponseTimeStudyDataSet(
 				"response time", new File("data/Email Response Study"));
 		MessageDatasetSummarizer.create(responseTimeDataset).summarize();
 

@@ -5,12 +5,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.TreeSet;
 
-import data.representation.actionbased.messages.SingleMessage;
 import metrics.MetricResult;
 import metrics.recipients.RecipientAddressingEvent;
 import recommendation.recipients.RecipientRecommendation;
 import recommendation.recipients.RecipientRecommender;
 import recommendation.recipients.SingleRecipientRecommendation;
+import data.representation.actionbased.CollaborativeAction;
+import data.representation.actionbased.messages.SingleMessage;
 
 public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 
@@ -68,6 +69,14 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 
 		public void addCollaborator(V collaborator) {
 			this.collaborators.add(collaborator);
+		}
+
+		@Override
+		public int compareTo(CollaborativeAction<V> action) {
+			if (!getStartDate().equals(action.getStartDate())) {
+				return getStartDate().compareTo(action.getStartDate());
+			}
+			return toString().compareTo(action.toString());
 		}
 	}
 

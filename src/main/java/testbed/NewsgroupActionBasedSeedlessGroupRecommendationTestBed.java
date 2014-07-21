@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -86,10 +87,10 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
 		
 		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
-		Object[] timeThresholdConstantSet1 = {1000.0*60*60*24*7*4}; //4 weeks
-		Object[] timeThresholdConstantSet2 = {1000.0*60*60*24*365/2}; //0.5 years
-		Object[] timeThresholdConstantSet3 = {1000.0*60*60*24*365}; //1 year
-		Object[] timeThresholdConstantSet4 = {1000.0*60*60*24*365*2}; //2 years
+		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7*4}; //4 weeks
+		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*365/2}; //0.5 years
+		Object[] timeThresholdConstantSet3 = {1000L*60*60*24*365}; //1 year
+		Object[] timeThresholdConstantSet4 = {1000L*60*60*24*365*2}; //2 years
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
@@ -97,10 +98,10 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
 		
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet1 = {1.0, 1000.0*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
-		Object[] interactionRankConstantSet2 = {1.0, 1000.0*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
-		Object[] interactionRankConstantSet3 = {1.0, 1000.0*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
-		Object[] interactionRankConstantSet4 = {1.0, 1000.0*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
+		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
+		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
+		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
+		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
@@ -278,10 +279,10 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		
 		Collection<ConstantValues> constantSets = constants.get(TimeThresholdActionBasedGraphBuilder.class);
 		for (ConstantValues constantSet : constantSets) {
-			double timeThreshold = (Double) constantSet.constants[0];
+			long timeThreshold = (Long) constantSet.constants[0];
 			
 			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
-					graphBuilderFactory.create((long) timeThreshold);
+					graphBuilderFactory.create(timeThreshold);
 
 			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
@@ -314,11 +315,11 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		Collection<ConstantValues> constantSets = constants.get(InteractionRankWeightedActionBasedGraphBuilder.class);
 		for (ConstantValues constantSet : constantSets) {
 			double wOut = (Double) constantSet.constants[0];
-			double halfLife = (Double) constantSet.constants[1];
+			long halfLife = (Long) constantSet.constants[1];
 			double scoreThreshold = (Double) constantSet.constants[2];
 			
 			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
-					graphBuilderFactory.create( (long) halfLife, wOut, scoreThreshold);
+					graphBuilderFactory.create(halfLife, wOut, scoreThreshold);
 
 			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
 					new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
@@ -351,7 +352,9 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 	private static Collection<JavaMailNewsgroupPost> getFirstMessagesOfThreads(Collection<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> threads) {
 		Collection<JavaMailNewsgroupPost> messages = new ArrayList<>();
 		for (NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost> thread : threads) {
-			JavaMailNewsgroupPost firstMessage = (new ArrayList<>(thread.getThreadedActions())).get(0);
+			ArrayList<JavaMailNewsgroupPost> threadedMessages = new ArrayList<>(thread.getThreadedActions());
+			Collections.sort(threadedMessages);
+			JavaMailNewsgroupPost firstMessage = threadedMessages.get(0);
 			messages.add(firstMessage);
 		}
 		return messages;

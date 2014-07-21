@@ -16,12 +16,12 @@ public class FixedValueEdgeWeightAnalysis {
 		Collection<ActionsDataSet> datasets = new ArrayList<>();
 		
 		//Add datasets
-		datasets.add(new EnronEmailDataSet("enron",
-				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+//		datasets.add(new EnronEmailDataSet("enron",
+//				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
 //		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
 //				"data/Email Response Study")));
-//		datasets.add(new Newsgroups20Dataset("20Newsgroups", new File(
-//				"data/20 Newsgroups"), false));
+		datasets.add(new Newsgroups20Dataset("20Newsgroups", new File(
+				"data/20 Newsgroups"), false));
 //		datasets.add(new SampledStackOverflowDataset("Sampled StackOverflow",
 //				new File("data/Stack Overflow/10000 Random Questions"), false));
 
@@ -30,11 +30,11 @@ public class FixedValueEdgeWeightAnalysis {
 		
 		for (ActionsDataSet dataset : datasets) {
 			System.out.println(dataset.getName());
-			dataset.writeEdgeWeightsWithFixedWOut();
+			dataset.writeEdgeWeightsWithFixedWOut(5);
 			for (String halfLife : halfLives) {
 				System.out.println("\t" + halfLife);
-				dataset.writeEdgeWeightsWithFixedHalfLife(halfLife);
+				dataset.writeEdgeWeightsWithFixedHalfLife(halfLife,10);
 			}
-		}
+		}																																													
 	}
 }

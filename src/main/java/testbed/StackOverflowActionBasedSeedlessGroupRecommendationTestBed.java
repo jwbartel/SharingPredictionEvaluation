@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import metrics.Metric;
 import metrics.MetricResult;
@@ -32,8 +32,10 @@ import org.jgrapht.graph.DefaultEdge;
 import recommendation.groups.seedless.SeedlessGroupRecommenderFactory;
 import recommendation.groups.seedless.actionbased.GraphFormingActionBasedSeedlessGroupRecommender;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
+import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
+import util.tools.io.StringValueWriterAndParser;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -53,7 +55,7 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
 	
-	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new TreeMap<>();
+	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
 	
 //	static Collection<Double> wOuts = new ArrayList<>();
 //	static Collection<Double> halfLives = new ArrayList<>();
@@ -74,7 +76,7 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 		}
 		
 		// Add seedless recommender factories
-		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>());
+		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>(new StringValueWriterAndParser(), 700));
 		//seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
 		
 		// Add graph builders
@@ -189,15 +191,15 @@ public class StackOverflowActionBasedSeedlessGroupRecommendationTestBed {
 			recommender.addPastAction(pastAction);
 		}
 
-		Collection<Set<String>> recommendations = new ArrayList<>();
-//		Collection<Set<String>> recommendations = recommender
-//				.getRecommendations();
-//		
-//		if (!groupOutputFile.getParentFile().exists()) {
-//			groupOutputFile.getParentFile().mkdirs();
-//		}
-//		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
-//		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
+//		Collection<Set<String>> recommendations = new ArrayList<>();
+		Collection<Set<String>> recommendations = recommender
+				.getRecommendations();
+		
+		if (!groupOutputFile.getParentFile().exists()) {
+			groupOutputFile.getParentFile().mkdirs();
+		}
+		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
+		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), recommendations);
 		
 		if (!graphOutputFile.getParentFile().exists()) {
 			graphOutputFile.getParentFile().mkdirs();

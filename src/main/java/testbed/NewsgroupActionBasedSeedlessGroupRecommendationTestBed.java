@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import metrics.Metric;
@@ -35,6 +35,8 @@ import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import recommendation.groups.seedless.hybrid.IOFunctions;
 import testbed.dataset.actions.messages.newsgroups.NewsgroupDataset;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
+import util.tools.io.ComparableAddressValueParser;
+import util.tools.io.StringValueWriterAndParser;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -52,7 +54,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 
 	static Collection<NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>> dataSets = new ArrayList<>();
 	
-	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new TreeMap<>();
+	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
 	
 	static Collection<SeedlessGroupRecommenderFactory<ComparableAddress>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>>> graphBuilderFactories = new ArrayList<>();
@@ -70,7 +72,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 				"data/20 Newsgroups")));
 		
 		// Add seedless recommender factories
-		seedlessRecommenderFactories.add(new HybridRecommenderFactory<ComparableAddress>());
+		seedlessRecommenderFactories.add(new HybridRecommenderFactory<ComparableAddress>(new ComparableAddressValueParser(), 700));
 		//seedlessRecommenderFactories.add(new FellowsRecommenderFactory<String>());
 		
 		// Add graph builders
@@ -199,9 +201,9 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			recommender.addPastAction(pastAction);
 		}
 
-		Collection<Set<ComparableAddress>> recommendations = new ArrayList<>();
-//		Collection<Set<ComparableAddress>> recommendations = recommender
-//				.getRecommendations();
+//		Collection<Set<ComparableAddress>> recommendations = new ArrayList<>();
+		Collection<Set<ComparableAddress>> recommendations = recommender
+				.getRecommendations();
 		Collection<Set<String>> strRecommendations  = new ArrayList<Set<String>>();
 		for (Set<ComparableAddress> recommendation : recommendations) {
 			Set<String> strRecommendation = new TreeSet<>();
@@ -210,11 +212,11 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			}
 		}
 		
-//		if (!groupOutputFile.getParentFile().exists()) {
-//			groupOutputFile.getParentFile().mkdirs();
-//		}
+		if (!groupOutputFile.getParentFile().exists()) {
+			groupOutputFile.getParentFile().mkdirs();
+		}
 		IOFunctions<String> ioHelp = new  IOFunctions<>(String.class);
-//		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), strRecommendations);
+		ioHelp.printCliqueIDsToFile(groupOutputFile.getAbsolutePath(), strRecommendations);
 		
 		if (!graphOutputFile.getParentFile().exists()) {
 			graphOutputFile.getParentFile().mkdirs();

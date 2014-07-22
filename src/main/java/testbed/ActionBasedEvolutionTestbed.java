@@ -25,6 +25,12 @@ import metrics.groups.actionbased.TestActionsToRecommendationPerfectMatchesMetri
 import metrics.groups.actionbased.evolution.ActionBasedGroupEvolutionMetric;
 import metrics.groups.actionbased.evolution.EdgeGrowthRateMetric;
 import metrics.groups.actionbased.evolution.EvolutionRepurposedActionBasedGroupMetric;
+import metrics.groups.actionbased.evolution.PercentMatchedRecommendedCreationRateMetric;
+import metrics.groups.actionbased.evolution.PercentMatchedRecommendedEvolutionsRateMetric;
+import metrics.groups.actionbased.evolution.PercentMatchedRecommendedUnchangedRateMetric;
+import metrics.groups.actionbased.evolution.PercentRecommendedCreationRateMetric;
+import metrics.groups.actionbased.evolution.PercentRecommendedEvolutionsRateMetric;
+import metrics.groups.actionbased.evolution.PercentRecommendedUnchangedRateMetric;
 import metrics.groups.actionbased.evolution.VertexGrowthRateMetric;
 import model.recommendation.groups.ActionBasedEvolutionGroupRecommendationAcceptanceModeler;
 
@@ -113,6 +119,12 @@ public abstract class ActionBasedEvolutionTestbed<Id, Collaborator, Action exten
 				new TestActionsMatchedToRecommendationMetric<Collaborator, Action>()));
 		metrics.add(new EvolutionRepurposedActionBasedGroupMetric<>(
 				new TestActionsToRecommendationPerfectMatchesMetric<Collaborator, Action>()));
+		metrics.add(new PercentRecommendedCreationRateMetric<Collaborator, Action>());
+		metrics.add(new PercentRecommendedEvolutionsRateMetric<Collaborator, Action>());
+		metrics.add(new PercentRecommendedUnchangedRateMetric<Collaborator, Action>());
+		metrics.add(new PercentMatchedRecommendedCreationRateMetric<Collaborator, Action>());
+		metrics.add(new PercentMatchedRecommendedEvolutionsRateMetric<Collaborator, Action>());
+		metrics.add(new PercentMatchedRecommendedUnchangedRateMetric<Collaborator, Action>());
 	}
 	
 	private static String getHalfLifeName(long halfLife) {

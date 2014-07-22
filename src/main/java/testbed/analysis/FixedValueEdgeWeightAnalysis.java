@@ -8,6 +8,9 @@ import java.util.Collection;
 
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
+import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
+import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 
 public class FixedValueEdgeWeightAnalysis {
 	
@@ -16,14 +19,14 @@ public class FixedValueEdgeWeightAnalysis {
 		Collection<ActionsDataSet> datasets = new ArrayList<>();
 		
 		//Add datasets
-//		datasets.add(new EnronEmailDataSet("enron",
-//				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
-//		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
-//				"data/Email Response Study")));
+		datasets.add(new EnronEmailDataSet("enron",
+				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
+				"data/Email Response Study")));
 		datasets.add(new Newsgroups20Dataset("20Newsgroups", new File(
 				"data/20 Newsgroups"), false));
-//		datasets.add(new SampledStackOverflowDataset("Sampled StackOverflow",
-//				new File("data/Stack Overflow/10000 Random Questions"), false));
+		datasets.add(new SampledStackOverflowDataset("Sampled StackOverflow",
+				new File("data/Stack Overflow/10000 Random Questions"), false));
 
 		String[] halfLives = { "1.0 minutes", "1.0 hours", "1.0 days",
 				"1.0 weeks", "4.0 weeks", "0.5 years", "1.0 years", "2.0 years" };

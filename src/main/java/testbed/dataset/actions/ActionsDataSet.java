@@ -364,6 +364,7 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 	
 	public abstract File getActionBasedSeedlessGroupsMetricsFile();
 	public abstract File getBurstyGroupsMetricsFile();
+	public abstract File getEvolutionMetricsFile();
 
 	public abstract CollaboratorType parseCollaborator(String collaboratorStr);
 }

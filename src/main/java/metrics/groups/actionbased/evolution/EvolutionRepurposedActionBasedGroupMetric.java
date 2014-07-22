@@ -2,14 +2,16 @@ package metrics.groups.actionbased.evolution;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import metrics.MetricResult;
 import metrics.groups.actionbased.ActionBasedGroupMetric;
 
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
@@ -25,17 +27,24 @@ public class EvolutionRepurposedActionBasedGroupMetric<Collaborator, Action exte
 			ActionBasedGroupMetric<Collaborator, Action> actionBasedMetric) {
 		this.actionBasedMetric = actionBasedMetric;
 	}
+	
+	private Set<Collaborator> getRecommendedGroup(RecommendedEvolution<Collaborator> recommendation) {
+		if (recommendation instanceof RecommendedGroupCreationEvolution) {
+			return recommendation.getRecommenderEngineResult();
+		} else if (recommendation instanceof RecommendedGroupChangeEvolution){
+			return ((RecommendedGroupChangeEvolution<Collaborator>) recommendation).getMerging();
+		}
+		return null;
+	}
 
 	@Override
 	public MetricResult evaluate(
-			SimpleGraph<Collaborator, DefaultEdge> oldGraph,
-			SimpleGraph<Collaborator, DefaultEdge> newGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> oldGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> newGraph,
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
-			Collection<Set<Collaborator>> ideals,
 			Collection<Action> testActions,
-			Map<Set<Collaborator>, Set<Collaborator>> recommendationsToIdeals,
-			Map<Set<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, Set<Collaborator>> testActionsToRecommendations) {
+			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
+			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
 
 		Collection<Set<Collaborator>> finalRecommendedGroups = new ArrayList<>();
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
@@ -52,10 +61,24 @@ public class EvolutionRepurposedActionBasedGroupMetric<Collaborator, Action exte
 				finalRecommendedGroups.add(recommendedGroup);
 			}
 		}
+		
+		Map<Set<Collaborator>, Action> recommendedGroupsToTestActions = new HashMap<>();
+		for (Entry<RecommendedEvolution<Collaborator>, Action> entry : recommendationsToTestActions.entrySet()) {
+			RecommendedEvolution<Collaborator> recommendation = entry.getKey();
+			Set<Collaborator> recommendedGroup = getRecommendedGroup(recommendation);
+			recommendedGroupsToTestActions.put(recommendedGroup, entry.getValue());
+		}
+		
+		Map<Action, Set<Collaborator>> testActionsToRecommendedGroup = new HashMap<>();
+		for (Entry<Action, RecommendedEvolution<Collaborator>> entry : testActionsToRecommendations.entrySet()) {
+			RecommendedEvolution<Collaborator> recommendation = entry.getValue();
+			Set<Collaborator> recommendedGroup = getRecommendedGroup(recommendation);
+			testActionsToRecommendedGroup.put(entry.getKey(), recommendedGroup);
+		}
 
-		return actionBasedMetric.evaluate(finalRecommendedGroups, ideals, testActions,
-				recommendationsToIdeals, recommendationsToTestActions,
-				testActionsToRecommendations);
+		return actionBasedMetric.evaluate(finalRecommendedGroups, new ArrayList<Set<Collaborator>>(), testActions,
+				new HashMap<Set<Collaborator>, Set<Collaborator>>(), recommendedGroupsToTestActions,
+				testActionsToRecommendedGroup);
 	}
 
 	@Override

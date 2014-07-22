@@ -93,6 +93,11 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 		return new File(getMetricsFolder(),
 				"bursty group recommendation results.csv");
 	}
+	
+	@Override
+	public File getEvolutionMetricsFile() {
+		return new File(getMetricsFolder(), "group evolution results.csv");
+	}
 
 	@Override
 	public Collection<MessageType> getTrainMessages(IdType account,

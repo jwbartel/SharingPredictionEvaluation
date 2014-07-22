@@ -8,8 +8,8 @@ import java.util.Set;
 import metrics.DoubleResult;
 import metrics.MetricResult;
 
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import data.representation.actionbased.CollaborativeAction;
@@ -19,14 +19,12 @@ public class VertexGrowthRateMetric<Collaborator, Action extends CollaborativeAc
 
 	@Override
 	public MetricResult evaluate(
-			SimpleGraph<Collaborator, DefaultEdge> oldGraph,
-			SimpleGraph<Collaborator, DefaultEdge> newGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> oldGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> newGraph,
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
-			Collection<Set<Collaborator>> ideals,
 			Collection<Action> testActions,
-			Map<Set<Collaborator>, Set<Collaborator>> recommendationsToIdeals,
-			Map<Set<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, Set<Collaborator>> testActionsToRecommendations) {
+			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
+			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
 		
 		Set<Collaborator> newVertices = new HashSet<>(newGraph.vertexSet());
 		newVertices.removeAll(oldGraph.vertexSet());

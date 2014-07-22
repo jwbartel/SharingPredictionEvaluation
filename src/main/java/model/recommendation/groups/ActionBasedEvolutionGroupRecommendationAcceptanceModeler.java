@@ -7,101 +7,144 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import metrics.MetricResult;
+import metrics.groups.actionbased.evolution.ActionBasedGroupEvolutionMetric;
+
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupChangeEvolution;
 import recommendation.groups.evolution.recommendations.RecommendedGroupCreationEvolution;
-import metrics.MetricResult;
-import metrics.groups.distance.GroupDistanceMetric;
-import metrics.groups.evolution.GroupEvolutionMetric;
+import data.representation.actionbased.CollaborativeAction;
 
-public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<V> implements
+public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborator, Action extends CollaborativeAction<Collaborator>> implements
 		GroupRecommendationAcceptanceModeler {
 
-	Set<Integer> newMembers;
-	GroupDistanceMetric<V> distanceMetric;
-	Collection<RecommendedEvolution<V>> recommendations;
-	Map<Set<V>,Collection<Set<V>>> oldToNewIdealGroups;
-	Collection<Set<V>> newlyCreatedIdealGroups;
-	Collection<GroupEvolutionMetric<V>> metrics;
+	UndirectedGraph<Collaborator, DefaultEdge> oldGraph;
+	UndirectedGraph<Collaborator, DefaultEdge> newGraph;
+	Collection<RecommendedEvolution<Collaborator>> recommendations;
+	Collection<Action> testActions;
+	Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics;
 
-	public ActionBasedEvolutionGroupRecommendationAcceptanceModeler(Set<Integer> newMembers,
-			GroupDistanceMetric<V> distanceMetric,
-			Collection<RecommendedEvolution<V>> recommendations,
-			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
-			Collection<Set<V>> newlyCreatedIdealGroups,	Collection<GroupEvolutionMetric<V>> metrics) {
-		this.newMembers = newMembers;
-		this.distanceMetric = distanceMetric;
+	public ActionBasedEvolutionGroupRecommendationAcceptanceModeler(
+			UndirectedGraph<Collaborator, DefaultEdge> oldGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> newGraph,
+			Collection<RecommendedEvolution<Collaborator>> recommendations,
+			Collection<Action> testActions,
+			Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics) {
+		this.oldGraph = oldGraph;
+		this.newGraph = newGraph;
 		this.recommendations = recommendations;
-		this.oldToNewIdealGroups = oldToNewIdealGroups;
-		this.newlyCreatedIdealGroups = newlyCreatedIdealGroups;
+		this.testActions = testActions;
 		this.metrics = metrics;
 	}
+
+	public Double distance(Set<Collaborator> recommendation,
+			Set<Collaborator> intendedGroup) {
+		Set<Collaborator> adds = new HashSet<Collaborator>(
+				intendedGroup);
+		adds.removeAll(recommendation);
+		if (adds.size() == intendedGroup.size()) {
+			return null;
+		}
+
+		Set<Collaborator> deletes = new HashSet<Collaborator>(
+				recommendation);
+		deletes.removeAll(intendedGroup);
+		if (deletes.size() == recommendation.size()) {
+			return null;
+		}
+
+		double distance = ((double) adds.size() + deletes.size());
+		if (distance >= intendedGroup.size()) {
+			return null;
+		}
+		return distance;
+	}
 	
-	private Set<V> findClosestIdeal(Collection<Set<V>> candidateIdeals, Set<V> recommendedGroup) {
-		double minDistance = Double.MAX_VALUE;
-		Set<V> bestIdeal = null;
-		
-		for (Set<V> ideal : candidateIdeals) {
-			Double distance = distanceMetric.distance(recommendedGroup, ideal);
-			if (distance != null && distance < minDistance) {
-				minDistance = distance;
-				bestIdeal = ideal;
+	protected Action matchRecommendationToAction(
+			Set<Collaborator> recommendation,
+			Collection<Action> futureActions) {
+
+		// Find best action to match with recommendation
+		double minDistanceToAction = Double.MAX_VALUE;
+		Action bestAction = null;
+
+		for (Action testAction : futureActions) {
+			Double distance = distance(recommendation,
+					new HashSet<>(testAction.getCollaborators()));
+			if (distance != null && distance < minDistanceToAction) {
+				minDistanceToAction = distance;
+				bestAction = testAction;
 			}
 		}
+		return bestAction;
+	}
+	
+	protected RecommendedEvolution<Collaborator> matchActionToRecommendation(
+			Action action,
+			RecommendedEvolution<Collaborator> bestRecommendation,
+			RecommendedEvolution<Collaborator> recommendation) {
 		
-		return bestIdeal;
+		double minDistanceToRecommendation = Double.MAX_VALUE;
+		if (bestRecommendation != null) {
+			minDistanceToRecommendation = distance(getRecommendedGroup(bestRecommendation), new HashSet<>(
+				action.getCollaborators()));
+		}
+		Double distance = distance(getRecommendedGroup(recommendation), new HashSet<>(
+				action.getCollaborators()));
+		if (distance != null && distance < minDistanceToRecommendation) {
+			minDistanceToRecommendation = distance;
+			bestRecommendation = recommendation;
+		}
+		return bestRecommendation;
+	}
+	
+	private Set<Collaborator> getRecommendedGroup(RecommendedEvolution<Collaborator> recommendation) {
+		if (recommendation instanceof RecommendedGroupCreationEvolution) {
+			return recommendation.getRecommenderEngineResult();
+		} else if (recommendation instanceof RecommendedGroupChangeEvolution){
+			return ((RecommendedGroupChangeEvolution<Collaborator>) recommendation).getMerging();
+		}
+		return null;
 	}
 
 	@Override
 	public Collection<MetricResult> modelRecommendationAcceptance() {
 
-		Collection<Set<V>> unusedIdealGroups = new HashSet<>(newlyCreatedIdealGroups);
-		for (Collection<Set<V>> evolvedIdeals : oldToNewIdealGroups.values()) {
-			unusedIdealGroups.addAll(evolvedIdeals);
+		Collection<RecommendedEvolution<Collaborator>> unusedRecommendations = new HashSet<RecommendedEvolution<Collaborator>>(recommendations);
+		Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations = new HashMap<>();
+		Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestAction = new HashMap<>();
+		
+		
+		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
+
+			// Find best action to match with recommendation
+			Action bestAction = matchRecommendationToAction(getRecommendedGroup(recommendation), testActions);
+			if (bestAction != null) {
+				recommendationsToTestAction.put(recommendation, bestAction);
+			}
 		}
 
-		Collection<RecommendedEvolution<V>> unusedRecommendations = new HashSet<RecommendedEvolution<V>>(recommendations);
-		Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal = new HashMap<>();
-		Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal = new HashMap<>();
-		
-		for(RecommendedEvolution<V> recommendation : recommendations) {
-			if (recommendation instanceof RecommendedGroupCreationEvolution) {
-				// If we are recommending the creation of a new group
-				
-				Set<V> recommendedGroup = recommendation.getRecommenderEngineResult();
-				Set<V> closestIdeal = findClosestIdeal(unusedIdealGroups, recommendedGroup);
-				
-				if (closestIdeal != null) {
-					groupCreationToIdeal.put((RecommendedGroupCreationEvolution<V>) recommendation,
-							closestIdeal);
-					unusedRecommendations.remove(recommendation);
-					unusedIdealGroups.remove(closestIdeal);
-				}
-				
-			} else if (recommendation instanceof RecommendedGroupChangeEvolution) {
-				// If we are recommending the evolution of an existing group
-				
-				Collection<Set<V>> candidateIdeals = oldToNewIdealGroups
-						.get(((RecommendedGroupChangeEvolution<V>) recommendation).getOldGroup());
-				Set<V> recommendedGroup = ((RecommendedGroupChangeEvolution<V>) recommendation)
-						.getMerging();
-				
-				Set<V> closestIdeal = findClosestIdeal(candidateIdeals, recommendedGroup);
+		for (Action testAction : testActions) {
 
-				if (closestIdeal != null) {
-					groupChangeToIdeal.put((RecommendedGroupChangeEvolution<V>) recommendation,
-							closestIdeal);
-					unusedRecommendations.remove(recommendation);
-					unusedIdealGroups.remove(closestIdeal);
-				}
+			RecommendedEvolution<Collaborator> bestRecommendation = null;
+
+			for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
+				bestRecommendation = matchActionToRecommendation(testAction,
+						bestRecommendation, recommendation);
+			}
+
+			if (bestRecommendation != null) {
+				testActionsToRecommendations
+						.put(testAction, bestRecommendation);
 			}
 		}
 
 		Collection<MetricResult> results = new ArrayList<MetricResult>();
-		for (GroupEvolutionMetric<V> metric : metrics) {
-			results.add(metric.evaluate(newMembers, oldToNewIdealGroups, newlyCreatedIdealGroups,
-					groupChangeToIdeal, groupCreationToIdeal,
-					unusedRecommendations, unusedIdealGroups));
+		for (ActionBasedGroupEvolutionMetric<Collaborator, Action> metric : metrics) {
+			results.add(metric.evaluate(oldGraph, newGraph, unusedRecommendations, testActions, recommendationsToTestAction, testActionsToRecommendations));
 		}
 
 		return results;

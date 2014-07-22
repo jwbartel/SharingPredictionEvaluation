@@ -2,13 +2,12 @@ package metrics.groups.actionbased.evolution;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import metrics.DoubleResult;
 import metrics.MetricResult;
 
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 
 import recommendation.groups.evolution.recommendations.RecommendedEvolution;
 import data.representation.actionbased.CollaborativeAction;
@@ -18,14 +17,12 @@ public class EdgeGrowthRateMetric<Collaborator, Action extends CollaborativeActi
 	
 	@Override
 	public MetricResult evaluate(
-			SimpleGraph<Collaborator, DefaultEdge> oldGraph,
-			SimpleGraph<Collaborator, DefaultEdge> newGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> oldGraph,
+			UndirectedGraph<Collaborator, DefaultEdge> newGraph,
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
-			Collection<Set<Collaborator>> ideals,
 			Collection<Action> testActions,
-			Map<Set<Collaborator>, Set<Collaborator>> recommendationsToIdeals,
-			Map<Set<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, Set<Collaborator>> testActionsToRecommendations) {
+			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
+			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
 		
 		int numNewEdges = 0;
 		for (DefaultEdge edge : newGraph.edgeSet()) {

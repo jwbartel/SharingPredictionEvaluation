@@ -2,6 +2,7 @@ package testbed;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import recommendation.groups.seedless.actionbased.bursty.RelativeEditsThresholdM
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.email.EnronEmailDataSet;
+import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.ActionBasedGraphBuilderFactory;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -42,12 +44,14 @@ import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
+import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
+import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class EmailBurstyGroupCreationTestBed {
+public class StackOverflowBurstyGroupCreationTestBed {
 	static double percentTraining = 0.8;
 
-	static Collection<ActionsDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
-
+	static Collection<ActionsDataSet<Long,String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
+	
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
 
@@ -55,13 +59,19 @@ public class EmailBurstyGroupCreationTestBed {
 
 	static Collection<Double> distanceThresholds = new ArrayList<>();
 
-	static Collection<BurstyGroupMetricFactory<String, EmailMessage<String>>> metricFactories = new ArrayList<>();
+	static Collection<BurstyGroupMetricFactory<String, StackOverflowMessage<String>>> metricFactories = new ArrayList<>();
 
 	static {
 
 		// Add data sets
-		dataSets.add(new EnronEmailDataSet("enron",
-				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
+		try {
+			dataSets.add(new SampledStackOverflowDataset(
+					"Sampled StackOverflow", new File(
+							"data/Stack Overflow/10000 Random Questions")));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
 
 		// Add seedless recommender factories
 		seedlessRecommenderFactories.add(new HybridRecommenderFactory<String>(false));
@@ -118,16 +128,16 @@ public class EmailBurstyGroupCreationTestBed {
 		// Add metrics
 		metricFactories.add(MessagesTriggeringGroupCreationMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(RecommendationsCreatedPerBurstMetric.factory(String.class, EmailMessage.class));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalTestActionsMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalRecommendedGroupsMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentDeletedMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentAddedMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentDeletedMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentAddedMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsMatchedToRecommendationMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsToRecommendationPerfectMatchesMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsMatchedToTestActionMetric<String, EmailMessage<String>>()));
-		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsToTestActionPerfectMatchesMetric<String, EmailMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalTestActionsMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TotalRecommendedGroupsMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentDeletedMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new GroupCenteredPercentAddedMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentDeletedMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new MessageCenteredPercentAddedMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsMatchedToRecommendationMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsToRecommendationPerfectMatchesMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsMatchedToTestActionMetric<String, StackOverflowMessage<String>>()));
+		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsToTestActionPerfectMatchesMetric<String, StackOverflowMessage<String>>()));
 
 	}
 
@@ -159,14 +169,14 @@ public class EmailBurstyGroupCreationTestBed {
 	}
 
 	private static Collection<MetricResult> collectResults(
-			Collection<EmailMessage<String>> trainMessages,
-			Collection<EmailMessage<String>> testMessages,
+			Collection<StackOverflowMessage<String>> trainMessages,
+			Collection<StackOverflowMessage<String>> testMessages,
 			Double seedClosenessThreshold,
 			Double recommendationClosenessThreshold,
 			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender) {
 
-		ArrayList<BurstyGroupMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
-		for (BurstyGroupMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
+		ArrayList<BurstyGroupMetric<String, StackOverflowMessage<String>>> metrics = new ArrayList<>();
+		for (BurstyGroupMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
 
@@ -175,7 +185,7 @@ public class EmailBurstyGroupCreationTestBed {
 						seedClosenessThreshold),
 				new RelativeEditsThresholdMatcher<String>(
 						recommendationClosenessThreshold));
-		BurstyGroupRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new BurstyGroupRecommendationAcceptanceModeler<String, EmailMessage<String>>(
+		BurstyGroupRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new BurstyGroupRecommendationAcceptanceModeler<String, StackOverflowMessage<String>>(
 				burstyRecommender, trainMessages, testMessages,
 				new ArrayList<Set<String>>(), metrics);
 
@@ -185,12 +195,12 @@ public class EmailBurstyGroupCreationTestBed {
 	}
 
 	private static void useGraphBuilderNoArgs(
-			String account,
-			Collection<EmailMessage<String>> trainMessages,
-			Collection<EmailMessage<String>> testMessages,
+			Long account,
+			Collection<StackOverflowMessage<String>> trainMessages,
+			Collection<StackOverflowMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
 			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
-			MetricResultCollection<String> resultCollection) throws IOException {
+			MetricResultCollection<Long> resultCollection) throws IOException {
 
 		ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
 				.create();
@@ -220,12 +230,12 @@ public class EmailBurstyGroupCreationTestBed {
 	}
 
 	private static void useGraphBuilderTimeThreshold(
-			String account,
-			Collection<EmailMessage<String>> trainMessages,
-			Collection<EmailMessage<String>> testMessages,
+			Long account,
+			Collection<StackOverflowMessage<String>> trainMessages,
+			Collection<StackOverflowMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
 			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
-			MetricResultCollection<String> resultCollection) throws IOException {
+			MetricResultCollection<Long> resultCollection) throws IOException {
 
 		
 
@@ -263,12 +273,12 @@ public class EmailBurstyGroupCreationTestBed {
 	}
 
 	private static void useGraphBuilderScoredEdges(
-			String account,
-			Collection<EmailMessage<String>> trainMessages,
-			Collection<EmailMessage<String>> testMessages,
+			Long account,
+			Collection<StackOverflowMessage<String>> trainMessages,
+			Collection<StackOverflowMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
 			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
-			MetricResultCollection<String> resultCollection) throws IOException {
+			MetricResultCollection<Long> resultCollection) throws IOException {
 
 		ActionBasedGraphBuilder<String, CollaborativeAction<String>> tempGraphBuilder = graphBuilderFactory
 				.create(0L, 0.0, 0.0);
@@ -309,24 +319,24 @@ public class EmailBurstyGroupCreationTestBed {
 
 	public static void main(String[] args) throws IOException {
 
-		for (ActionsDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> dataset : dataSets) {
+		for (ActionsDataSet<Long,String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset : dataSets) {
 
 			ArrayList<Metric> tempMetrics = new ArrayList<>();
-			for (BurstyGroupMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
+			for (BurstyGroupMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 				tempMetrics.add(metricFactory.create());
 			}
 			String headerPrefix = "graph builder,seed threshold,recommendation threshold,"
 					+ "account,half_life,w_out,edge threshold";
-			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
+			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, tempMetrics,
 					dataset.getBurstyGroupsMetricsFile());
 
-			for (String account : dataset.getAccountIds()) {
+			for (Long account : dataset.getAccountIds()) {
 				System.out.println(account);
 
-				Collection<EmailMessage<String>> trainMessages = dataset
+				Collection<StackOverflowMessage<String>> trainMessages = dataset
 						.getTrainMessages(account, percentTraining);
-				Collection<EmailMessage<String>> testMessages = dataset
+				Collection<StackOverflowMessage<String>> testMessages = dataset
 						.getTestMessages(account, percentTraining);
 
 				for (SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory : seedlessRecommenderFactories) {

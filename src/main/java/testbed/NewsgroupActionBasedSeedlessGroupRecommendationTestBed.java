@@ -61,7 +61,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>>> graphBuilderFactories = new ArrayList<>();
 	
 //	static Collection<Double> wOuts = new ArrayList<>();
-//	static Collection<Double> halfLives = new ArrayList<>();
+//	static Collection<Long> halfLives = new ArrayList<>();
 //	static Collection<Double> scoreThresholds = new ArrayList<>();
 
 	static Collection<ActionBasedGroupMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
@@ -80,33 +80,6 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		graphBuilderFactories.add(SimpleActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		graphBuilderFactories.add(TimeThresholdActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
-
-		Collection<ConstantValues> simpleConstants = new ArrayList<>();
-		Object[] simpleConstantSet = {};
-		simpleConstants.add(new ConstantValues(simpleConstantSet));
-		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
-		
-		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
-		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7*4}; //4 weeks
-		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*365/2}; //0.5 years
-		Object[] timeThresholdConstantSet3 = {1000L*60*60*24*365}; //1 year
-		Object[] timeThresholdConstantSet4 = {1000L*60*60*24*365*2}; //2 years
-		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
-		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
-		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
-		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet4));
-		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
-		
-		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
-		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
-		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
-		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
-		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
-		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
-		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
-		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
-		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
 		
 		// Add w_outs
 //		wOuts.add(0.125);
@@ -119,13 +92,13 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 		
 //		// Add half lives
 //		halfLives.add(1000.0*60); // 1 minute
-//		halfLives.add(1000.0*60*60); // 1 hour
-//		halfLives.add(1000.0*60*60*24); // 1 day
-//		halfLives.add(1000.0*60*60*24*7); // 1 week
-//		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
-//		halfLives.add(1000.0*60*60*24*365/2); // 6 months
-//		halfLives.add(1000.0*60*60*24*365); // 1 year
-//		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+//		halfLives.add(1000L*60*60); // 1 hour
+//		halfLives.add(1000L*60*60*24); // 1 day
+//		halfLives.add(1000L*60*60*24*7); // 1 week
+//		halfLives.add(1000L*60*60*24*7*4); // 4 weeks
+//		halfLives.add(1000L*60*60*24*365/2); // 6 months
+//		halfLives.add(1000L*60*60*24*365); // 1 year
+//		halfLives.add(1000L*60*60*24*365*2); // 2 years
 		
 		// Add score thresholds
 //		scoreThresholds.add(0.0);
@@ -139,6 +112,38 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 //		scoreThresholds.add(0.40);
 //		scoreThresholds.add(0.45);
 //		scoreThresholds.add(0.50);
+
+		
+		Collection<ConstantValues> simpleConstants = new ArrayList<>();
+		Object[] simpleConstantSet = {};
+		simpleConstants.add(new ConstantValues(simpleConstantSet));
+		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
+		
+		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
+		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7}; //1.0 weeks
+		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*7*4}; //4.0 weeks
+		Object[] timeThresholdConstantSet3 = {1000L*60*60*24*365/2}; //0.5 years
+		Object[] timeThresholdConstantSet4 = {1000L*60*60*24*365}; //1 year
+		Object[] timeThresholdConstantSet5 = {1000L*60*60*24*365*2}; //2 years
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet4));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet5));
+		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
+		
+		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
+		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.02}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.02
+		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
+		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
+		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
+		Object[] interactionRankConstantSet5 = {1.0, 1000L*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet5));
+		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
 		
 		// Add metrics
 		metrics.add(new TotalTestActionsMetric<ComparableAddress, JavaMailNewsgroupPost>());
@@ -211,6 +216,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			for (ComparableAddress member : recommendation) {
 				strRecommendation.add(member.toString());
 			}
+			strRecommendations.add(strRecommendation);
 		}
 		
 		if (!groupOutputFile.getParentFile().exists()) {

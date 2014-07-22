@@ -56,7 +56,7 @@ public class NewsgroupBurstyGroupCreationTestBed {
 	static Collection<SeedlessGroupRecommenderFactory<ComparableAddress>> seedlessRecommenderFactories = new ArrayList<>();
 	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>>> graphBuilderFactories = new ArrayList<>();
 
-	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constantValues = new HashMap<>();
+	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
 
 	static Collection<Double> distanceThresholds = new ArrayList<>();
 
@@ -78,12 +78,11 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		graphBuilderFactories.add(InteractionRankWeightedActionBasedGraphBuilder.factory(String.class, EmailMessage.class));
 
 		
-		// Add constants for simple graph builder
 		Collection<ConstantValues> simpleConstants = new ArrayList<>();
-		simpleConstants.add(new ConstantValues(new Object[0]));
-		constantValues.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
+		Object[] simpleConstantSet = {};
+		simpleConstants.add(new ConstantValues(simpleConstantSet));
+		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
 		
-		// Add constants for time threshold graph builder
 		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
 		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7}; //1.0 weeks
 		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*7*4}; //4.0 weeks
@@ -95,21 +94,20 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet4));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet5));
-		constantValues.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
+		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
 		
-		// Add constants for interaction rank graph builder
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.01}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.01
-		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*4, 0.01}; //wOut=1.0, halfLife=4 weeks, threshold=0.01
-		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365/2, 1.0}; //wOut=1.0, halfLife=0.5 years, threshold=1.0
-		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365, 1.25}; //wOut=1.0, halfLife=1 year, threshold=1.25
-		Object[] interactionRankConstantSet5 = {1.0, 1000L*60*60*24*365*2, 1.75}; //wOut=1.0, halfLife=2 years, threshold=1.75
+		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.02}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.02
+		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
+		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
+		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8
+		Object[] interactionRankConstantSet5 = {1.0, 1000L*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet5));
-		constantValues.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
+		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
 
 		// Add thresholds for seed and recommendation matchers
 		distanceThresholds.add(0.00);
@@ -203,7 +201,7 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
 				seedlessRecommenderFactory, graphBuilder);
 		
-		Collection<ConstantValues> constantSets = constantValues.get(graphBuilder.getClass());
+		Collection<ConstantValues> constantSets = constants.get(graphBuilder.getClass());
 		for (ConstantValues constantSet : constantSets) {
 			for (Double seedThreshold : distanceThresholds) {
 				for (Double recommendationThreshold : distanceThresholds) {
@@ -237,7 +235,7 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> tempGraphBuilder = graphBuilderFactory
 				.create(0L);
 		
-		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
+		Collection<ConstantValues> constantSets = constants.get(tempGraphBuilder.getClass());
 		for (ConstantValues constantSet : constantSets) {
 			Long timeThreshold = (Long) constantSet.constants[0];
 			
@@ -278,7 +276,7 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> tempGraphBuilder = graphBuilderFactory
 				.create(0L, 0.0, 0.0);
 		
-		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
+		Collection<ConstantValues> constantSets = constants.get(tempGraphBuilder.getClass());
 		for (ConstantValues constantSet : constantSets) {
 			
 			Double wOut = (Double) constantSet.constants[0];

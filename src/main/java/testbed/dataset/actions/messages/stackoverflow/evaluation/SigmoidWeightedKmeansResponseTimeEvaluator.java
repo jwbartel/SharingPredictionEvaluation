@@ -20,6 +20,7 @@ public class SigmoidWeightedKmeansResponseTimeEvaluator<Id, Recipient, Message e
 	
 	public static <Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
 	ResponseTimeEvaluatorFactory<Id, Recipient, Message, ThreadType> factory(
+			Class<Id> idClass,
 			Class<Recipient> recipientClass,
 			Class<Message> messageClass,
 			Class<ThreadType> threadClass,

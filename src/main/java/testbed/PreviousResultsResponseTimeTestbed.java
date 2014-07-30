@@ -1,14 +1,10 @@
 package testbed;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import prediction.response.time.InverseGaussianDistribution;
-import prediction.response.time.LogNormalDistribution;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -27,36 +23,40 @@ import metrics.response.time.ResponseTimeMetricFactory;
 import metrics.response.time.ScaleDifferenceMetric;
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
-import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
-import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
+import testbed.dataset.actions.messages.MessageDataset;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.CollaborativeFilteringResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 
-public class StackOverflowPreviousResultsResponseTimeTestBed {
+public class PreviousResultsResponseTimeTestbed<Id, Collaborator extends Comparable<Collaborator>, Message extends SingleMessage<Collaborator>, MsgThread extends MessageThread<Collaborator, Message>> {
 
-	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
-	static Collection<ResponseTimeMetricFactory> metricFactories = new ArrayList<>();
-	static Collection<ResponseTimeEvaluatorFactory<Long, String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> evaluatorFactories = new ArrayList<>();
+	Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets;
+	Collection<ResponseTimeMetricFactory> metricFactories = new ArrayList<>();
+	Collection<ResponseTimeEvaluatorFactory<Id, Collaborator, Message, MsgThread>> evaluatorFactories = new ArrayList<>();
+
+	public PreviousResultsResponseTimeTestbed(
+			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets,
+			Class<Id> idClass,
+			Class<Collaborator> collaboratorClass,
+			Class<Message> messageClass,
+			Class<MsgThread> threadClass) {
+
+		this.datasets = datasets;
+		init(idClass, collaboratorClass, messageClass, threadClass);
+	}
 	
-
-	static {
-		try {
-			dataSets.add(new SampledStackOverflowDataset("Sampled StackOverflow", new File(
-								"data/Stack Overflow/10000 Random Questions"), false));
-		} catch (IOException | ParseException e) {
-			e.printStackTrace();
-			System.exit(0);
-		}
-		
+	private void init(
+			Class<Id> idClass,
+			Class<Collaborator> collaboratorClass,
+			Class<Message> messageClass,
+			Class<MsgThread> threadClass) {
 		metricFactories.add(RecallMetric.factory());
 		metricFactories.add(PercentWithinRangeMetric.factory());
 		metricFactories.add(PercentZeroMinimum.factory());
@@ -78,34 +78,33 @@ public class StackOverflowPreviousResultsResponseTimeTestBed {
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 day", 3600.0*24));
 		metricFactories.add(PercentWithinErrorThresholdMetric.factory(MinOrMaxType.Minimum, "1 week", 3600.0*24*7));
 		
-		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, "1 minute", 60.0));
-		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, "3 minutes", 3*60.0));
-		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, "5 minutes", 5*60.0));
-		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, "10 minutes", 10*60.0));
-		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, "20 minutes", 20*60.0));
-		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, new InverseGaussianDistribution(867.482, 571.108)));
-		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, new LogNormalDistribution(6.35702, 0.927127)));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, "1 minute", 60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, "3 minutes", 3*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, "5 minutes", 5*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, "10 minutes", 10*60.0));
+		evaluatorFactories.add(ConstantPredictionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, "20 minutes", 20*60.0));
+		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, new InverseGaussianDistribution(867.482, 571.108)));
+		evaluatorFactories.add(DistributionResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, new LogNormalDistribution(6.35702, 0.927127)));
 		
-		
-		evaluatorFactories.add(GradientAscentResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class));
+		evaluatorFactories.add(GradientAscentResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass));
+
 		for (int k=2; k<=25; k++) {
-			evaluatorFactories.add(KmeansResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, k));
+			evaluatorFactories.add(KmeansResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, k));
 		}
 		for (int k=2; k<=25; k++) {
-			evaluatorFactories.add(SigmoidWeightedKmeansResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, k));
+			evaluatorFactories.add(SigmoidWeightedKmeansResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, k));
 		}
 		String[] collaborativeFilteringFeatureTypes = {"owner and tag", "owner and word", "owner and tag_word pair", "tag and word"};
 		String[] collaborativeFilteringTypes = {"Random", "Euclidean", "PearsonCorrelation", "SlopeOne"};
 		for (String featureType : collaborativeFilteringFeatureTypes) {
 			for (String algorithmType : collaborativeFilteringTypes) {
-				evaluatorFactories.add(CollaborativeFilteringResponseTimeEvaluator.factory(Long.class, String.class, StackOverflowMessage.class, StackOverflowThread.class, featureType, algorithmType));
+				evaluatorFactories.add(CollaborativeFilteringResponseTimeEvaluator.factory(idClass, collaboratorClass, messageClass, threadClass, featureType, algorithmType));
 			}
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		
-		for (StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> dataset : dataSets) {
+	public void runTestbed() throws IOException {
+		for (MessageDataset<Id, Collaborator, Message, MsgThread> dataset : datasets) {
 			
 			Collection<Metric> unusedMetrics = new ArrayList<>();
 			for (ResponseTimeMetricFactory metricFactory : metricFactories) {
@@ -115,12 +114,12 @@ public class StackOverflowPreviousResultsResponseTimeTestBed {
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
 					dataset.getPreviousResultsResponseTimeMetricsFile());
-			for (ResponseTimeEvaluatorFactory<Long, String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluatorFactory : evaluatorFactories) {
+			for (ResponseTimeEvaluatorFactory<Id, Collaborator, Message, MsgThread> evaluatorFactory : evaluatorFactories) {
 				Collection<ResponseTimeMetric> metrics = new ArrayList<>();
 				for (ResponseTimeMetricFactory metricFactory : metricFactories) {
 					metrics.add(metricFactory.create());
 				}
-				ResponseTimeEvaluator<Long, String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>> evaluator = 
+				ResponseTimeEvaluator<Id, Collaborator, Message, MsgThread> evaluator = 
 						evaluatorFactory.create(dataset, metrics);
 				
 				for (Integer testId : evaluator.getTestIds()) {

@@ -1,23 +1,19 @@
 package testbed.dataset.actions.messages.stackoverflow;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.io.FileUtils;
-
-import testbed.dataset.actions.messages.MessageDataSet;
+import testbed.dataset.actions.messages.MessageDataset;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
 public abstract class StackOverflowDataset<Recipient, MessageType extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, MessageType>>
-		extends MessageDataSet<Long, Recipient, MessageType, ThreadType> {
+		extends MessageDataset<Long, Recipient, MessageType, ThreadType> {
 
 	protected Collection<MessageType> messages = new TreeSet<>();
 	protected Map<Long, ThreadType> threads = new TreeMap<>();
@@ -69,79 +65,5 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 			threads.put(id, thread);
 		}
 		thread.addThreadedAction(message);
-	}
-
-	private File getResponseTimesExperimentsFolder() {
-		return new File(getRootFolder(), "response times");
-	}
-
-	private File getResponseTimesFoldsFolder() {
-		return new File(getResponseTimesExperimentsFolder(), "folds");
-	}
-
-	private File getResponseTimesFoldSetsFolder() {
-		return new File(getResponseTimesExperimentsFolder(), "fold sets for experiments");
-	}
-
-	private File getResponseTimesTrainingSetsFile() {
-		return new File(getResponseTimesFoldSetsFolder(), "train_sets.csv");
-	}
-
-	private List<Double> loadTimes(String fold) throws IOException {
-		List<Double> retVal = new ArrayList<>();
-		File foldFile = new File(getResponseTimesFoldsFolder(), fold + "_y.csv");
-		List<String> lines = FileUtils.readLines(foldFile);
-		for (String line : lines) {
-			if (line.equals("Inf")) {
-				retVal.add(Double.POSITIVE_INFINITY);
-			} else {
-				retVal.add(Double.parseDouble(line)*60*60);
-			}
-		}
-		return retVal;
-	}
-
-	public Map<Integer, List<Double>> getResponesTimesTrainingTimes() throws IOException {
-		Map<Integer, List<Double>> retVal = new TreeMap<>();
-
-		List<String> trainSetsLines = FileUtils.readLines(getResponseTimesTrainingSetsFile());
-		Integer setId = 1;
-		for (String trainSetsLine : trainSetsLines) {
-			String[] trainingSet = trainSetsLine.split(",");
-			List<Double> trainingTimes = new ArrayList<>();
-			for (String trainingFold : trainingSet) {
-				trainingTimes.addAll(loadTimes(trainingFold));
-			}
-			retVal.put(setId, trainingTimes);
-			setId++;
-		}
-
-		return retVal;
-	}
-
-	private File getResponseTimesTestingSetsFile() {
-		return new File(getResponseTimesFoldSetsFolder(), "test_sets.csv");
-	}
-
-	public Map<Integer, List<Double>> getResponesTimesTestingTimes() throws IOException {
-		Map<Integer, List<Double>> retVal = new TreeMap<>();
-
-		List<String> testSetsLines = FileUtils.readLines(getResponseTimesTestingSetsFile());
-		Integer setId = 1;
-		for (String testSetsLine : testSetsLines) {
-			String[] testingSet = testSetsLine.split(",");
-			List<Double> testingTimes = new ArrayList<>();
-			for (String testingFold : testingSet) {
-				testingTimes.addAll(loadTimes(testingFold));
-			}
-			retVal.put(setId, testingTimes);
-			setId++;
-		}
-
-		return retVal;
-	}
-
-	public File getResponseTimesResultsFolder() {
-		return new File(getResponseTimesExperimentsFolder(), "results");
 	}
 }

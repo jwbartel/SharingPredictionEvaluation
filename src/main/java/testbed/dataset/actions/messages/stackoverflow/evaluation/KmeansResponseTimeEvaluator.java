@@ -13,24 +13,25 @@ import metrics.response.time.ResponseTimeMetric;
 import org.apache.commons.io.FileUtils;
 
 import prediction.response.time.ResponseTimeRange;
-import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
+import testbed.dataset.actions.messages.MessageDataset;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 
-public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
-		extends ResponseTimeEvaluator<Recipient, Message, ThreadType> {
+public class KmeansResponseTimeEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
+		extends ResponseTimeEvaluator<Id, Recipient, Message, ThreadType> {
 	
-	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
-	ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType> factory(
+	public static <Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
+	ResponseTimeEvaluatorFactory<Id, Recipient, Message, ThreadType> factory(
+			Class<Id> idClass,
 			Class<Recipient> recipientClass,
 			Class<Message> messageClass,
 			Class<ThreadType> threadClass,
 			final int k) {
-		return new ResponseTimeEvaluatorFactory<Recipient, Message, ThreadType>() {
+		return new ResponseTimeEvaluatorFactory<Id, Recipient, Message, ThreadType>() {
 
 			@Override
-			public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
-					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+			public ResponseTimeEvaluator<Id, Recipient, Message, ThreadType> create(
+					MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 					Collection<ResponseTimeMetric> metrics) {
 				return new KmeansResponseTimeEvaluator<>(dataset, k, metrics);
 			}
@@ -41,7 +42,7 @@ public class KmeansResponseTimeEvaluator<Recipient, Message extends StackOverflo
 	private File kmeansFolder;
 	
 	public KmeansResponseTimeEvaluator(
-			StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+			MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 			int k,
 			Collection<ResponseTimeMetric> metrics) {
 		super(dataset, metrics);

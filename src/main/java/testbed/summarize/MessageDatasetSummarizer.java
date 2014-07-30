@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import testbed.dataset.actions.messages.MessageDataSet;
+import testbed.dataset.actions.messages.MessageDataset;
 import testbed.summarize.SortableColumn.Order;
 import data.representation.actionbased.messages.MessageThread;
 import data.representation.actionbased.messages.SingleMessage;
@@ -13,16 +13,16 @@ import data.representation.actionbased.messages.SingleMessage;
 public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>> extends
 		DatasetSummarizer<IdType> {
 
-	MessageDataSet<IdType, RecipientType, MessageType, ThreadType> dataset;
+	MessageDataset<IdType, RecipientType, MessageType, ThreadType> dataset;
 	
-	private MessageDatasetSummarizer (MessageDataSet<IdType, RecipientType, MessageType, ThreadType> dataset) {
+	private MessageDatasetSummarizer (MessageDataset<IdType, RecipientType, MessageType, ThreadType> dataset) {
 		this.dataset = dataset;
 	}
 	
 	
 	public static <IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>
 			MessageDatasetSummarizer<IdType, RecipientType, MessageType, ThreadType>
-			create(MessageDataSet<IdType, RecipientType, MessageType, ThreadType> dataset){
+			create(MessageDataset<IdType, RecipientType, MessageType, ThreadType> dataset){
 		return new MessageDatasetSummarizer<>(dataset);
 	}
 	

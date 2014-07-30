@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.mail.MessagingException;
@@ -16,10 +18,10 @@ import testbed.dataset.actions.ActionsDataSet;
 import data.representation.actionbased.messages.MessageThread;
 import data.representation.actionbased.messages.SingleMessage;
 
-public abstract class MessageDataSet<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>
+public abstract class MessageDataset<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>
 		extends ActionsDataSet<IdType, RecipientType, MessageType, ThreadType> {
 
-	public MessageDataSet(String name, IdType[] accountIds, File rootFolder,
+	public MessageDataset(String name, IdType[] accountIds, File rootFolder,
 			Class<IdType> genericClass) {
 		super(name, accountIds, rootFolder, genericClass);
 	}
@@ -106,6 +108,80 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 	
 	public File getResponseTimesAnalysisFile() {
 		return new File(getAnalysisFolder(), "response times.csv");
+	}
+
+	private File getResponseTimesExperimentsFolder() {
+		return new File(getRootFolder(), "response times");
+	}
+
+	private File getResponseTimesFoldsFolder() {
+		return new File(getResponseTimesExperimentsFolder(), "folds");
+	}
+
+	private File getResponseTimesFoldSetsFolder() {
+		return new File(getResponseTimesExperimentsFolder(), "fold sets for experiments");
+	}
+
+	private File getResponseTimesTrainingSetsFile() {
+		return new File(getResponseTimesFoldSetsFolder(), "train_sets.csv");
+	}
+
+	private List<Double> loadTimes(String fold) throws IOException {
+		List<Double> retVal = new ArrayList<>();
+		File foldFile = new File(getResponseTimesFoldsFolder(), fold + "_y.csv");
+		List<String> lines = FileUtils.readLines(foldFile);
+		for (String line : lines) {
+			if (line.equals("Inf")) {
+				retVal.add(Double.POSITIVE_INFINITY);
+			} else {
+				retVal.add(Double.parseDouble(line)*60*60);
+			}
+		}
+		return retVal;
+	}
+
+	public Map<Integer, List<Double>> getResponesTimesTrainingTimes() throws IOException {
+		Map<Integer, List<Double>> retVal = new TreeMap<>();
+
+		List<String> trainSetsLines = FileUtils.readLines(getResponseTimesTrainingSetsFile());
+		Integer setId = 1;
+		for (String trainSetsLine : trainSetsLines) {
+			String[] trainingSet = trainSetsLine.split(",");
+			List<Double> trainingTimes = new ArrayList<>();
+			for (String trainingFold : trainingSet) {
+				trainingTimes.addAll(loadTimes(trainingFold));
+			}
+			retVal.put(setId, trainingTimes);
+			setId++;
+		}
+
+		return retVal;
+	}
+
+	private File getResponseTimesTestingSetsFile() {
+		return new File(getResponseTimesFoldSetsFolder(), "test_sets.csv");
+	}
+
+	public Map<Integer, List<Double>> getResponesTimesTestingTimes() throws IOException {
+		Map<Integer, List<Double>> retVal = new TreeMap<>();
+
+		List<String> testSetsLines = FileUtils.readLines(getResponseTimesTestingSetsFile());
+		Integer setId = 1;
+		for (String testSetsLine : testSetsLines) {
+			String[] testingSet = testSetsLine.split(",");
+			List<Double> testingTimes = new ArrayList<>();
+			for (String testingFold : testingSet) {
+				testingTimes.addAll(loadTimes(testingFold));
+			}
+			retVal.put(setId, testingTimes);
+			setId++;
+		}
+
+		return retVal;
+	}
+
+	public File getResponseTimesResultsFolder() {
+		return new File(getResponseTimesExperimentsFolder(), "results");
 	}
 
 	@Override

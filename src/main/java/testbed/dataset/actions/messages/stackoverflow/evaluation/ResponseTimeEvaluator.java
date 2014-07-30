@@ -10,26 +10,27 @@ import java.util.Map;
 import metrics.MetricResult;
 import metrics.response.time.ResponseTimeMetric;
 import prediction.response.time.ResponseTimeRange;
+import testbed.dataset.actions.messages.MessageDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 
-public abstract class ResponseTimeEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+public abstract class ResponseTimeEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
 		implements Evaluator {
 	
-	public static interface ResponseTimeEvaluatorFactory<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>> {
+	public static interface ResponseTimeEvaluatorFactory<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>> {
 
-		public ResponseTimeEvaluator<Recipient, Message, ThreadType> create(
-				StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+		public ResponseTimeEvaluator<Id, Recipient, Message, ThreadType> create(
+				MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 				Collection<ResponseTimeMetric> metrics);
 	}
 	
-	protected StackOverflowDataset<Recipient, Message, ThreadType> dataset;
+	protected MessageDataset<Id, Recipient, Message, ThreadType> dataset;
 	protected Collection<ResponseTimeMetric> metrics;
 	protected File resultsFolder;
 	protected File timeFolder;
 
-	public ResponseTimeEvaluator(StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+	public ResponseTimeEvaluator(MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 			Collection<ResponseTimeMetric> metrics) {
 		this.dataset = dataset;
 		this.resultsFolder = dataset.getResponseTimesResultsFolder();

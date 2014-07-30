@@ -37,8 +37,8 @@ public class ScaleDifferenceMetric extends MinOrMaxResponseTimeMetric {
 			Double trueTime = trueTimes.get(i);
 			ResponseTimeRange predictedRange = responseTimePredictions.get(i);
 			Double prediction = getPredictionValue(predictedRange);
-			if (prediction != null && trueTime != null && trueTime != 0 && trueTime != Double.POSITIVE_INFINITY
-					&& prediction != Double.POSITIVE_INFINITY) {
+			if (prediction != null && trueTime != null && !trueTime.isInfinite()
+					&& !prediction.isInfinite()) {
 				
 				Double minVal = Math.min(prediction, trueTime);
 				Double maxVal = Math.max(prediction, trueTime);

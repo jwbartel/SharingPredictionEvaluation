@@ -41,7 +41,7 @@ import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeighted
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class PreviousResultsResponseTimeTestBed {
+public class StackOverflowPreviousResultsResponseTimeTestBed {
 
 	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<ResponseTimeMetricFactory> metricFactories = new ArrayList<>();

@@ -27,7 +27,7 @@ import testbed.dataset.actions.messages.stackoverflow.evaluation.RandomPredictio
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class PreviousResultsLivenessTestBed {
+public class StackOverflowPreviousResultsLivenessTestBed {
 
 	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
 	static Collection<ResponseLivenessMetricFactory> metricFactories = new ArrayList<>();

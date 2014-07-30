@@ -52,6 +52,9 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		List<Collection<ThreadType>> folds = new ArrayList<>(numFolds);
 		
 		int foldSize = threads.size() / numFolds;
+		if (foldSize == 0) {
+			return new TreeMap<>();
+		}
 		int remainder = threads.size() % foldSize;
 		
 		int pos = 0;
@@ -153,7 +156,7 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		return new File(groupsFolder, "graph.txt");
 	}
 	
-	private File getAnalysisFolder() {
+	protected File getAnalysisFolder() {
 		return new File(getRootFolder(), "analysis");
 	}
 	

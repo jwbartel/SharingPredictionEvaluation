@@ -1,11 +1,16 @@
 package testbed.dataset.actions.messages;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
+
+import javax.mail.MessagingException;
+
+import org.apache.commons.io.FileUtils;
 
 import testbed.dataset.actions.ActionsDataSet;
 import data.representation.actionbased.messages.MessageThread;
@@ -97,6 +102,10 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 	@Override
 	public File getEvolutionMetricsFile() {
 		return new File(getMetricsFolder(), "group evolution results.csv");
+	}
+	
+	public File getResponseTimesAnalysisFile() {
+		return new File(getAnalysisFolder(), "response times.csv");
 	}
 
 	@Override
@@ -194,6 +203,32 @@ public abstract class MessageDataSet<IdType, RecipientType, MessageType extends 
 			count++;
 		}
 		return testThreads;
+	}
+	
+	public Collection<Double> getAllResponseTimes(double trainingSize) throws MessagingException {
+		
+		Collection<Double> responseTimes = new ArrayList<>();
+		for (IdType account : getAccountIds()) {
+			Collection<ThreadType> threads = getTrainThreads(account, trainingSize);
+			for (ThreadType thread : threads) {
+				responseTimes.add(thread.getTimeToResponse());
+			}
+		}
+		return responseTimes;
+	}
+	
+	public void writeAllResponseTimes(double trainingSize) throws MessagingException, IOException {
+		Collection<Double> responseTimes = getAllResponseTimes(trainingSize);
+		
+		String outputStr = "";
+		for (Double responseTime : responseTimes) {
+			if (responseTime != null && !responseTime.isInfinite()) {
+				outputStr += responseTime + "\n";
+			}
+		}
+		
+		File outputFile = getResponseTimesAnalysisFile();
+		FileUtils.write(outputFile, outputStr);
 	}
 
 }

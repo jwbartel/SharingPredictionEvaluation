@@ -97,7 +97,7 @@ public class NewsgroupBurstyGroupCreationTestBed {
 		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
 		
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.02}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.02
+		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7, 0.02}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.02
 		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*4, 0.6}; //wOut=1.0, halfLife=4 weeks, threshold=0.6
 		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365/2, 1.7}; //wOut=1.0, halfLife=0.5 years, threshold=1.7
 		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365, 1.8}; //wOut=1.0, halfLife=1 year, threshold=1.8

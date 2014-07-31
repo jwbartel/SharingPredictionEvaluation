@@ -54,7 +54,7 @@ import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.CollaborativeActionThread;
 
-public abstract class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends CollaborativeAction<Collaborator>, ActionThread extends CollaborativeActionThread<Collaborator, Action>> {
+public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends CollaborativeAction<Collaborator>, ActionThread extends CollaborativeActionThread<Collaborator, Action>> {
 
 	public static final double MAX_VERTEX_GROWTH_RATE = 1.0;
 	public static final double PERCENT_TRAINING = 0.8;
@@ -65,13 +65,14 @@ public abstract class ActionBasedEvolutionTestbed<Id, Collaborator, Action exten
 	Collection<SeedlessGroupRecommenderFactory<Collaborator>> seedlessGroupRecommenderFactories;
 	Collection<ActionBasedGraphBuilderFactory<Collaborator, Action>> graphBuilderFactories;
 
-	Map<Class<? extends ActionBasedGraphBuilder<Collaborator, Action>>, Collection<ConstantValues>> graphConstants = new HashMap<>();
+	@SuppressWarnings("rawtypes")
+	Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants = new HashMap<>();
 
 	Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics;
 
 	public ActionBasedEvolutionTestbed(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets,
-			Map<Class<? extends ActionBasedGraphBuilder<Collaborator, Action>>, Collection<ConstantValues>> graphConstants,
+			@SuppressWarnings("rawtypes") Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants,
 			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {
 		this.datasets = datasets;
 		this.graphConstants = graphConstants;

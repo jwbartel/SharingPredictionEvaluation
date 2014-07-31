@@ -66,6 +66,10 @@ public class CollaborativeFilteringResponseTimeEvaluator<Id, Recipient, Message 
 
 	private Map<Integer,List<DataPoint<Integer>>> getTestPoints() throws IOException {
 		
+		if (!collaborativeFilteringResultsFolder.exists()) {
+			return null;
+		}
+		
 		Map<Integer,List<DataPoint<Integer>>> retVal = new TreeMap<>();
 		
 		File[] testFolders = collaborativeFilteringResultsFolder.listFiles();
@@ -92,6 +96,9 @@ public class CollaborativeFilteringResponseTimeEvaluator<Id, Recipient, Message 
 	
 	private Map<Integer,List<Double>> getTrueTimes() throws IOException {
 		Map<Integer,List<DataPoint<Integer>>> testPoints = getTestPoints();
+		if (testPoints == null) {
+			return null;
+		}
 		Map<Integer, List<Double>> retVal = new TreeMap<>();
 		for (Integer test : testPoints.keySet()) {
 			List<Double> trueTimes = new ArrayList<>();
@@ -121,7 +128,11 @@ public class CollaborativeFilteringResponseTimeEvaluator<Id, Recipient, Message 
 	
 	@Override
 	public Collection<Integer> getTestIds() throws IOException {
-		return getTrueTimes().keySet();
+		Map<Integer,List<Double>> trueTimes = getTrueTimes();
+		if (trueTimes == null) {
+			return null;
+		}
+		return trueTimes.keySet();
 	}
 
 	@Override

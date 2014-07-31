@@ -14,7 +14,7 @@ public class NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<Recip
 		HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 	
 	public NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
-			HierarchicalRecipientRecommender<RecipientType> recommender,
+			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {

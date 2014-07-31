@@ -18,14 +18,14 @@ public class BurstyGroupRecommendationAcceptanceModeler<Collaborator extends Com
 		extends
 		ActionBasedSeedlessGroupRecommendationAcceptanceModeler<Collaborator, Action> {
 
-	BurstyGroupRecommender<Collaborator> recommender;
+	BurstyGroupRecommender<Collaborator,Action> recommender;
 	Collection<Action> trainingActions;
 	Collection<Action> testActions;
 	Collection<Set<Collaborator>> idealGroups;
 	Collection<BurstyGroupMetric<Collaborator, Action>> metrics;
 
 	public BurstyGroupRecommendationAcceptanceModeler(
-			BurstyGroupRecommender<Collaborator> recommender,
+			BurstyGroupRecommender<Collaborator,Action> recommender,
 			Collection<Action> trainingActions, Collection<Action> testActions,
 			Collection<Set<Collaborator>> idealGroups,
 			Collection<BurstyGroupMetric<Collaborator, Action>> metrics) {

@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import prediction.response.time.InverseGaussianDistribution;
+import prediction.response.time.LogNormalDistribution;
 import testbed.PreviousResultsResponseTimeTestbed;
+import testbed.ResponseTimeTestbed;
 import testbed.dataset.actions.messages.MessageDataset;
 import testbed.dataset.actions.messages.newsgroups.Newsgroups20Dataset;
 import data.representation.actionbased.messages.ComparableAddress;
@@ -31,18 +34,28 @@ public class NewsgroupTestbed {
 
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 
-		runPreviousResultsResponseTime();
+//		runPreviousResultsResponseTimeEvaluation();
+		runResponseTimeTests();
 
 	}
 	
-	static void runPreviousResultsResponseTime() throws IOException {
+	static void runPreviousResultsResponseTimeEvaluation() throws IOException {
 		PreviousResultsResponseTimeTestbed<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> previousResultsResponseTimeTestbed =
 				new PreviousResultsResponseTimeTestbed<>(
 						datasets, idClass, collaboratorClass, messageClass, threadClass);
 		previousResultsResponseTimeTestbed.runTestbed();
 	}
 	
+	static void runResponseTimeTests() throws Exception {
+		ResponseTimeTestbed<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> testbed =
+				new ResponseTimeTestbed<>(
+						datasets, 
+						new InverseGaussianDistribution(87621.1, 1042.61),
+						new LogNormalDistribution(10.4017, 1.74268),
+						collaboratorClass, messageClass, threadClass);
+		testbed.runTestbed();
+	}
 
 }

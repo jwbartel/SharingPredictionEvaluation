@@ -51,7 +51,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 	static int listSize = 4;
 
 	static Collection<NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>> dataSets = new ArrayList<>();
-	static Collection<RecipientRecommenderFactory<ComparableAddress>> recommenderFactories = new ArrayList<>();
+	static Collection<RecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<ComparableAddress>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -66,7 +66,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 
 		// Add recommender factories
 		recommenderFactories
-				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<ComparableAddress>());
+				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost>());
 
 		// Add GroupScorerFactories
 		groupScorerFactories.add(IntersectionGroupCount.factory(ComparableAddress.class));
@@ -154,13 +154,13 @@ public class NewsgroupRecipientRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			MetricResultCollection<Integer> resultCollection,
-			RecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			RecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory,
 			GroupScorerFactory<ComparableAddress> scorerFactory)
 			throws IOException {
 
 		GroupScorer<ComparableAddress> groupScorer = scorerFactory.create();
 
-		RecipientRecommender<ComparableAddress> recommender = recommenderFactory
+		RecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = recommenderFactory
 				.createRecommender(groupScorer);
 
 		String label = recommender.getTypeOfRecommender();
@@ -181,7 +181,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			MetricResultCollection<Integer> resultCollection,
-			RecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			RecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory,
 			GroupScorerFactory<ComparableAddress> scorerFactory)
 			throws IOException {
 
@@ -191,7 +191,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 				GroupScorer<ComparableAddress> groupScorer = scorerFactory
 						.create(wOut, halfLife);
 
-				RecipientRecommender<ComparableAddress> recommender = recommenderFactory
+				RecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = recommenderFactory
 						.createRecommender(groupScorer);
 
 				String label = recommender.getTypeOfRecommender();
@@ -211,7 +211,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 	private static Collection<MetricResult> modelRecommendations(
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
-			RecipientRecommender<ComparableAddress> recommender) {
+			RecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender) {
 
 		Collection<RecipientMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
 		for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
@@ -246,7 +246,7 @@ public class NewsgroupRecipientRecommendationTestBed {
 				Collection<JavaMailNewsgroupPost> testMessages = dataset
 						.getTestMessages(account, percentTraining);
 
-				for (RecipientRecommenderFactory<ComparableAddress> recommenderFactory : recommenderFactories) {
+				for (RecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory : recommenderFactories) {
 					for (GroupScorerFactory<ComparableAddress> scorerFactory : groupScorerFactories) {
 
 						if (scorerFactory.takesWOutAndHalfLife()) {

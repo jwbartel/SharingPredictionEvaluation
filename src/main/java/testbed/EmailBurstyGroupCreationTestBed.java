@@ -49,7 +49,7 @@ public class EmailBurstyGroupCreationTestBed {
 	static Collection<ActionsDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
 
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
-	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
+	static Collection<ActionBasedGraphBuilderFactory<String,EmailMessage<String>>> graphBuilderFactories = new ArrayList<>();
 
 	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constantValues = new HashMap<>();
 
@@ -163,14 +163,14 @@ public class EmailBurstyGroupCreationTestBed {
 			Collection<EmailMessage<String>> testMessages,
 			Double seedClosenessThreshold,
 			Double recommendationClosenessThreshold,
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender) {
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender) {
 
 		ArrayList<BurstyGroupMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
 		for (BurstyGroupMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
 
-		BurstyGroupRecommender<String> burstyRecommender = new BurstyGroupRecommender<>(
+		BurstyGroupRecommender<String,EmailMessage<String>> burstyRecommender = new BurstyGroupRecommender<>(
 				recommender, new RelativeEditsThresholdMatcher<String>(
 						seedClosenessThreshold),
 				new RelativeEditsThresholdMatcher<String>(
@@ -189,13 +189,13 @@ public class EmailBurstyGroupCreationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String,EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
-		ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
+		ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder = graphBuilderFactory
 				.create();
 
-		GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
+		GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 				seedlessRecommenderFactory, graphBuilder);
 		
 		Collection<ConstantValues> constantSets = constantValues.get(graphBuilder.getClass());
@@ -224,22 +224,22 @@ public class EmailBurstyGroupCreationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String,EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
 		
 
-		ActionBasedGraphBuilder<String, CollaborativeAction<String>> tempGraphBuilder = graphBuilderFactory
+		ActionBasedGraphBuilder<String,EmailMessage<String>> tempGraphBuilder = graphBuilderFactory
 				.create(0L);
 		
 		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
 		for (ConstantValues constantSet : constantSets) {
 			Long timeThreshold = (Long) constantSet.constants[0];
 			
-			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
+			ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder = graphBuilderFactory
 					.create(timeThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 					seedlessRecommenderFactory, graphBuilder);
 			
 			for (Double seedThreshold : distanceThresholds) {
@@ -267,10 +267,10 @@ public class EmailBurstyGroupCreationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String,EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
-		ActionBasedGraphBuilder<String, CollaborativeAction<String>> tempGraphBuilder = graphBuilderFactory
+		ActionBasedGraphBuilder<String,EmailMessage<String>> tempGraphBuilder = graphBuilderFactory
 				.create(0L, 0.0, 0.0);
 		
 		Collection<ConstantValues> constantSets = constantValues.get(tempGraphBuilder.getClass());
@@ -280,10 +280,10 @@ public class EmailBurstyGroupCreationTestBed {
 			Long halfLife = (Long) constantSet.constants[1];
 			Double scoreThreshold = (Double) constantSet.constants[2];
 			
-			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
+			ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder = graphBuilderFactory
 					.create((long) halfLife, wOut, scoreThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 					seedlessRecommenderFactory, graphBuilder);
 
 			for (Double seedThreshold : distanceThresholds) {
@@ -330,7 +330,7 @@ public class EmailBurstyGroupCreationTestBed {
 						.getTestMessages(account, percentTraining);
 
 				for (SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory : seedlessRecommenderFactories) {
-					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {
+					for (ActionBasedGraphBuilderFactory<String,EmailMessage<String>> graphBuilderFactory : graphBuilderFactories) {
 
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
 							useGraphBuilderScoredEdges(account, trainMessages,

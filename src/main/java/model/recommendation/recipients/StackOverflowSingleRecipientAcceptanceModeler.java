@@ -11,7 +11,7 @@ public class StackOverflowSingleRecipientAcceptanceModeler<RecipientType extends
 		NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 
 	public StackOverflowSingleRecipientAcceptanceModeler(int listSize,
-			RecipientRecommender<RecipientType> recommender,
+			RecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {

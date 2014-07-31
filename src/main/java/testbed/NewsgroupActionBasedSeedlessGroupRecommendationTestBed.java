@@ -58,7 +58,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
 	
 	static Collection<SeedlessGroupRecommenderFactory<ComparableAddress>> seedlessRecommenderFactories = new ArrayList<>();
-	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>>> graphBuilderFactories = new ArrayList<>();
+	static Collection<ActionBasedGraphBuilderFactory<ComparableAddress, JavaMailNewsgroupPost>> graphBuilderFactories = new ArrayList<>();
 	
 //	static Collection<Double> wOuts = new ArrayList<>();
 //	static Collection<Long> halfLives = new ArrayList<>();
@@ -199,7 +199,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 	private static Collection<MetricResult> collectResults(
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
-			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender,
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender,
 			File groupOutputFile,
 			File graphOutputFile) {
 		
@@ -249,15 +249,15 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			SeedlessGroupRecommenderFactory<ComparableAddress> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<ComparableAddress, JavaMailNewsgroupPost> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
 
 		Collection<ConstantValues> constantSets = constants.get(SimpleActionBasedGraphBuilder.class);
 		for (ConstantValues constantSet : constantSets) {
-			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder = graphBuilderFactory
+			ActionBasedGraphBuilder<ComparableAddress, JavaMailNewsgroupPost> graphBuilder = graphBuilderFactory
 					.create();
 
-			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender =
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender =
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 
@@ -280,17 +280,17 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			SeedlessGroupRecommenderFactory<ComparableAddress> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<ComparableAddress, JavaMailNewsgroupPost> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
 		
 		Collection<ConstantValues> constantSets = constants.get(TimeThresholdActionBasedGraphBuilder.class);
 		for (ConstantValues constantSet : constantSets) {
 			long timeThreshold = (Long) constantSet.constants[0];
 			
-			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
+			ActionBasedGraphBuilder<ComparableAddress, JavaMailNewsgroupPost> graphBuilder =
 					graphBuilderFactory.create(timeThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = 
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 					
@@ -315,7 +315,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			SeedlessGroupRecommenderFactory<ComparableAddress> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<ComparableAddress, JavaMailNewsgroupPost> graphBuilderFactory,
 			MetricResultCollection<Integer> resultCollection) throws IOException {
 		
 		Collection<ConstantValues> constantSets = constants.get(InteractionRankWeightedActionBasedGraphBuilder.class);
@@ -324,11 +324,11 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 			long halfLife = (Long) constantSet.constants[1];
 			double scoreThreshold = (Double) constantSet.constants[2];
 			
-			ActionBasedGraphBuilder<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilder =
+			ActionBasedGraphBuilder<ComparableAddress, JavaMailNewsgroupPost> graphBuilder =
 					graphBuilderFactory.create(halfLife, wOut, scoreThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress> recommender = 
-					new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress>(
+			GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = 
+					new GraphFormingActionBasedSeedlessGroupRecommender<ComparableAddress, JavaMailNewsgroupPost>(
 							seedlessRecommenderFactory, graphBuilder);
 
 			File groupsFile = dataset
@@ -383,7 +383,7 @@ public class NewsgroupActionBasedSeedlessGroupRecommendationTestBed {
 				Collection<JavaMailNewsgroupPost> testMessages =  getFirstMessagesOfThreads(dataset.getTestThreads(account, percentTraining));
 				
 				for (SeedlessGroupRecommenderFactory<ComparableAddress> seedlessRecommenderFactory : seedlessRecommenderFactories) {
-					for (ActionBasedGraphBuilderFactory<ComparableAddress, CollaborativeAction<ComparableAddress>> graphBuilderFactory : graphBuilderFactories) {
+					for (ActionBasedGraphBuilderFactory<ComparableAddress, JavaMailNewsgroupPost> graphBuilderFactory : graphBuilderFactories) {
 						
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
 							useGraphBuilderScoredEdges(dataset, account, trainMessages,

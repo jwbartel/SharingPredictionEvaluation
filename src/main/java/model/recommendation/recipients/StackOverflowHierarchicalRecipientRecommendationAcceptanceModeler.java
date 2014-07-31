@@ -11,7 +11,7 @@ public class StackOverflowHierarchicalRecipientRecommendationAcceptanceModeler<R
 		NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 	
 	public StackOverflowHierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
-			HierarchicalRecipientRecommender<RecipientType> recommender,
+			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {

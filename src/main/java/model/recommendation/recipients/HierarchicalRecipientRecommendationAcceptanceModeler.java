@@ -22,13 +22,13 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 		RecipientRecommendationAcceptanceModeler<RecipientType, MessageType> {
 
 	protected final int listSize;
-	protected final RecipientRecommender<RecipientType> recommender;
+	protected final RecipientRecommender<RecipientType, MessageType> recommender;
 	protected final Collection<MessageType> trainingMessages;
 	protected final Collection<MessageType> testMessages;
 	protected final Collection<RecipientMetric<RecipientType, MessageType>> metrics;
 	
 	public HierarchicalRecipientRecommendationAcceptanceModeler(int listSize,
-			HierarchicalRecipientRecommender<RecipientType> recommender,
+			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {

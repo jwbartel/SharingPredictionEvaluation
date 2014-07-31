@@ -49,7 +49,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 	static int listSize = 4;
 
 	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
-	static Collection<GroupBasedRecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -70,7 +70,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 
 		// Add recommender factories
 		recommenderFactories
-				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String>());
+				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>>());
 		
 		// Add GroupScorerFactories
 //		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
@@ -144,7 +144,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
 			MetricResultCollection<Long> resultCollection,
-			GroupBasedRecipientRecommenderFactory<String> recommenderFactory,
+			GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
 			GroupScorerFactory<String> scorerFactory)
 			throws IOException {
 		
@@ -153,9 +153,9 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 				.create();
 
 		
-			GroupBasedRecipientRecommender<String> recommender = recommenderFactory
+			GroupBasedRecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
 					.createRecommender(groupScorer);
-			HierarchicalRecipientRecommender<String> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
+			HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
 
 
 
@@ -176,7 +176,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
 			MetricResultCollection<Long> resultCollection,
-			GroupBasedRecipientRecommenderFactory<String> recommenderFactory,
+			GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
 			GroupScorerFactory<String> scorerFactory)
 			throws IOException {
 
@@ -187,9 +187,9 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 				GroupScorer<String> groupScorer = scorerFactory
 						.create(wOut, halfLife);
 
-				GroupBasedRecipientRecommender<String> recommender = recommenderFactory
+				GroupBasedRecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
 						.createRecommender(groupScorer);
-				HierarchicalRecipientRecommender<String> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
+				HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
 						recommender);
 
 
@@ -209,7 +209,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 	private static Collection<MetricResult> modelRecommendations(
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
-			HierarchicalRecipientRecommender<String> hierarchicalRecommender) {
+			HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender) {
 		
 		Collection<RecipientMetric<String, StackOverflowMessage<String>>> metrics = new ArrayList<>();
 		for (RecipientMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
@@ -245,7 +245,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 				Collection<StackOverflowMessage<String>> testMessages = dataset
 						.getTestQuestions(account, percentTraining);
 
-				for (GroupBasedRecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
+				for (GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory : recommenderFactories) {
 					for (GroupScorerFactory<String> scorerFactory : groupScorerFactories) {
 
 						if (scorerFactory.takesWOutAndHalfLife()) {

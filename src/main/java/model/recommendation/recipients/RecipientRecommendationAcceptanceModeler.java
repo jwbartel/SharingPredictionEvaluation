@@ -186,7 +186,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 
 	protected ArrayList<RecipientAddressingEvent> modelSelection(
 			MessageType message,
-			RecipientRecommender<RecipientType> recommender, int listSize) {
+			RecipientRecommender<RecipientType, MessageType> recommender, int listSize) {
 
 		ArrayList<RecipientAddressingEvent> events = new ArrayList<>();
 

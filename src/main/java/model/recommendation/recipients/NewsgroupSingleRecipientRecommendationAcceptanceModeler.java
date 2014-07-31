@@ -14,7 +14,7 @@ public class NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientTy
 	extends SingleRecipientRecommendationAcceptanceModeler<RecipientType,MessageType> {
 	
 	public NewsgroupSingleRecipientRecommendationAcceptanceModeler(int listSize,
-			RecipientRecommender<RecipientType> recommender,
+			RecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
 			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {

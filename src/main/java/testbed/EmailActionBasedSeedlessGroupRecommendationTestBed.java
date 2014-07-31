@@ -53,7 +53,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	static Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
 		
 	static Collection<SeedlessGroupRecommenderFactory<String>> seedlessRecommenderFactories = new ArrayList<>();
-	static Collection<ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>>> graphBuilderFactories = new ArrayList<>();
+	static Collection<ActionBasedGraphBuilderFactory<String,EmailMessage<String>>> graphBuilderFactories = new ArrayList<>();
 	
 //	static Collection<Double> wOuts = new ArrayList<>();
 //	static Collection<Double> halfLives = new ArrayList<>();
@@ -201,7 +201,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 	private static Collection<MetricResult> collectResults(
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender,
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender,
 			File groupOutputFile,
 			File graphOutputFile) {
 		
@@ -243,15 +243,15 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String, EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 
 		Collection<ConstantValues> constantSets = constants.get(SimpleActionBasedGraphBuilder.class);
 		for (ConstantValues constantSet : constantSets) {
-			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder = graphBuilderFactory
+			ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder = graphBuilderFactory
 					.create();
 
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender =
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender =
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 
@@ -274,7 +274,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String, EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 		
 
@@ -282,10 +282,10 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 		for (ConstantValues constantSet : constantSets) {
 			long timeThreshold = (Long) constantSet.constants[0];
 			
-			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder =
+			ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder =
 					graphBuilderFactory.create(timeThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = 
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender = 
 					new GraphFormingActionBasedSeedlessGroupRecommender<>(
 							seedlessRecommenderFactory, graphBuilder);
 					
@@ -310,7 +310,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			Collection<EmailMessage<String>> trainMessages,
 			Collection<EmailMessage<String>> testMessages,
 			SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory,
-			ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory,
+			ActionBasedGraphBuilderFactory<String,EmailMessage<String>> graphBuilderFactory,
 			MetricResultCollection<String> resultCollection) throws IOException {
 		
 		Collection<ConstantValues> constantSets = constants.get(InteractionRankWeightedActionBasedGraphBuilder.class);
@@ -319,11 +319,11 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 			long halfLife = (Long) constantSet.constants[1];
 			double scoreThreshold = (Double) constantSet.constants[2];
 			
-			ActionBasedGraphBuilder<String, CollaborativeAction<String>> graphBuilder =
+			ActionBasedGraphBuilder<String,EmailMessage<String>> graphBuilder =
 					graphBuilderFactory.create(halfLife, wOut, scoreThreshold);
 
-			GraphFormingActionBasedSeedlessGroupRecommender<String> recommender = 
-					new GraphFormingActionBasedSeedlessGroupRecommender<String>(
+			GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>> recommender = 
+					new GraphFormingActionBasedSeedlessGroupRecommender<String,EmailMessage<String>>(
 							seedlessRecommenderFactory, graphBuilder);
 
 			File groupsFile = dataset
@@ -371,7 +371,7 @@ public class EmailActionBasedSeedlessGroupRecommendationTestBed {
 				}
 				
 				for (SeedlessGroupRecommenderFactory<String> seedlessRecommenderFactory : seedlessRecommenderFactories) {
-					for (ActionBasedGraphBuilderFactory<String, CollaborativeAction<String>> graphBuilderFactory : graphBuilderFactories) {
+					for (ActionBasedGraphBuilderFactory<String, EmailMessage<String>> graphBuilderFactory : graphBuilderFactories) {
 						
 						if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
 							useGraphBuilderScoredEdges(dataset, account,

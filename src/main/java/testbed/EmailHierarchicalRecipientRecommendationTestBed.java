@@ -52,7 +52,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 	static int minTestableMessages = 5;
 
 	static Collection<EmailDataSet<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> dataSets = new ArrayList<>();
-	static Collection<GroupBasedRecipientRecommenderFactory<String>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupBasedRecipientRecommenderFactory<String, EmailMessage<String>>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -69,7 +69,7 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 
 		// Add recommender factories
 		recommenderFactories
-				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String>());
+				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String, EmailMessage<String>>());
 		
 		// Add GroupScorerFactories
 		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
@@ -193,10 +193,10 @@ public class EmailHierarchicalRecipientRecommendationTestBed {
 							GroupScorer<String> groupScorer = scorerFactory
 									.create(wOut, halfLife);
 
-							for (GroupBasedRecipientRecommenderFactory<String> recommenderFactory : recommenderFactories) {
-								GroupBasedRecipientRecommender<String> recommender = recommenderFactory
+							for (GroupBasedRecipientRecommenderFactory<String, EmailMessage<String>> recommenderFactory : recommenderFactories) {
+								GroupBasedRecipientRecommender<String, EmailMessage<String>> recommender = recommenderFactory
 										.createRecommender(groupScorer);
-								HierarchicalRecipientRecommender<String> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
+								HierarchicalRecipientRecommender<String, EmailMessage<String>> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
 
 								Collection<RecipientMetric<String, EmailMessage<String>>> metrics = new ArrayList<>();
 								for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {

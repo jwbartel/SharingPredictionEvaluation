@@ -94,15 +94,19 @@ public class ResponseTimeTestbed <Id, Collaborator extends Comparable<Collaborat
 	
 	public ResponseTimeTestbed(
 			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets,
+			InverseGaussianDistribution inverseGaussianDistribution,
+			LogNormalDistribution lognormalDistribution,
 			Class<Collaborator> collaboratorClass,
 			Class<Message> messageClass,
 			Class<MsgThread> threadClass) {
 		
 		this.datasets = datasets;
-		init(collaboratorClass, messageClass, threadClass);
+		init(inverseGaussianDistribution, lognormalDistribution, collaboratorClass, messageClass, threadClass);
 	}
 	
-	private void init(Class<Collaborator> collaboratorClass,
+	private void init(InverseGaussianDistribution inverseGaussianDistribution,
+			LogNormalDistribution lognormalDistribution,
+			Class<Collaborator> collaboratorClass,
 			Class<Message> messageClass,
 			Class<MsgThread> threadClass) {
 		
@@ -119,8 +123,14 @@ public class ResponseTimeTestbed <Id, Collaborator extends Comparable<Collaborat
 //		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new LogNormalDistribution(6.35702, 0.927127), collaboratorClass, messageClass, threadClass));
 		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new InverseGaussianDistribution(50132.4, 113.647), collaboratorClass, messageClass, threadClass));
 		predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(new LogNormalDistribution(8.407, 2.87785), collaboratorClass, messageClass, threadClass));
+		if (inverseGaussianDistribution != null) {
+			predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(inverseGaussianDistribution, collaboratorClass, messageClass, threadClass));
+		}
+		if (lognormalDistribution != null) {
+			predictorFactories.add(DistributionBasedMessageResponseTimePredictor.factory(lognormalDistribution, collaboratorClass, messageClass, threadClass));
+		}
 //		predictorFactories.add(WekaRegressionMessageResponseTimePredictor.factory("sgd - num collaborators and title length", new WekaSGDRegressionModelRule("responseTime"), collaboratorClass, messageClass, threadClass));
-		predictorFactories.add(WekaRegressionMessageResponseTimePredictor.factory("linear regression - num collaborators and title length", new WekaLinearRegressionModelRule("responseTime"), collaboratorClass, messageClass, threadClass));
+//		predictorFactories.add(WekaRegressionMessageResponseTimePredictor.factory("linear regression - num collaborators and title length", new WekaLinearRegressionModelRule("responseTime"), collaboratorClass, messageClass, threadClass));
 		for (int k = 2; k <= 25; k++) {
 			predictorFactories.add(WekaClusteringMessageResponseTimePredictor.factory("k-means_k"+k, new WekaKmeansModelRule("responseTime",k), collaboratorClass, messageClass, threadClass));
 		}
@@ -349,7 +359,10 @@ public class ResponseTimeTestbed <Id, Collaborator extends Comparable<Collaborat
 		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
 				"data/Email Response Study")));
 		ResponseTimeTestbed<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> testbed = new ResponseTimeTestbed<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>(
-				datasets, String.class,
+				datasets,
+				new InverseGaussianDistribution(50132.4, 113.647),
+				new LogNormalDistribution(8.407, 2.87785),
+				String.class,
 				(Class<EmailMessage<String>>) tempMessage.getClass(),
 				(Class<EmailThread<String, EmailMessage<String>>>) tempThread
 						.getClass());

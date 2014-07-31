@@ -52,7 +52,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 	static int listSize = 4;
 
 	static Collection<NewsgroupDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>> dataSets = new ArrayList<>();
-	static Collection<GroupBasedRecipientRecommenderFactory<ComparableAddress>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<ComparableAddress>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -67,7 +67,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 
 		// Add recommender factories
 		recommenderFactories
-				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<ComparableAddress>());
+				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost>());
 		
 		// Add GroupScorerFactories
 //		groupScorerFactories.add(IntersectionGroupCount.factory(ComparableAddress.class));
@@ -141,7 +141,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			MetricResultCollection<Integer> resultCollection,
-			GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			GroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory,
 			GroupScorerFactory<ComparableAddress> scorerFactory)
 			throws IOException {
 		
@@ -150,9 +150,9 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 				.create();
 
 		
-			GroupBasedRecipientRecommender<ComparableAddress> recommender = recommenderFactory
+			GroupBasedRecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = recommenderFactory
 					.createRecommender(groupScorer);
-			HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
+			HierarchicalRecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
 
 
 
@@ -173,7 +173,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
 			MetricResultCollection<Integer> resultCollection,
-			GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory,
+			GroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory,
 			GroupScorerFactory<ComparableAddress> scorerFactory)
 			throws IOException {
 
@@ -184,9 +184,9 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 				GroupScorer<ComparableAddress> groupScorer = scorerFactory
 						.create(wOut, halfLife);
 
-				GroupBasedRecipientRecommender<ComparableAddress> recommender = recommenderFactory
+				GroupBasedRecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> recommender = recommenderFactory
 						.createRecommender(groupScorer);
-				HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
+				HierarchicalRecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
 						recommender);
 
 
@@ -206,7 +206,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 	private static Collection<MetricResult> modelRecommendations(
 			Collection<JavaMailNewsgroupPost> trainingMessages,
 			Collection<JavaMailNewsgroupPost> testMessages,
-			HierarchicalRecipientRecommender<ComparableAddress> hierarchicalRecommender) {
+			HierarchicalRecipientRecommender<ComparableAddress, JavaMailNewsgroupPost> hierarchicalRecommender) {
 		
 		Collection<RecipientMetric<ComparableAddress, JavaMailNewsgroupPost>> metrics = new ArrayList<>();
 		for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
@@ -242,7 +242,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 				Collection<JavaMailNewsgroupPost> testMessages = dataset
 						.getTestMessages(account, percentTraining);
 
-				for (GroupBasedRecipientRecommenderFactory<ComparableAddress> recommenderFactory : recommenderFactories) {
+				for (GroupBasedRecipientRecommenderFactory<ComparableAddress, JavaMailNewsgroupPost> recommenderFactory : recommenderFactories) {
 					for (GroupScorerFactory<ComparableAddress> scorerFactory : groupScorerFactories) {
 
 						if (scorerFactory.takesWOutAndHalfLife()) {

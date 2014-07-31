@@ -24,14 +24,14 @@ import metrics.response.time.ScaleDifferenceMetric;
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
 import testbed.dataset.actions.messages.MessageDataset;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.CollaborativeFilteringResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.DistributionResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.KmeansResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.SigmoidWeightedKmeansResponseTimeEvaluator;
+import testbed.previousresults.CollaborativeFilteringResponseTimeEvaluator;
+import testbed.previousresults.ConstantPredictionResponseTimeEvaluator;
+import testbed.previousresults.DistributionResponseTimeEvaluator;
+import testbed.previousresults.GradientAscentResponseTimeEvaluator;
+import testbed.previousresults.KmeansResponseTimeEvaluator;
+import testbed.previousresults.ResponseTimeEvaluator;
+import testbed.previousresults.SigmoidWeightedKmeansResponseTimeEvaluator;
+import testbed.previousresults.ResponseTimeEvaluator.ResponseTimeEvaluatorFactory;
 import data.representation.actionbased.messages.MessageThread;
 import data.representation.actionbased.messages.SingleMessage;
 
@@ -122,7 +122,11 @@ public class PreviousResultsResponseTimeTestbed<Id, Collaborator extends Compara
 				ResponseTimeEvaluator<Id, Collaborator, Message, MsgThread> evaluator = 
 						evaluatorFactory.create(dataset, metrics);
 				
-				for (Integer testId : evaluator.getTestIds()) {
+				Collection<Integer> testIds = evaluator.getTestIds();
+				if (testIds == null) {
+					continue;
+				}
+				for (Integer testId : testIds) {
 					List<MetricResult> results = evaluator.evaluate(testId);
 					String label = evaluator.getType()+","+testId;
 					System.out.println(evaluator.getType()+","+testId);

@@ -33,33 +33,6 @@ public class NewsgroupTestbed
 	static Class<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> threadClass = (Class<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>) (new NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>()
 			.getClass());
 
-	static Collection<MessageDataset<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>>> datasets = new ArrayList<>();
-
-	static {
-
-		// Add data sets
-		datasets.add(new Newsgroups20Dataset("20Newsgroups", new File(
-				"data/20 Newsgroups")));
-
-	}
-	
-	static void runPreviousResultsResponseTimeEvaluation() throws IOException {
-		PreviousResultsResponseTimeTestbed<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> previousResultsResponseTimeTestbed =
-				new PreviousResultsResponseTimeTestbed<>(
-						datasets, idClass, collaboratorClass, messageClass, threadClass);
-		previousResultsResponseTimeTestbed.runTestbed();
-	}
-	
-	static void runResponseTimeTests() throws Exception {
-		ResponseTimeTestbed<Integer, ComparableAddress, JavaMailNewsgroupPost, NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> testbed =
-				new ResponseTimeTestbed<>(
-						datasets, 
-						new InverseGaussianDistribution(87621.1, 1042.61),
-						new LogNormalDistribution(10.4017, 1.74268),
-						collaboratorClass, messageClass, threadClass);
-		testbed.runTestbed();
-	}
-
 	public NewsgroupTestbed() {
 		super(idClass, collaboratorClass, messageClass, threadClass);
 	}

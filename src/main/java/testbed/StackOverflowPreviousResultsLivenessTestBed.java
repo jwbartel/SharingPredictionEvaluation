@@ -19,11 +19,11 @@ import metrics.response.liveness.ResponseLivenessMetric;
 import metrics.response.liveness.ResponseLivenessMetricFactory;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.ConstantPredictionLivenessEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.GradientAscentLivenessEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.LivenessEvaluator;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.LivenessEvaluator.LivenessEvaluatorFactory;
-import testbed.dataset.actions.messages.stackoverflow.evaluation.RandomPredictionLivenessEvaluator;
+import testbed.previousresults.ConstantPredictionLivenessEvaluator;
+import testbed.previousresults.GradientAscentLivenessEvaluator;
+import testbed.previousresults.LivenessEvaluator;
+import testbed.previousresults.RandomPredictionLivenessEvaluator;
+import testbed.previousresults.LivenessEvaluator.LivenessEvaluatorFactory;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 

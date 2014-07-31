@@ -1,6 +1,5 @@
-package testbed.dataset.actions.messages.stackoverflow.evaluation;
+package testbed.previousresults;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,53 +8,47 @@ import java.util.Map;
 
 import metrics.MetricResult;
 import metrics.response.liveness.ResponseLivenessMetric;
-
-import org.apache.commons.io.FileUtils;
-
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class GradientAscentLivenessEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+public class ConstantPredictionLivenessEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 		extends LivenessEvaluator<Recipient, Message, ThreadType> {
 	
 	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
 			LivenessEvaluatorFactory<Recipient, Message, ThreadType> factory(
 					Class<Recipient> recipientClass,
 					Class<Message> messageClass,
-					Class<ThreadType> threadClass) {
+					Class<ThreadType> threadClass,
+					final String label, final double prediction) {
 		return new LivenessEvaluatorFactory<Recipient, Message, ThreadType>() {
 
 			@Override
 			public LivenessEvaluator<Recipient, Message, ThreadType> create(
 					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
 					Collection<ResponseLivenessMetric> metrics) {
-				return new GradientAscentLivenessEvaluator<>(dataset, metrics);
+				return new ConstantPredictionLivenessEvaluator<>(label, prediction, dataset,
+						metrics);
 			}
 		};
 	}
 
-	private File gradientAscentFolder;
+	private String label;
+	private Double prediction;
 	private Collection<ResponseLivenessMetric> metrics;
 	
-	public GradientAscentLivenessEvaluator(StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+	public ConstantPredictionLivenessEvaluator(String label, double prediction, StackOverflowDataset<Recipient, Message, ThreadType> dataset,
 			Collection<ResponseLivenessMetric> metrics) {
 		super(dataset);
-		this.gradientAscentFolder = new File(livenessFolder, "gradient ascent");
+		this.label = label;
+		this.prediction = prediction;
 		this.metrics = metrics;
 	}
 	
-	private File getPredictionsFolder() {
-		return new File(gradientAscentFolder, "computed liveness");
-	}
-	
-	private List<Double> getPredictedLiveness(Integer test) throws IOException {
-		File predictionsFile = new File(getPredictionsFolder(), test + ".csv");
+	private List<Double> getPredictedLiveness(List<Double> testingTimes) throws IOException {
 		List<Double> predictions = new ArrayList<Double>();
-		List<String> lines = FileUtils.readLines(predictionsFile);
-		for (String line : lines) {
-			String[] splitLine = line.split(",");
-			predictions.add(Double.parseDouble(splitLine[splitLine.length-1]));
+		for (int i=0; i<testingTimes.size(); i++) {
+			predictions.add(prediction);
 		}
 		return predictions;
 	}
@@ -64,10 +57,11 @@ public class GradientAscentLivenessEvaluator<Recipient, Message extends StackOve
 	public List<MetricResult> evaluate(Integer testId) {
 		try {
 			Map<Integer, List<Double>> testingTimes = dataset.getResponesTimesTestingTimes();
+			
 			List<Double> trueTimes = testingTimes.get(testId);
-			List<Double> predictedLiveness = getPredictedLiveness(testId);
+			List<Double> predictedLiveness = getPredictedLiveness(trueTimes);
 			for (ResponseLivenessMetric metric : metrics) {
-				metric.addTestResult(trueTimes, predictedLiveness);
+					metric.addTestResult(trueTimes, predictedLiveness);
 			}
 			List<MetricResult> results = new ArrayList<>();
 			for (ResponseLivenessMetric metric : metrics) {
@@ -82,6 +76,6 @@ public class GradientAscentLivenessEvaluator<Recipient, Message extends StackOve
 
 	@Override
 	public String getType() {
-		return "gradient ascent";
+		return label;
 	}
 }

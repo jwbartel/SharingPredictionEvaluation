@@ -1,4 +1,4 @@
-package testbed.dataset.actions.messages.stackoverflow.evaluation;
+package testbed.previousresults;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,32 +17,40 @@ import testbed.dataset.actions.messages.MessageDataset;
 import data.representation.actionbased.messages.MessageThread;
 import data.representation.actionbased.messages.SingleMessage;
 
-public class GradientAscentResponseTimeEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
+public class ConstantPredictionResponseTimeEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
 		extends ResponseTimeEvaluator<Id, Recipient, Message, ThreadType> {
-
-	private File gradientAscentFolder;
 	
 	public static <Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
 	ResponseTimeEvaluatorFactory<Id, Recipient, Message, ThreadType> factory(
 			Class<Id> idClass,
 			Class<Recipient> recipientClass,
 			Class<Message> messageClass,
-			Class<ThreadType> threadClass) {
+			Class<ThreadType> threadClass,
+			final String label,
+			final Double prediction) {
 		return new ResponseTimeEvaluatorFactory<Id, Recipient, Message, ThreadType>() {
 
 			@Override
 			public ResponseTimeEvaluator<Id, Recipient, Message, ThreadType> create(
 					MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 					Collection<ResponseTimeMetric> metrics) {
-				return new GradientAscentResponseTimeEvaluator<>(dataset, metrics);
+				return new ConstantPredictionResponseTimeEvaluator<>(dataset, metrics, prediction, label);
 			}
 		};
 	}
+
+	private Double prediction;
+	private String label;
+	private File gradientAscentFolder;
 	
-	public GradientAscentResponseTimeEvaluator(
+	public ConstantPredictionResponseTimeEvaluator(
 			MessageDataset<Id, Recipient, Message, ThreadType> dataset,
-			Collection<ResponseTimeMetric> metrics) {
+			Collection<ResponseTimeMetric> metrics,
+			Double prediction,
+			String label) {
 		super(dataset, metrics);
+		this.prediction = prediction;
+		this.label = label;
 		this.gradientAscentFolder = new File(new File(timeFolder, "gradient ascent"),"expected times");
 	}
 
@@ -62,13 +70,13 @@ public class GradientAscentResponseTimeEvaluator<Id, Recipient, Message extends 
 		List<String> lines = FileUtils.readLines(iterationFiles[iterationFiles.length - 1]);
 		List<ResponseTimeRange> predictions = new ArrayList<>();
 		for (String line : lines) {
-			predictions.add(new ResponseTimeRange(Double.parseDouble(line)*60*60, null));
+			predictions.add(new ResponseTimeRange(prediction, null));
 		}
 		return predictions;
 	}
 
 	@Override
 	public String getType() {
-		return "gradient ascent,N/A";
+		return "constant prediction of " + label + ",N/A";
 	}
 }

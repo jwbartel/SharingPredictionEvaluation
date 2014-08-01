@@ -6,6 +6,7 @@ import java.util.Map;
 
 import testbed.ActionBasedBurstyGroupCreationTestBed;
 import testbed.ActionBasedEvolutionTestbed;
+import testbed.ActionBasedSeedlessGroupCreationTestbed;
 import testbed.ConstantValues;
 import testbed.dataset.actions.ActionsDataSet;
 import data.representation.actionbased.CollaborativeAction;
@@ -41,11 +42,21 @@ public abstract class ActionsSpecificTestbed<Id, Collaborator extends Comparable
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets)
 			throws Exception {
 
+		runSeedlessGroupCreationTest(datasets);
 		runBurstyGroupCreationTest(datasets);
-//		runGroupEvolutionTest(datasets);
+		runGroupEvolutionTest(datasets);
 	}
 
 	public abstract Map<String, Collection<ConstantValues>> getGraphConstants();
+
+	public void runSeedlessGroupCreationTest(
+			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets)
+			throws IOException {
+		ActionBasedSeedlessGroupCreationTestbed<Id, Collaborator, Action, ActionThread> testbed = new ActionBasedSeedlessGroupCreationTestbed<>(
+				datasets, getGraphConstants(), collaboratorClass, actionClass);
+
+		testbed.runTestbed();
+	}
 
 	public void runBurstyGroupCreationTest(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets)

@@ -165,7 +165,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 				seedlessRecommenderFactory, graphBuilder);
 		
 		Collection<ConstantValues> constantSets = graphConstants.get(graphBuilder.getClass().getName());
-		for (ConstantValues constantSet : constantSets) {
+		for (@SuppressWarnings("unused") ConstantValues constantSet : constantSets) {
 			for (Double seedThreshold : distanceThresholds) {
 				for (Double recommendationThreshold : distanceThresholds) {
 					String label = graphBuilder.getName() + ",";

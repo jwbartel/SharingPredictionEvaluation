@@ -8,7 +8,6 @@ import testbed.ActionBasedBurstyGroupCreationTestBed;
 import testbed.ActionBasedEvolutionTestbed;
 import testbed.ConstantValues;
 import testbed.dataset.actions.ActionsDataSet;
-import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.CollaborativeActionThread;
 
@@ -43,11 +42,10 @@ public abstract class ActionsSpecificTestbed<Id, Collaborator extends Comparable
 			throws Exception {
 
 		runBurstyGroupCreationTest(datasets);
-		runGroupEvolutionTest(datasets);
+//		runGroupEvolutionTest(datasets);
 	}
 
-	@SuppressWarnings("rawtypes")
-	public abstract Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> getGraphConstants();
+	public abstract Map<String, Collection<ConstantValues>> getGraphConstants();
 
 	public void runBurstyGroupCreationTest(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets)

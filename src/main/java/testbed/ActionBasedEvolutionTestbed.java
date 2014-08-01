@@ -65,14 +65,13 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 	Collection<SeedlessGroupRecommenderFactory<Collaborator>> seedlessGroupRecommenderFactories;
 	Collection<ActionBasedGraphBuilderFactory<Collaborator, Action>> graphBuilderFactories;
 
-	@SuppressWarnings("rawtypes")
-	Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants = new HashMap<>();
+	Map<String, Collection<ConstantValues>> graphConstants = new HashMap<>();
 
 	Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics;
 
 	public ActionBasedEvolutionTestbed(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets,
-			@SuppressWarnings("rawtypes") Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants,
+			Map<String, Collection<ConstantValues>> graphConstants,
 			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {
 		this.datasets = datasets;
 		this.graphConstants = graphConstants;
@@ -220,11 +219,11 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 	
 	private Collection<ConstantValues> getConstantSets(ActionBasedGraphBuilderFactory<Collaborator, Action> graphBuilderFactory) {
 		if (graphBuilderFactory.takesScoredEdgeWithThreshold()) {
-			return graphConstants.get(InteractionRankWeightedActionBasedGraphBuilder.class);
+			return graphConstants.get(InteractionRankWeightedActionBasedGraphBuilder.class.getName());
 		} else if (graphBuilderFactory.takesTime()) {
-			return graphConstants.get(TimeThresholdActionBasedGraphBuilder.class);
+			return graphConstants.get(TimeThresholdActionBasedGraphBuilder.class.getName());
 		} else {
-			return graphConstants.get(SimpleActionBasedGraphBuilder.class);
+			return graphConstants.get(SimpleActionBasedGraphBuilder.class.getName());
 		}
 		
 	}

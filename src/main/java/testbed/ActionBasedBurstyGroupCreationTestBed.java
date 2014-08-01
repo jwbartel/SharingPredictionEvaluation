@@ -50,8 +50,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 	Collection<SeedlessGroupRecommenderFactory<Collaborator>> seedlessRecommenderFactories = new ArrayList<>();
 	Collection<ActionBasedGraphBuilderFactory<Collaborator, Action>> graphBuilderFactories = new ArrayList<>();
 
-	@SuppressWarnings("rawtypes")
-	Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants = new HashMap<>();
+	Map<String, Collection<ConstantValues>> graphConstants = new HashMap<>();
 
 	Collection<Double> distanceThresholds = new ArrayList<>();
 
@@ -59,7 +58,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 	
 	public ActionBasedBurstyGroupCreationTestBed(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets,
-			@SuppressWarnings("rawtypes") Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> graphConstants,
+			Map<String, Collection<ConstantValues>> graphConstants,
 			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {
 		this.datasets = datasets;
 		this.graphConstants = graphConstants;
@@ -91,6 +90,10 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new TestActionsToRecommendationPerfectMatchesMetric<Collaborator,Action>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsMatchedToTestActionMetric<Collaborator,Action>()));
 		metricFactories.add(RepurposedActionBasedGroupMetric.factory(new RecommendationsToTestActionPerfectMatchesMetric<Collaborator,Action>()));
+		
+		distanceThresholds.add(0.0);
+		distanceThresholds.add(0.1);
+		distanceThresholds.add(0.2);
 		
 	}
 
@@ -161,7 +164,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 		GraphFormingActionBasedSeedlessGroupRecommender<Collaborator, Action> recommender = new GraphFormingActionBasedSeedlessGroupRecommender<>(
 				seedlessRecommenderFactory, graphBuilder);
 		
-		Collection<ConstantValues> constantSets = graphConstants.get(graphBuilder.getClass());
+		Collection<ConstantValues> constantSets = graphConstants.get(graphBuilder.getClass().getName());
 		for (ConstantValues constantSet : constantSets) {
 			for (Double seedThreshold : distanceThresholds) {
 				for (Double recommendationThreshold : distanceThresholds) {
@@ -195,7 +198,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 		ActionBasedGraphBuilder<Collaborator, Action> tempGraphBuilder = graphBuilderFactory
 				.create(0L);
 		
-		Collection<ConstantValues> constantSets = graphConstants.get(tempGraphBuilder.getClass());
+		Collection<ConstantValues> constantSets = graphConstants.get(tempGraphBuilder.getClass().getName());
 		for (ConstantValues constantSet : constantSets) {
 			Long timeThreshold = (Long) constantSet.constants[0];
 			
@@ -236,7 +239,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 		ActionBasedGraphBuilder<Collaborator, Action> tempGraphBuilder = graphBuilderFactory
 				.create(0L, 0.0, 0.0);
 		
-		Collection<ConstantValues> constantSets = graphConstants.get(tempGraphBuilder.getClass());
+		Collection<ConstantValues> constantSets = graphConstants.get(tempGraphBuilder.getClass().getName());
 		for (ConstantValues constantSet : constantSets) {
 			
 			Double wOut = (Double) constantSet.constants[0];

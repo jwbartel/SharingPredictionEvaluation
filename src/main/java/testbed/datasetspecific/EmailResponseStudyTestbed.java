@@ -11,15 +11,11 @@ import prediction.response.time.LogNormalDistribution;
 import testbed.ConstantValues;
 import testbed.dataset.actions.messages.MessageDataset;
 import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
-import data.preprocess.graphbuilder.ActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
-import data.representation.actionbased.messages.ComparableAddress;
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
-import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
-import data.representation.actionbased.messages.newsgroup.NewsgroupThread;
 
 public class EmailResponseStudyTestbed
 		extends
@@ -60,21 +56,21 @@ public class EmailResponseStudyTestbed
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> getGraphConstants() {
+	public Map<String, Collection<ConstantValues>> getGraphConstants() {
 		
-		Map<Class<? extends ActionBasedGraphBuilder>, Collection<ConstantValues>> constants = new HashMap<>();
+		Map<String, Collection<ConstantValues>> constants = new HashMap<>();
 		
 		Collection<ConstantValues> simpleConstants = new ArrayList<>();
 		Object[] simpleConstantSet = {};
 		simpleConstants.add(new ConstantValues(simpleConstantSet));
-		constants.put(SimpleActionBasedGraphBuilder.class, simpleConstants);
+		constants.put(SimpleActionBasedGraphBuilder.class.getName(), simpleConstants);
 		
 		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
 		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7*2}; //2.0 weeks
 		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*7*4}; //1 month
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
-		constants.put(TimeThresholdActionBasedGraphBuilder.class, timeThresholdConstants);
+		constants.put(TimeThresholdActionBasedGraphBuilder.class.getName(), timeThresholdConstants);
 		
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
 		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7, 0.25}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.25
@@ -85,9 +81,16 @@ public class EmailResponseStudyTestbed
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
-		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class, interactionRankConstants);
+		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class.getName(), interactionRankConstants);
 		
 		return constants;
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		EmailResponseStudyTestbed testbed = new EmailResponseStudyTestbed();
+		testbed.runTestbed();
+
 	}
 
 }

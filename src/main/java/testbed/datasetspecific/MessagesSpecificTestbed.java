@@ -6,8 +6,10 @@ import java.util.Collection;
 
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
+import testbed.HierarchicalRecipientRecommendationTestbed;
 import testbed.LivenessTestbed;
 import testbed.PreviousResultsResponseTimeTestbed;
+import testbed.RecipientRecommendationTestbed;
 import testbed.ResponseTimeTestbed;
 import testbed.dataset.actions.ActionsDataSet;
 import testbed.dataset.actions.messages.MessageDataset;
@@ -41,6 +43,11 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 	public void runMessageTests(
 			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets)
 			throws Exception {
+		
+		runRecipientRecommendationTests(datasets);
+		runHierarchicalRecipientRecommendationTests(datasets);
+		
+		//TODO: run previous results liveness
 		runPreviousResultsResponseTimeEvaluation(datasets);
 		
 		runLivenessTests(datasets);
@@ -61,6 +68,20 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 				new PreviousResultsResponseTimeTestbed<Id, Collaborator, Message, MsgThread>(
 						datasets, idClass, collaboratorClass, actionClass, threadClass);
 		previousResultsResponseTimeTestbed.runTestbed();
+	}
+	
+	public void runRecipientRecommendationTests(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws Exception {
+		RecipientRecommendationTestbed<Id, Collaborator, Message, MsgThread> testbed =
+				new RecipientRecommendationTestbed<>(
+						datasets,collaboratorClass, actionClass);
+		testbed.runTestbed();
+	}
+	
+	public void runHierarchicalRecipientRecommendationTests(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws Exception {
+		HierarchicalRecipientRecommendationTestbed<Id, Collaborator, Message, MsgThread> testbed =
+				new HierarchicalRecipientRecommendationTestbed<>(
+						datasets,collaboratorClass, actionClass);
+		testbed.runTestbed();
 	}
 	
 	public void runLivenessTests(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws Exception {

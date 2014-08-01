@@ -17,7 +17,7 @@ import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
 import data.representation.actionbased.messages.email.EmailMessage;
 import data.representation.actionbased.messages.email.EmailThread;
 
-public class EmailResponseStudyTestbed
+public class EnronEmailTestbed
 		extends
 		MessagesSpecificTestbed<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>> {
 
@@ -29,7 +29,7 @@ public class EmailResponseStudyTestbed
 	static Class<EmailThread<String, EmailMessage<String>>> threadClass = (Class<EmailThread<String, EmailMessage<String>>>) (new EmailThread<String, EmailMessage<String>>()
 			.getClass());
 	
-	public EmailResponseStudyTestbed() {
+	public EnronEmailTestbed() {
 		super(idClass, collaboratorClass, messageClass, threadClass);
 	}
 	
@@ -65,21 +65,29 @@ public class EmailResponseStudyTestbed
 		constants.put(SimpleActionBasedGraphBuilder.class.getName(), simpleConstants);
 		
 		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
-		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7*2}; //2.0 weeks
-		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*7*4}; //1 month
+		Object[] timeThresholdConstantSet1 = {1000L*60*60*24*7}; //1.0 weeks
+		Object[] timeThresholdConstantSet2 = {1000L*60*60*24*7*4}; //4.0 weeks
+		Object[] timeThresholdConstantSet3 = {1000L*60*60*24*365/2}; //0.5 years
+		Object[] timeThresholdConstantSet4 = {1000L*60*60*24*365}; //1 year
+		Object[] timeThresholdConstantSet5 = {1000L*60*60*24*365*2}; //2 years
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet1));
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet2));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet3));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet4));
+		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet5));
 		constants.put(TimeThresholdActionBasedGraphBuilder.class.getName(), timeThresholdConstants);
 		
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7, 0.25}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.25
-		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*2, 0.25}; //wOut=1.0, halfLife=2.0 weeks, threshold=0.25
-		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*7*4, 0.25}; //wOut=1.0, halfLife=1 month, threshold=0.25
-		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*7*4*2, 0.25}; //wOut=1.0, halfLife=2 months, threshold=0.25
+		Object[] interactionRankConstantSet1 = {1.0, 1000L*60*60*24*7*4, 0.01}; //wOut=1.0, halfLife=1.0 weeks, threshold=0.01
+		Object[] interactionRankConstantSet2 = {1.0, 1000L*60*60*24*7*4, 0.01}; //wOut=1.0, halfLife=4 weeks, threshold=0.01
+		Object[] interactionRankConstantSet3 = {1.0, 1000L*60*60*24*365/2, 1.0}; //wOut=1.0, halfLife=0.5 years, threshold=1.0
+		Object[] interactionRankConstantSet4 = {1.0, 1000L*60*60*24*365, 1.25}; //wOut=1.0, halfLife=1 year, threshold=1.25
+		Object[] interactionRankConstantSet5 = {1.0, 1000L*60*60*24*365*2, 1.75}; //wOut=1.0, halfLife=2 years, threshold=1.75
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet1));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet2));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet3));
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet4));
+		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet5));
 		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class.getName(), interactionRankConstants);
 		
 		return constants;
@@ -87,7 +95,7 @@ public class EmailResponseStudyTestbed
 
 	public static void main(String[] args) throws Exception {
 
-		EmailResponseStudyTestbed testbed = new EmailResponseStudyTestbed();
+		EnronEmailTestbed testbed = new EnronEmailTestbed();
 		testbed.runTestbed();
 
 	}

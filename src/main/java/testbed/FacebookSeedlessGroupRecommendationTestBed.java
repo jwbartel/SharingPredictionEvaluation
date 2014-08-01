@@ -33,7 +33,7 @@ import testbed.dataset.group.GroupDataSet;
 import testbed.dataset.group.MixedInitiativeDataSet;
 import testbed.dataset.group.SnapGroupDataSet;
 
-public class SeedlessGroupRecommendationTestBed {
+public class FacebookSeedlessGroupRecommendationTestBed {
 
 	static Collection<GroupDataSet<Integer>> dataSets = new ArrayList<GroupDataSet<Integer>>();
 	static Collection<GroupDistanceMetric<Integer>> similarityMetrics = new ArrayList<GroupDistanceMetric<Integer>>();

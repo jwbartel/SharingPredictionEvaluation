@@ -40,7 +40,7 @@ import data.preprocess.graphbuilder.TimeThresholdActionBasedGraphBuilder;
 import data.representation.actionbased.CollaborativeAction;
 import data.representation.actionbased.CollaborativeActionThread;
 
-public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comparable<Collaborator>, Action extends CollaborativeAction<Collaborator>, ActionThread extends CollaborativeActionThread<Collaborator, Action>> {
+public class ActionBasedBurstyGroupCreationTestbed<Id, Collaborator extends Comparable<Collaborator>, Action extends CollaborativeAction<Collaborator>, ActionThread extends CollaborativeActionThread<Collaborator, Action>> {
 
 
 	static final double PERCENT_TRAINING = 0.8;
@@ -56,7 +56,7 @@ public class ActionBasedBurstyGroupCreationTestBed<Id, Collaborator extends Comp
 
 	Collection<BurstyGroupMetricFactory<Collaborator, Action>> metricFactories = new ArrayList<>();
 	
-	public ActionBasedBurstyGroupCreationTestBed(
+	public ActionBasedBurstyGroupCreationTestbed(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets,
 			Map<String, Collection<ConstantValues>> graphConstants,
 			Class<Collaborator> collaboratorClass, Class<Action> actionClass) {

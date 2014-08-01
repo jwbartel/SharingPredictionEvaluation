@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import testbed.ActionBasedBurstyGroupCreationTestBed;
+import testbed.ActionBasedBurstyGroupCreationTestbed;
 import testbed.ActionBasedEvolutionTestbed;
 import testbed.ActionBasedSeedlessGroupCreationTestbed;
 import testbed.ConstantValues;
@@ -61,7 +61,7 @@ public abstract class ActionsSpecificTestbed<Id, Collaborator extends Comparable
 	public void runBurstyGroupCreationTest(
 			Collection<ActionsDataSet<Id, Collaborator, Action, ActionThread>> datasets)
 			throws IOException {
-		ActionBasedBurstyGroupCreationTestBed<Id, Collaborator, Action, ActionThread> testbed = new ActionBasedBurstyGroupCreationTestBed<>(
+		ActionBasedBurstyGroupCreationTestbed<Id, Collaborator, Action, ActionThread> testbed = new ActionBasedBurstyGroupCreationTestbed<>(
 				datasets, getGraphConstants(), collaboratorClass, actionClass);
 
 		testbed.runTestbed();

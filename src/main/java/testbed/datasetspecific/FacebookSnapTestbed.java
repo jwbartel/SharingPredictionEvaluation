@@ -7,11 +7,11 @@ import java.util.Collection;
 import testbed.dataset.group.GroupDataSet;
 import testbed.dataset.group.SnapGroupDataSet;
 
-public class FacebookSnapTestbed extends GraphsSpecificTestbed<Integer> {
+public class FacebookSnapTestbed extends GraphsSpecificTestbed<Integer, Integer> {
 
 	@Override
-	public Collection<GroupDataSet<Integer>> getGraphsDatasets() {
-		Collection<GroupDataSet<Integer>> datasets = new ArrayList<>();
+	public Collection<GroupDataSet<Integer, Integer>> getGraphsDatasets() {
+		Collection<GroupDataSet<Integer, Integer>> datasets = new ArrayList<>();
 		Integer[] snapAccounts = { 0, 348, 414, 686, 698, 1684, 3437, 3980 };
 		datasets.add(new SnapGroupDataSet("snap_facebook", snapAccounts,
 				new File("data/Stanford_snap/facebook")));

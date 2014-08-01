@@ -35,7 +35,7 @@ import testbed.dataset.group.SnapGroupDataSet;
 
 public class FacebookSeedlessGroupRecommendationTestBed {
 
-	static Collection<GroupDataSet<Integer>> dataSets = new ArrayList<GroupDataSet<Integer>>();
+	static Collection<GroupDataSet<Integer, Integer>> dataSets = new ArrayList<GroupDataSet<Integer,Integer>>();
 	static Collection<GroupDistanceMetric<Integer>> similarityMetrics = new ArrayList<GroupDistanceMetric<Integer>>();
 	static Collection<SeedlessGroupRecommenderFactory<Integer>> recommenderFactories = new ArrayList<SeedlessGroupRecommenderFactory<Integer>>();
 
@@ -71,7 +71,7 @@ public class FacebookSeedlessGroupRecommendationTestBed {
 	
 	public static void main(String[] args) throws IOException {
 		
-		for (GroupDataSet<Integer> dataset : dataSets) {
+		for (GroupDataSet<Integer, Integer> dataset : dataSets) {
 			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(
 					"type,account", new ArrayList<Metric>(metrics),
 					dataset.getSeedlessMetricsFile());

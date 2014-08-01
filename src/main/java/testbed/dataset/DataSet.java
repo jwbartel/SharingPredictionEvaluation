@@ -4,21 +4,20 @@ import java.io.File;
 
 import recommendation.groups.seedless.hybrid.IOFunctions;
 
-public abstract class DataSet<V> {
-	protected IOFunctions<V> ioHelp;
+public abstract class DataSet<Id> {
+	protected IOFunctions<Id> ioHelp;
 	
 	protected final String name;
-	protected final V[] accountIds;
+	protected final Id[] accountIds;
 	protected final File rootFolder;
 	
-	public DataSet(String name, V[] accountIds, File rootFolder, Class<V> genericClass) {
+	public DataSet(String name, Id[] accountIds, File rootFolder) {
 		this.name = name;
 		this.accountIds = accountIds;
 		this.rootFolder = rootFolder;
-		this.ioHelp = new IOFunctions<V>(genericClass);
 	}
 	
-	public V[] getAccountIds() {
+	public Id[] getAccountIds() {
 		return accountIds;
 	}
 	

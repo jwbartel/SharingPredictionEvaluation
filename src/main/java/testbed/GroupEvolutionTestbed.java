@@ -57,12 +57,12 @@ import recommendation.groups.seedless.fellows.FellowsRecommenderFactory;
 import recommendation.groups.seedless.hybrid.HybridRecommenderFactory;
 import testbed.dataset.group.GroupDataSet;
 
-public class GroupEvolutionTestbed<Collaborator extends Comparable<Collaborator>> {
+public class GroupEvolutionTestbed<Id, Collaborator extends Comparable<Collaborator>> {
 
 	double[] growthRates = {0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
 	int[] testIds = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
 	
-	Collection<GroupDataSet<Collaborator>> datasets;
+	Collection<GroupDataSet<Id, Collaborator>> datasets;
 	
 	Collection<GroupDistanceMetric<Collaborator>> distanceMetrics = new ArrayList<>();
 	Collection<GroupEvolutionRecommenderFactory<Collaborator>> evolutionRecommenderFactories = new ArrayList<>();
@@ -70,7 +70,7 @@ public class GroupEvolutionTestbed<Collaborator extends Comparable<Collaborator>
 	
 	Collection<GroupEvolutionMetric<Collaborator>> metrics = new ArrayList<>();
 	
-	public GroupEvolutionTestbed(Collection<GroupDataSet<Collaborator>> datasets) {
+	public GroupEvolutionTestbed(Collection<GroupDataSet<Id, Collaborator>> datasets) {
 		this.datasets = datasets;
 		init();
 	}
@@ -160,11 +160,11 @@ public class GroupEvolutionTestbed<Collaborator extends Comparable<Collaborator>
 	
 	public void runTestbed() throws IOException {
 		
-		for (GroupDataSet<Collaborator> dataset : datasets) {
+		for (GroupDataSet<Id, Collaborator> dataset : datasets) {
 			String headerPrefix = "evolution-type,distance measure,growth rate,test,account";
-			MetricResultCollection<Collaborator> resultCollection = new MetricResultCollection<Collaborator>(
+			MetricResultCollection<Id> resultCollection = new MetricResultCollection<Id>(
 					headerPrefix, new ArrayList<Metric>(metrics),dataset.getEvolutionMetricsFile());
-			for (Collaborator accountId : dataset.getAccountIds()) {
+			for (Id accountId : dataset.getAccountIds()) {
 				
 				UndirectedGraph<Collaborator, DefaultEdge> graph = dataset.getGraph(accountId);
 				Collection<Set<Collaborator>> idealGroups = dataset.getIdealGroups(accountId);

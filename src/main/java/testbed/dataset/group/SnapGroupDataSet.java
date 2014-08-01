@@ -2,6 +2,7 @@ package testbed.dataset.group;
 
 import java.io.File;
 
+import util.tools.io.IntegerValueParser;
 import util.tools.io.SnapIOFunctions;
 
 public class SnapGroupDataSet extends GroupDataSet<Integer> {
@@ -10,7 +11,7 @@ public class SnapGroupDataSet extends GroupDataSet<Integer> {
 			698, 1684, 3437, 3980 };
 
 	public SnapGroupDataSet(String name, Integer[] accountIds, File rootFolder) {
-		super(name, accountIds, rootFolder, Integer.class);
+		super(name, accountIds, rootFolder, Integer.class, new IntegerValueParser());
 		ioHelp = new SnapIOFunctions<Integer>(Integer.class);
 		ioHelp.setStoreSubSteps(false);
 	}

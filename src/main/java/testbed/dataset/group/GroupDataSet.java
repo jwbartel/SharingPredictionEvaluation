@@ -15,10 +15,14 @@ import org.jgrapht.graph.DefaultEdge;
 import testbed.dataset.DataSet;
 import util.tools.io.CollectionIOAssist;
 import util.tools.io.IntegerValueParser;
+import util.tools.io.ValueParser;
 
 public abstract class GroupDataSet<V> extends DataSet<V> {
-	public GroupDataSet(String name, V[] accountIds, File rootFolder, Class<V> genericClass) {
+	ValueParser<V> parser;
+	
+	public GroupDataSet(String name, V[] accountIds, File rootFolder, Class<V> genericClass, ValueParser<V> parser) {
 		super(name, accountIds, rootFolder, genericClass);
+		this.parser = parser;
 	}
 
 	public UndirectedGraph<V, DefaultEdge> getGraph(V account) {
@@ -50,7 +54,7 @@ public abstract class GroupDataSet<V> extends DataSet<V> {
 		
 	}
 
-	public Set<Integer> getNewMembers(V account, double growthRate, int test) {
+	public Set<V> getNewMembers(V account, double growthRate, int test) {
 		try {
 			File newMembersFile = getNewMembersFile(account, growthRate, test);
 			if (!newMembersFile.exists()) {
@@ -63,9 +67,8 @@ public abstract class GroupDataSet<V> extends DataSet<V> {
 								.vertexSet(), growthRate);
 				CollectionIOAssist.writeCollection(newMembersFile, newMembers);
 			}
-			Set<Integer> newMembers = new HashSet<>(
-					CollectionIOAssist.readCollection(newMembersFile,
-							new IntegerValueParser()));
+			Set<V> newMembers = new HashSet<>(
+					CollectionIOAssist.readCollection(newMembersFile, parser));
 			return newMembers;
 		} catch (IOException e) {
 			e.printStackTrace();

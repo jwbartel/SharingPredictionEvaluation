@@ -17,14 +17,14 @@ import metrics.groups.evolution.GroupEvolutionMetric;
 public class EvolutionGroupRecommendationAcceptanceModeler<V> implements
 		GroupRecommendationAcceptanceModeler {
 
-	Set<Integer> newMembers;
+	Set<V> newMembers;
 	GroupDistanceMetric<V> distanceMetric;
 	Collection<RecommendedEvolution<V>> recommendations;
 	Map<Set<V>,Collection<Set<V>>> oldToNewIdealGroups;
 	Collection<Set<V>> newlyCreatedIdealGroups;
 	Collection<GroupEvolutionMetric<V>> metrics;
 
-	public EvolutionGroupRecommendationAcceptanceModeler(Set<Integer> newMembers,
+	public EvolutionGroupRecommendationAcceptanceModeler(Set<V> newMembers,
 			GroupDistanceMetric<V> distanceMetric,
 			Collection<RecommendedEvolution<V>> recommendations,
 			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,

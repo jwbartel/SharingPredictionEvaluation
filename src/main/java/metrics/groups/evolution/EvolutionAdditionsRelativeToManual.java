@@ -19,7 +19,7 @@ public class EvolutionAdditionsRelativeToManual<V> extends GroupEvolutionMetric<
 	}
 
 	@Override
-	public MetricResult evaluate(Set<Integer> newMembers, Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
+	public MetricResult evaluate(Set<V> newMembers, Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,
 			Map<RecommendedGroupCreationEvolution<V>, Set<V>> groupCreationToIdeal,

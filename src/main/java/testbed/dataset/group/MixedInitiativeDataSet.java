@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
+import util.tools.io.IntegerValueParser;
+
 public class MixedInitiativeDataSet extends GroupDataSet<Integer> {
 
 	public static final Integer[] DEFAULT_ACCOUNT_SET = { 1, 2, 5, /*8,*/ 9, 10,
@@ -11,7 +13,7 @@ public class MixedInitiativeDataSet extends GroupDataSet<Integer> {
 	
 	public MixedInitiativeDataSet(String name, Integer[] accountIds,
 			File rootFolder) {
-		super(name, accountIds, rootFolder, Integer.class);
+		super(name, accountIds, rootFolder, Integer.class, new IntegerValueParser());
 	}
 
 	private File getGraphFolder() {

@@ -36,7 +36,7 @@ public abstract class GroupEvolutionMetric<V> implements Metric {
 	}
 
 	public abstract MetricResult evaluate(
-			Set<Integer> newMembers,
+			Set<V> newMembers,
 			Map<Set<V>, Collection<Set<V>>> oldToNewIdealGroups,
 			Collection<Set<V>> newlyCreatedIdealGroups,
 			Map<RecommendedGroupChangeEvolution<V>, Set<V>> groupChangeToIdeal,

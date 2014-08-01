@@ -5,21 +5,21 @@ import java.io.IOException;
 import java.util.Collection;
 
 import metrics.response.liveness.ResponseLivenessMetric;
-import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
+import testbed.dataset.actions.messages.MessageDataset;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 
-public abstract class LivenessEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
+public abstract class LivenessEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
 		implements Evaluator {
 	
-	public static interface LivenessEvaluatorFactory<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>> {
+	public static interface LivenessEvaluatorFactory<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>> {
 
-		public LivenessEvaluator<Recipient, Message, ThreadType> create(
-				StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+		public LivenessEvaluator<Id, Recipient, Message, ThreadType> create(
+				MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 				Collection<ResponseLivenessMetric> metrics);
 	}
 
-	protected StackOverflowDataset<Recipient, Message, ThreadType> dataset;
+	protected MessageDataset<Id, Recipient, Message, ThreadType> dataset;
 	protected File resultsFolder;
 	protected File livenessFolder;
 	
@@ -28,7 +28,7 @@ public abstract class LivenessEvaluator<Recipient, Message extends StackOverflow
 		return dataset.getResponesTimesTestingTimes().keySet();
 	}
 
-	public LivenessEvaluator(StackOverflowDataset<Recipient, Message, ThreadType> dataset) {
+	public LivenessEvaluator(MessageDataset<Id, Recipient, Message, ThreadType> dataset) {
 		this.dataset = dataset;
 		this.resultsFolder = dataset.getResponseTimesResultsFolder();
 		livenessFolder = new File(resultsFolder, "liveness");

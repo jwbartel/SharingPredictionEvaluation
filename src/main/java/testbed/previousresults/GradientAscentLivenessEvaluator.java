@@ -12,23 +12,24 @@ import metrics.response.liveness.ResponseLivenessMetric;
 
 import org.apache.commons.io.FileUtils;
 
-import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
-import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
+import testbed.dataset.actions.messages.MessageDataset;
+import data.representation.actionbased.messages.MessageThread;
+import data.representation.actionbased.messages.SingleMessage;
 
-public class GradientAscentLivenessEvaluator<Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
-		extends LivenessEvaluator<Recipient, Message, ThreadType> {
+public class GradientAscentLivenessEvaluator<Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
+		extends LivenessEvaluator<Id, Recipient, Message, ThreadType> {
 	
-	public static <Recipient, Message extends StackOverflowMessage<Recipient>, ThreadType extends StackOverflowThread<Recipient, Message>>
-			LivenessEvaluatorFactory<Recipient, Message, ThreadType> factory(
+	public static <Id, Recipient, Message extends SingleMessage<Recipient>, ThreadType extends MessageThread<Recipient, Message>>
+			LivenessEvaluatorFactory<Id, Recipient, Message, ThreadType> factory(
+					Class<Id> idClass,
 					Class<Recipient> recipientClass,
 					Class<Message> messageClass,
 					Class<ThreadType> threadClass) {
-		return new LivenessEvaluatorFactory<Recipient, Message, ThreadType>() {
+		return new LivenessEvaluatorFactory<Id, Recipient, Message, ThreadType>() {
 
 			@Override
-			public LivenessEvaluator<Recipient, Message, ThreadType> create(
-					StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+			public LivenessEvaluator<Id, Recipient, Message, ThreadType> create(
+					MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 					Collection<ResponseLivenessMetric> metrics) {
 				return new GradientAscentLivenessEvaluator<>(dataset, metrics);
 			}
@@ -38,7 +39,7 @@ public class GradientAscentLivenessEvaluator<Recipient, Message extends StackOve
 	private File gradientAscentFolder;
 	private Collection<ResponseLivenessMetric> metrics;
 	
-	public GradientAscentLivenessEvaluator(StackOverflowDataset<Recipient, Message, ThreadType> dataset,
+	public GradientAscentLivenessEvaluator(MessageDataset<Id, Recipient, Message, ThreadType> dataset,
 			Collection<ResponseLivenessMetric> metrics) {
 		super(dataset);
 		this.gradientAscentFolder = new File(livenessFolder, "gradient ascent");

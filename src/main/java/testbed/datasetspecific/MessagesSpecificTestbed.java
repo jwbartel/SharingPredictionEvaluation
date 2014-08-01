@@ -8,6 +8,7 @@ import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
 import testbed.HierarchicalRecipientRecommendationTestbed;
 import testbed.LivenessTestbed;
+import testbed.PreviousResultsLivenessTestbed;
 import testbed.PreviousResultsResponseTimeTestbed;
 import testbed.RecipientRecommendationTestbed;
 import testbed.ResponseTimeTestbed;
@@ -47,7 +48,7 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 		runRecipientRecommendationTests(datasets);
 		runHierarchicalRecipientRecommendationTests(datasets);
 		
-		//TODO: run previous results liveness
+		runPreviousResultsLivenessEvaluation(datasets);
 		runPreviousResultsResponseTimeEvaluation(datasets);
 		
 		runLivenessTests(datasets);
@@ -66,6 +67,13 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 	public void runPreviousResultsResponseTimeEvaluation(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws IOException {
 		PreviousResultsResponseTimeTestbed<Id, Collaborator, Message, MsgThread> previousResultsResponseTimeTestbed =
 				new PreviousResultsResponseTimeTestbed<Id, Collaborator, Message, MsgThread>(
+						datasets, idClass, collaboratorClass, actionClass, threadClass);
+		previousResultsResponseTimeTestbed.runTestbed();
+	}
+	
+	public void runPreviousResultsLivenessEvaluation(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws IOException {
+		PreviousResultsLivenessTestbed<Id, Collaborator, Message, MsgThread> previousResultsResponseTimeTestbed =
+				new PreviousResultsLivenessTestbed<Id, Collaborator, Message, MsgThread>(
 						datasets, idClass, collaboratorClass, actionClass, threadClass);
 		previousResultsResponseTimeTestbed.runTestbed();
 	}

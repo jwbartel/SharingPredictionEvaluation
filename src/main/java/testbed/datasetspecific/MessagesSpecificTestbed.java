@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
+import testbed.LivenessTestbed;
 import testbed.PreviousResultsResponseTimeTestbed;
 import testbed.ResponseTimeTestbed;
 import testbed.dataset.actions.ActionsDataSet;
@@ -41,6 +42,8 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets)
 			throws Exception {
 		runPreviousResultsResponseTimeEvaluation(datasets);
+		
+		runLivenessTests(datasets);
 		runResponseTimeTests(datasets);
 	}
 	
@@ -58,6 +61,13 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 				new PreviousResultsResponseTimeTestbed<Id, Collaborator, Message, MsgThread>(
 						datasets, idClass, collaboratorClass, actionClass, threadClass);
 		previousResultsResponseTimeTestbed.runTestbed();
+	}
+	
+	public void runLivenessTests(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws Exception {
+		LivenessTestbed<Id, Collaborator, Message, MsgThread> testbed =
+				new LivenessTestbed<>(
+						datasets,collaboratorClass, actionClass, threadClass);
+		testbed.runTestbed();
 	}
 	
 	public void runResponseTimeTests(Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets) throws Exception {

@@ -30,7 +30,7 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 	private Collection<NewsgroupThread<ComparableAddress, JavaMailNewsgroupPost>> threads;
 
 	public Newsgroups20Dataset(String name, File rootFolder) {
-		super(name, new Integer[1], rootFolder, Integer.class);
+		super(name, new Integer[1], rootFolder);
 		try {
 			loadPostsAndThreads();
 		} catch (MessagingException | IOException e) {
@@ -40,7 +40,7 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 	}
 	
 	public Newsgroups20Dataset(String name, File rootFolder, boolean loadPostsAndThreads) {
-		super(name, new Integer[1], rootFolder, Integer.class);
+		super(name, new Integer[1], rootFolder);
 		if (loadPostsAndThreads) {
 			try {
 				loadPostsAndThreads();

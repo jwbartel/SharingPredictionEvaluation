@@ -9,9 +9,8 @@ import data.representation.actionbased.messages.email.EmailThread;
 public abstract class EmailDataSet<IdType, RecipientType, MessageType extends EmailMessage<RecipientType>, ThreadType extends EmailThread<RecipientType, MessageType>>
 		extends MessageDataset<IdType, RecipientType, MessageType, ThreadType> {
 
-	public EmailDataSet(String name, IdType[] accountIds, File rootFolder,
-			Class<IdType> genericClass) {
-		super(name, accountIds, rootFolder, genericClass);
+	public EmailDataSet(String name, IdType[] accountIds, File rootFolder) {
+		super(name, accountIds, rootFolder);
 	}
 
 }

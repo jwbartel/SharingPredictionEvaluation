@@ -21,9 +21,8 @@ import data.representation.actionbased.messages.SingleMessage;
 public abstract class MessageDataset<IdType, RecipientType, MessageType extends SingleMessage<RecipientType>, ThreadType extends MessageThread<RecipientType, MessageType>>
 		extends ActionsDataSet<IdType, RecipientType, MessageType, ThreadType> {
 
-	public MessageDataset(String name, IdType[] accountIds, File rootFolder,
-			Class<IdType> genericClass) {
-		super(name, accountIds, rootFolder, genericClass);
+	public MessageDataset(String name, IdType[] accountIds, File rootFolder) {
+		super(name, accountIds, rootFolder);
 	}
 	
 	public abstract Collection<MessageType> getAllMessages(IdType account);

@@ -50,13 +50,13 @@ public class EnronEmailDataSet extends
 	private List<EmailMessage<String>> currentMessages;
 
 	public EnronEmailDataSet(String name, String[] accountIds, File rootFolder) {
-		super(name, accountIds, rootFolder, String.class);
+		super(name, accountIds, rootFolder);
 		messageListName = "ALL_MESSAGES_ADAPTED.TXT";
 	}
 
 	public EnronEmailDataSet(String name, String[] accountIds, File rootFolder,
 			String messageListName) {
-		super(name, accountIds, rootFolder, String.class);
+		super(name, accountIds, rootFolder);
 		this.messageListName = messageListName;
 	}
 

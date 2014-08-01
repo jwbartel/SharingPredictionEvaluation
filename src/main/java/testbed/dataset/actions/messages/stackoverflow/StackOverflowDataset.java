@@ -19,7 +19,7 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 	protected Map<Long, ThreadType> threads = new TreeMap<>();
 
 	public StackOverflowDataset(String name, Long[] accountIds, File rootFolder) {
-		super(name, accountIds, rootFolder, Long.class);
+		super(name, accountIds, rootFolder);
 	}
 
 	@Override

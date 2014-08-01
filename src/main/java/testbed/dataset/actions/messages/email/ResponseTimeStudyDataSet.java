@@ -29,7 +29,7 @@ public class ResponseTimeStudyDataSet
 			"EEE MMM dd HH:mm:ss z yyyy");
 
 	public ResponseTimeStudyDataSet(String name, File rootFolder) {
-		super(name, getAccountIds(rootFolder), rootFolder, String.class);
+		super(name, getAccountIds(rootFolder), rootFolder);
 	}
 
 	private File getEmailThreadsFolder() {

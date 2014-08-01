@@ -5,7 +5,7 @@ import java.io.File;
 import util.tools.io.IntegerValueParser;
 import util.tools.io.SnapIOFunctions;
 
-public class SnapGroupDataSet extends GroupDataSet<Integer> {
+public class SnapGroupDataSet extends GroupDataSet<Integer, Integer> {
 	
 	public static final Integer[] DEFAULT_ACCOUNT_SET = { 0, 348, 414, 686,
 			698, 1684, 3437, 3980 };

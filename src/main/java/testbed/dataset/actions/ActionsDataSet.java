@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -40,9 +39,8 @@ public abstract class ActionsDataSet<IdType, CollaboratorType, ActionType extend
 		}
 	}
 
-	public ActionsDataSet(String name, IdType[] accountIds, File rootFolder,
-			Class<IdType> genericClass) {
-		super(name, accountIds, rootFolder, genericClass);
+	public ActionsDataSet(String name, IdType[] accountIds, File rootFolder) {
+		super(name, accountIds, rootFolder);
 	}
 	
 	public Map<Integer, ThreadFold<CollaboratorType, ActionType, ThreadType>> getThreadFolds(

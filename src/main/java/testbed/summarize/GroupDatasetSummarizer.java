@@ -8,16 +8,16 @@ import java.util.Collection;
 import testbed.dataset.group.GroupDataSet;
 import testbed.summarize.SortableColumn.Order;
 
-public class GroupDatasetSummarizer<AccountType> extends DatasetSummarizer<AccountType> {
+public class GroupDatasetSummarizer<AccountType, Collaborator> extends DatasetSummarizer<AccountType> {
 
-	GroupDataSet<AccountType> dataset;
+	GroupDataSet<AccountType, Collaborator> dataset;
 
-	private GroupDatasetSummarizer(GroupDataSet<AccountType> dataset) {
+	private GroupDatasetSummarizer(GroupDataSet<AccountType, Collaborator> dataset) {
 		this.dataset = dataset;
 	}
 
-	public static <AccountType> GroupDatasetSummarizer<AccountType> create(
-			GroupDataSet<AccountType> dataset) {
+	public static <AccountType, Collaborator> GroupDatasetSummarizer<AccountType, Collaborator> create(
+			GroupDataSet<AccountType, Collaborator> dataset) {
 		return new GroupDatasetSummarizer<>(dataset);
 	}
 

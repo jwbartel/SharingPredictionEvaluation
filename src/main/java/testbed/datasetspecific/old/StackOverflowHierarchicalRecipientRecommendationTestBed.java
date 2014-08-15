@@ -1,4 +1,4 @@
-package testbed;
+package testbed.datasetspecific.old;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,32 +26,30 @@ import metrics.recipients.TotalSelectedPerClickMetric;
 import metrics.recipients.TotalTestMessagesMetric;
 import metrics.recipients.TotalTrainMessagesMetric;
 import metrics.recipients.TrainWithMultipleFromMetric;
-import model.recommendation.recipients.SingleRecipientRecommendationAcceptanceModeler;
-import model.recommendation.recipients.StackOverflowSingleRecipientAcceptanceModeler;
-import recommendation.recipients.RecipientRecommender;
-import recommendation.recipients.RecipientRecommenderFactory;
+import model.recommendation.recipients.HierarchicalRecipientRecommendationAcceptanceModeler;
+import model.recommendation.recipients.NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler;
+import recommendation.recipients.groupbased.GroupBasedRecipientRecommender;
+import recommendation.recipients.groupbased.GroupBasedRecipientRecommenderFactory;
 import recommendation.recipients.groupbased.GroupScorer;
 import recommendation.recipients.groupbased.GroupScorer.GroupScorerFactory;
+import recommendation.recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
 import recommendation.recipients.groupbased.interactionrank.InteractionRankGroupBasedRecipientRecommenderFactory;
-import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionGroupCount;
 import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionGroupScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.IntersectionWeightedScore;
-import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupCount;
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupScore;
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeightedScore;
-import recommendation.recipients.groupbased.interactionrank.scoring.TopContactScore;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
-public class StackOverflowRecipientRecommendationTestBed {
+public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 
 	static double percentTraining = 0.8;
 	static int listSize = 4;
 
 	static Collection<StackOverflowDataset<String, StackOverflowMessage<String>, StackOverflowThread<String, StackOverflowMessage<String>>>> dataSets = new ArrayList<>();
-	static Collection<RecipientRecommenderFactory<String, StackOverflowMessage<String>>> recommenderFactories = new ArrayList<>();
+	static Collection<GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>>> recommenderFactories = new ArrayList<>();
 	static Collection<GroupScorerFactory<String>> groupScorerFactories = new ArrayList<>();
 	static Collection<Double> wOuts = new ArrayList<>();
 	static Collection<Double> halfLives = new ArrayList<>();
@@ -73,62 +71,48 @@ public class StackOverflowRecipientRecommendationTestBed {
 		// Add recommender factories
 		recommenderFactories
 				.add(new InteractionRankGroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>>());
-
+		
 		// Add GroupScorerFactories
-		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
+//		groupScorerFactories.add(IntersectionGroupCount.factory(String.class));
 		groupScorerFactories.add(IntersectionGroupScore.factory(String.class));
 		groupScorerFactories.add(IntersectionWeightedScore.factory(String.class));
-		groupScorerFactories.add(SubsetGroupCount.factory(String.class));
+//		groupScorerFactories.add(SubsetGroupCount.factory(String.class));
 		groupScorerFactories.add(SubsetGroupScore.factory(String.class));
 		groupScorerFactories.add(SubsetWeightedScore.factory(String.class));
-		groupScorerFactories.add(TopContactScore.factory(String.class));
-
+//		groupScorerFactories.add(TopContactScore.factory(String.class));
+		
 		// Add w_outs
 		wOuts.add(1.0);
-
+		
 		// Add half lives
-		halfLives.add(1000.0 * 60); // 1 minute
-		halfLives.add(1000.0 * 60 * 60); // 1 hour
-		halfLives.add(1000.0 * 60 * 60 * 24); // 1 day
-		halfLives.add(1000.0 * 60 * 60 * 24 * 7); // 1 week
-		halfLives.add(1000.0 * 60 * 60 * 24 * 7 * 4); // 4 weeks
-		halfLives.add(1000.0 * 60 * 60 * 24 * 365 / 2); // 6 months
-		halfLives.add(1000.0 * 60 * 60 * 24 * 365); // 1 year
-		halfLives.add(1000.0 * 60 * 60 * 24 * 365 * 2); // 2 years
-
+		halfLives.add(1000.0*60); // 1 minute
+		halfLives.add(1000.0*60*60); // 1 hour
+		halfLives.add(1000.0*60*60*24); // 1 day
+		halfLives.add(1000.0*60*60*24*7); // 1 week
+		halfLives.add(1000.0*60*60*24*7*4); // 4 weeks
+		halfLives.add(1000.0*60*60*24*365/2); // 6 months
+		halfLives.add(1000.0*60*60*24*365); // 1 year
+		halfLives.add(1000.0*60*60*24*365*2); // 2 years
+		
 		// Add metric factories
-		metricFactories.add(TotalTrainMessagesMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(TotalTestMessagesMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RecommendableMessagesMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(TotalRecipientsToAddressMetric.factory(
-				String.class, StackOverflowMessage.class));
-		metricFactories.add(RecipientsToAddressPerMessageMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RequestsForListsMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(PrecisionMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RecallMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(TotalSelectedPerClickMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RelativeScansMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RelativeClicksMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RelativeManualEntriesMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(RelativeSwitchesMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class,
-				StackOverflowMessage.class));
-		metricFactories.add(TestWithMultipleFromMetric.factory(String.class,
-				StackOverflowMessage.class));
+		metricFactories.add(TotalTrainMessagesMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(TotalTestMessagesMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RecommendableMessagesMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RecipientsToAddressPerMessageMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(TotalRecipientsToAddressMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RecipientsToAddressPerMessageMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RequestsForListsMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(PrecisionMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RecallMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(TotalSelectedPerClickMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RelativeScansMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RelativeClicksMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RelativeManualEntriesMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(RelativeSwitchesMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, StackOverflowMessage.class));
+		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, StackOverflowMessage.class));
 	}
-
+	
 	private static String getHalfLifeName(double halfLife) {
 		if (halfLife < 1000) {
 			return halfLife + " ms";
@@ -138,11 +122,11 @@ public class StackOverflowRecipientRecommendationTestBed {
 			return halfLife + " seconds";
 		}
 		halfLife /= 60;
-		if (halfLife < 60) {
+		if (halfLife < 60){
 			return halfLife + " minutes";
 		}
 		halfLife /= 60;
-		if (halfLife < 24) {
+		if (halfLife < 24){
 			return halfLife + " hours";
 		}
 		halfLife /= 24;
@@ -150,53 +134,64 @@ public class StackOverflowRecipientRecommendationTestBed {
 			return halfLife + " days";
 		}
 		if (halfLife <= 28) {
-			return halfLife / 7 + " weeks";
+			return halfLife/7 + " weeks";
 		}
 		halfLife /= 365;
 		return halfLife + " years";
 	}
-
+	
 	private static void runWithoutWoutAndHalfLife(Long account,
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
 			MetricResultCollection<Long> resultCollection,
-			RecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
-			GroupScorerFactory<String> scorerFactory) throws IOException {
+			GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
+			GroupScorerFactory<String> scorerFactory)
+			throws IOException {
+		
+		
+		GroupScorer<String> groupScorer = scorerFactory
+				.create();
 
-		GroupScorer<String> groupScorer = scorerFactory.create();
+		
+			GroupBasedRecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
+					.createRecommender(groupScorer);
+			HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(recommender);
 
-		RecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
-				.createRecommender(groupScorer);
 
-		String label = recommender.getTypeOfRecommender();
-		label += "," + groupScorer.getName();
-		label += ",N/A";
-		System.out.println(label);
 
-		Collection<MetricResult> results = modelRecommendations(
-				trainingMessages, testMessages, recommender);
+			String label = recommender.getTypeOfRecommender();
+			label += ","+groupScorer.getName();
+			label += ",N/A";
+			System.out.println(label);
 
-		resultCollection.addResults(label, account, results);
-
-		resultCollection.addResults(label, account, results);
-
+			Collection<MetricResult> results = modelRecommendations(
+					trainingMessages, testMessages, hierarchicalRecommender);
+			
+			resultCollection.addResults(label, account,
+					results);
 	}
-
-	private static void runWithWoutAndHalfLife(Long account,
+	
+	private static void runWithWoutAndHalfLife(
+			Long account,
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
 			MetricResultCollection<Long> resultCollection,
-			RecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
-			GroupScorerFactory<String> scorerFactory) throws IOException {
+			GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory,
+			GroupScorerFactory<String> scorerFactory)
+			throws IOException {
 
 		for (Double wOut : wOuts) {
 
 			for (Double halfLife : halfLives) {
-				GroupScorer<String> groupScorer = scorerFactory.create(wOut,
-						halfLife);
 
-				RecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
+				GroupScorer<String> groupScorer = scorerFactory
+						.create(wOut, halfLife);
+
+				GroupBasedRecipientRecommender<String, StackOverflowMessage<String>> recommender = recommenderFactory
 						.createRecommender(groupScorer);
+				HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender = new HierarchicalRecipientRecommender<>(
+						recommender);
+
 
 				String label = recommender.getTypeOfRecommender();
 				label += "," + groupScorer.getName();
@@ -204,29 +199,28 @@ public class StackOverflowRecipientRecommendationTestBed {
 				System.out.println(label);
 
 				Collection<MetricResult> results = modelRecommendations(
-						trainingMessages, testMessages, recommender);
+						trainingMessages, testMessages, hierarchicalRecommender);
 
 				resultCollection.addResults(label, account, results);
 			}
 		}
-
 	}
-
+	
 	private static Collection<MetricResult> modelRecommendations(
 			Collection<StackOverflowMessage<String>> trainingMessages,
 			Collection<StackOverflowMessage<String>> testMessages,
-			RecipientRecommender<String, StackOverflowMessage<String>> recommender) {
-
+			HierarchicalRecipientRecommender<String, StackOverflowMessage<String>> hierarchicalRecommender) {
+		
 		Collection<RecipientMetric<String, StackOverflowMessage<String>>> metrics = new ArrayList<>();
 		for (RecipientMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
 
-		SingleRecipientRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new StackOverflowSingleRecipientAcceptanceModeler<String, StackOverflowMessage<String>>(
-				listSize, recommender, trainingMessages, testMessages, metrics);
+		HierarchicalRecipientRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<>(
+				listSize, hierarchicalRecommender, trainingMessages,
+				testMessages, metrics);
 		Collection<MetricResult> results = modeler
 				.modelRecommendationAcceptance();
-
 		return results;
 	}
 
@@ -238,19 +232,20 @@ public class StackOverflowRecipientRecommendationTestBed {
 			for (RecipientMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 				unusedMetrics.add(metricFactory.create());
 			}
-			String headerPrefix = "recommendationType,group scorer,half_life,account";
+			String headerPrefix = "recommendationType,group scorer,w_out,half_life,account";
 			MetricResultCollection<Long> resultCollection = new MetricResultCollection<Long>(
 					headerPrefix, unusedMetrics,
-					dataset.getRecipientRecommendationMetricsFile());
+					dataset.getHierarchicalRecipientRecommendationMetricsFile());
 
 			for (Long account : dataset.getAccountIds()) {
+				System.out.println(account);
 
 				Collection<StackOverflowMessage<String>> trainingMessages = dataset
 						.getTrainQuestions(account, percentTraining);
 				Collection<StackOverflowMessage<String>> testMessages = dataset
 						.getTestQuestions(account, percentTraining);
 
-				for (RecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory : recommenderFactories) {
+				for (GroupBasedRecipientRecommenderFactory<String, StackOverflowMessage<String>> recommenderFactory : recommenderFactories) {
 					for (GroupScorerFactory<String> scorerFactory : groupScorerFactories) {
 
 						if (scorerFactory.takesWOutAndHalfLife()) {

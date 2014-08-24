@@ -72,12 +72,12 @@ public class StackOverflowTestbed
 		constants.put(SimpleActionBasedGraphBuilder.class.getName(), simpleConstants);
 		
 		Collection<ConstantValues> timeThresholdConstants = new ArrayList<>();
-		Object[] timeThresholdConstantSet = {1000.0*60*60*24*365*2}; //2 years
+		Object[] timeThresholdConstantSet = {1000L*60*60*24*365*2}; //2 years
 		timeThresholdConstants.add(new ConstantValues(timeThresholdConstantSet));
 		constants.put(TimeThresholdActionBasedGraphBuilder.class.getName(), timeThresholdConstants);
 		
 		Collection<ConstantValues> interactionRankConstants = new ArrayList<>();
-		Object[] interactionRankConstantSet = {1.0, 1000.0*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
+		Object[] interactionRankConstantSet = {1.0, 1000L*60*60*24*365*2, 0.01}; //wOut=1.0, halfLife=2 years, threshold=0.01
 		interactionRankConstants.add(new ConstantValues(interactionRankConstantSet));
 		constants.put(InteractionRankWeightedActionBasedGraphBuilder.class.getName(), interactionRankConstants);
 		return constants;

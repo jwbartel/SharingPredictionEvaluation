@@ -50,7 +50,7 @@ public class SurveyResults {
 
 	public static class QuestionResults {
 
-		final String questionText;
+		public final String questionText;
 		Map<Integer, List<QuestionAnswer>> usersAnswers = new TreeMap<>();
 
 		public QuestionResults(String questionText) {
@@ -72,6 +72,14 @@ public class SurveyResults {
 			if (!userAnswers.contains(answer)) {
 				userAnswers.add(answer);
 			}
+		}
+		
+		public int getTotalAnswerCount() {
+			return usersAnswers.size();
+		}
+		
+		public Map<Integer, List<QuestionAnswer>> getAnswers() {
+			return usersAnswers;
 		}
 	}
 
@@ -114,13 +122,49 @@ public class SurveyResults {
 	public ResponseTimeQuestionResults getResponseTimeResults() {
 		return responseTimeResults;
 	}
+	
+	public QuestionResults getDeadlineResults() {
+		return deadlineResults;
+	}
+	
+	public QuestionResults getReactionResults() {
+		return reactionResults;
+	}
+	
+	public QuestionResults getReactionRemoveResults() {
+		return reactionRemoveResults;
+	}
+	
+	public QuestionResults getReactionKeepResults() {
+		return reactionKeepResults;
+	}
+	
+	public QuestionResults getReactionFindResults() {
+		return reactionFindResults;
+	}
+	
+	public QuestionResults getReactionOtherResults() {
+		return otherResults;
+	}
+	
+	public QuestionResults getSelfResults() {
+		return selfResults;
+	}
+	
+	public QuestionResults getHarmResults() {
+		return harmResults;
+	}
+	
+	public QuestionResults getCommentsResults() {
+		return commentsResults;
+	}
 
 	private Integer getUserId(String surveyId) {
 
 		String userString = surveyId;
-		if (userString.contains("_")) {
-			userString = surveyId.substring(0,surveyId.indexOf('_'));
-		}
+//		if (userString.contains("_")) {
+//			userString = surveyId.substring(0,surveyId.indexOf('_'));
+//		}
 
 		if (surveyToUserId.containsKey(userString)) {
 			return surveyToUserId.get(userString);

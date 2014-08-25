@@ -5,10 +5,16 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import metrics.response.time.survey.QuestionAnswer;
+import metrics.response.time.survey.QuestionAnswer.OtherValue;
+import metrics.response.time.survey.QuestionAnswer.QuestionAnswerPair;
+import metrics.response.time.survey.QuestionAnswer.SelectedItem;
+import metrics.response.time.survey.QuestionAnswer.SurveyElaborationAnswer;
 import metrics.response.time.survey.SurveyDataParser;
 import metrics.response.time.survey.SurveyResults;
-import metrics.response.time.survey.QuestionAnswer.QuestionAnswerPair;
+import metrics.response.time.survey.SurveyResults.QuestionResults;
 import metrics.response.time.survey.SurveyResults.ResponseTimeQuestionResults;
 
 import org.apache.commons.io.FileUtils;
@@ -106,6 +112,117 @@ public class SurveyResultsTestbed {
 		
 	}
 	
+	private void printGeneralQuestionsResults(ResponseTimeStudyDataSet dataset,
+			SurveyResults results) throws IOException {
+		File outputFile = dataset.getSurveyGeneralQuestionResults();
+		String header = ",number of answers, percent selected\n";
+		FileUtils.write(outputFile, header);
+		
+		printQuestionResults(outputFile, results.getDeadlineResults());
+		printQuestionResults(outputFile, results.getReactionResults());
+		printQuestionResults(outputFile, results.getReactionRemoveResults());
+		printQuestionResults(outputFile, results.getReactionKeepResults());
+		printQuestionResults(outputFile, results.getReactionFindResults());
+		printQuestionResults(outputFile, results.getSelfResults());
+		printQuestionResults(outputFile, results.getHarmResults());
+	}
+
+	private void printQuestionResults(File outputFile,
+			QuestionResults questionResults) throws IOException {
+
+		int totalAnswers = questionResults.getTotalAnswerCount(); 
+		FileUtils.write(outputFile, questionResults.questionText.replaceAll(",","_") + "," + totalAnswers + " answers \n", true);
+		
+		Map<String, Integer> selectionCounts = new TreeMap<>();
+		
+		Map<Integer, List<QuestionAnswer>> usersAnswers = questionResults.getAnswers();
+		for (Integer user : usersAnswers.keySet()) {
+			List<QuestionAnswer> answers = usersAnswers.get(user);
+			for (QuestionAnswer answer : answers) {
+				String value = null;
+				if (answer instanceof SelectedItem) {
+					value = ((SelectedItem) answer).value;
+				} else if (answer instanceof OtherValue){
+					value = "other";
+				}
+				
+				if (value != null) {
+					Integer count = selectionCounts.get(value);
+					count = (count == null)? 1 : count + 1;
+					selectionCounts.put(value, count);
+				}
+			}
+		}
+		
+		for (String selection : selectionCounts.keySet()) {
+			int count = selectionCounts.get(selection);
+			selection = selection.replaceAll(",", "_");
+			double percentage = ((double) count)/totalAnswers;
+			FileUtils.write(outputFile, selection + "," + count + "," + percentage + "\n", true);
+		}
+		FileUtils.write(outputFile, "\n", true);
+	}
+	
+	private void printShortAnswersResults(ResponseTimeStudyDataSet dataset,
+			SurveyResults results) throws IOException {
+		
+		File outputFile = dataset.getSurveyShortAnswerResults();
+		FileUtils.write(outputFile, "");
+		
+		printShortAnswerResults(outputFile, results.getDeadlineResults());
+		printShortAnswerResults(outputFile, results.getReactionResults());
+		printShortAnswerResults(outputFile, results.getReactionRemoveResults());
+		printShortAnswerResults(outputFile, results.getReactionKeepResults());
+		printShortAnswerResults(outputFile, results.getReactionFindResults());
+		printShortAnswerResults(outputFile, results.getSelfResults());
+		printShortAnswerResults(outputFile, results.getHarmResults());
+		printShortAnswerResults(outputFile, results.getCommentsResults());
+	}
+	
+	private void printShortAnswerResults(File outputFile,
+			QuestionResults questionResults) throws IOException {
+		
+		FileUtils.write(outputFile, "========================\n", true);
+		FileUtils.write(outputFile, questionResults.questionText + "\n", true);
+		FileUtils.write(outputFile, "========================\n", true);
+		
+		Map<Integer, List<QuestionAnswer>> usersAnswers = questionResults.getAnswers();
+		
+		FileUtils.write(outputFile, "Other (Please Specify)\n", true);
+		FileUtils.write(outputFile, "------------------------\n", true);
+		for (Integer user : usersAnswers.keySet()) {
+			List<QuestionAnswer> answers = usersAnswers.get(user);
+			for (QuestionAnswer answer : answers) {
+				if (answer instanceof OtherValue && ((OtherValue) answer).value.trim().length() > 0){
+					String outputStr = "\tParticipant " + user + ": ";
+					outputStr += ((OtherValue) answer).value;
+					outputStr += "\n";
+					FileUtils.write(outputFile, outputStr, true);
+					break;
+				}
+			}
+		}
+		
+		FileUtils.write(outputFile, "Please elaborate on your answer (e.g. give details about your selected option(s) or reasons why you did not select any of the above options)\n", true);
+		FileUtils.write(outputFile, "------------------------\n", true);
+		for (Integer user : usersAnswers.keySet()) {
+			List<QuestionAnswer> answers = usersAnswers.get(user);
+			for (QuestionAnswer answer : answers) {
+				if (answer instanceof SurveyElaborationAnswer
+						&& ((SurveyElaborationAnswer) answer).value.trim()
+								.length() > 0) {
+					String outputStr = "\tParticipant " + user + ": ";
+					outputStr += ((SurveyElaborationAnswer) answer).value;
+					outputStr += "\n";
+					FileUtils.write(outputFile, outputStr, true);
+					break;
+				}
+			}
+		}
+		
+		FileUtils.write(outputFile, "\n\n\n", true);
+	}
+	
 	public void runTestbed() throws Exception {
 
 		for(ResponseTimeStudyDataSet dataset : datasets) {
@@ -124,7 +241,8 @@ public class SurveyResultsTestbed {
 				
 			}
 			printResponseTimesResults(dataset, results);
-			
+			printGeneralQuestionsResults(dataset, results);
+			printShortAnswersResults(dataset, results);
 		}
 
 	}

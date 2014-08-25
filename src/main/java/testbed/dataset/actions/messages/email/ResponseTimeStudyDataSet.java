@@ -59,6 +59,14 @@ public class ResponseTimeStudyDataSet
 	public File getSurveyResponseErrorResults() {
 		return new File(getMetricsFolder(), "survey - response error results.csv");
 	}
+	
+	public File getSurveyGeneralQuestionResults() {
+		return new File(getMetricsFolder(), "survey - general question results.csv");
+	}
+	
+	public File getSurveyShortAnswerResults() {
+		return new File(getMetricsFolder(), "survey - short answers.txt");
+	}
 
 	private String getAccountOwnerRecipientId(String account)
 			throws IOException {

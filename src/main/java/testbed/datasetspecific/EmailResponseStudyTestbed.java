@@ -93,7 +93,7 @@ public class EmailResponseStudyTestbed
 	
 	@Override
 	public void runTestbed() throws Exception{
-//		super.runTestbed();
+		super.runTestbed();
 		runResponseStudyTests(getResponseTimeStudyDatasets());
 	}
 	

@@ -9,6 +9,7 @@ import java.util.Map;
 import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
 import testbed.ConstantValues;
+import testbed.SurveyResultsTestbed;
 import testbed.dataset.actions.messages.MessageDataset;
 import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
@@ -33,13 +34,18 @@ public class EmailResponseStudyTestbed
 		super(idClass, collaboratorClass, messageClass, threadClass);
 	}
 	
-	@Override
-	public Collection<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> getMessageDatasets() {
+	public Collection<ResponseTimeStudyDataSet> getResponseTimeStudyDatasets() {
 	
-		Collection<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> datasets = new ArrayList<>();
+		Collection<ResponseTimeStudyDataSet> datasets = new ArrayList<>();
 		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
 				"data/Email Response Study")));
 		return datasets;
+	}
+	
+	@Override
+	public Collection<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> getMessageDatasets() {
+	
+		return new ArrayList<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>>(getResponseTimeStudyDatasets());
 	}
 
 	@Override
@@ -84,7 +90,20 @@ public class EmailResponseStudyTestbed
 		
 		return constants;
 	}
+	
+	@Override
+	public void runTestbed() throws Exception{
+//		super.runTestbed();
+		runResponseStudyTests(getResponseTimeStudyDatasets());
+	}
+	
+	
+	public void runResponseStudyTests(Collection<ResponseTimeStudyDataSet> datasets) throws Exception {
+		SurveyResultsTestbed testbed = new SurveyResultsTestbed(datasets);
+		testbed.runTestbed();
+	}
 
+	
 	public static void main(String[] args) throws Exception {
 
 		EmailResponseStudyTestbed testbed = new EmailResponseStudyTestbed();

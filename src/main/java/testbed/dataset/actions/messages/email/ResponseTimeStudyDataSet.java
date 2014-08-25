@@ -44,6 +44,22 @@ public class ResponseTimeStudyDataSet
 		return new File(getEmailThreadsFolder(), "private_data");
 	}
 
+	private File getPrivateDataFolder(String account) {
+		return new File(getPrivateDataFolder(), account);
+	}
+	
+	public File getSurveyQuestionsFile(String account) {
+		return new File(getPrivateDataFolder(account), "survey_questions.txt");
+	}
+	
+	public File getSurveyResultsFile(String account) {
+		return new File(getPrivateDataFolder(account), "survey_data.txt");
+	}
+	
+	public File getSurveyResponseErrorResults() {
+		return new File(getMetricsFolder(), "survey - response error results.csv");
+	}
+
 	private String getAccountOwnerRecipientId(String account)
 			throws IOException {
 		File privateFolder = new File(getPrivateDataFolder(), account);
@@ -75,6 +91,24 @@ public class ResponseTimeStudyDataSet
 			if (accountFolder.isDirectory()
 					&& accountFolder.getName().matches("\\d+_\\d+")
 					&& new File(accountFolder, "messages.txt").exists()) {
+
+				accounts.add(accountFolder.getName());
+			}
+		}
+		
+		Collections.sort(accounts);
+		return accounts.toArray(new String[0]);
+	}
+
+	public String[] getPrivateAccountIds() {
+		File privateDataFolder = getPrivateDataFolder();
+
+		File[] accountFolders = privateDataFolder.listFiles();
+		ArrayList<String> accounts = new ArrayList<>();
+		for (File accountFolder : accountFolders) {
+			if (accountFolder.isDirectory()
+					&& accountFolder.getName().matches("\\d+_\\d+")
+					&& new File(accountFolder, "survey_data.txt").exists()) {
 
 				accounts.add(accountFolder.getName());
 			}
@@ -212,7 +246,7 @@ public class ResponseTimeStudyDataSet
 		});
 		return messages;
 	}
-
+	
 	@Override
 	public Collection<EmailMessage<String>> getAllMessages(String account) {
 

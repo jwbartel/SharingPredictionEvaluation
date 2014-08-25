@@ -31,6 +31,9 @@ public class SurveyDataParser {
 	public static Map<Integer,Long> getSurveyedResponseTimes(File surveyTimesFile) throws IOException {
 		
 		Map<Integer, Long> surveyTimes = new TreeMap<>();
+		if (!surveyTimesFile.exists()) {
+			return surveyTimes;
+		}
 		List<String> lines = FileUtils.readLines(surveyTimesFile);
 		
 		int question = 0;

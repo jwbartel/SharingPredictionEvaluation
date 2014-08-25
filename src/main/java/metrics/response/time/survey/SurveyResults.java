@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class SurveyResults {
 
-	public static class ResponsetTimeQuestionResults {
+	public static class ResponseTimeQuestionResults {
 
 		Map<Integer, Map<Long, List<QuestionAnswerPair>>> usersAnswers = new TreeMap<>();
 
@@ -41,6 +41,10 @@ public class SurveyResults {
 			if (!userAnswers.contains(answer)) {
 				userAnswers.add(answer);
 			}
+		}
+		
+		public Map<Integer, Map<Long, List<QuestionAnswerPair>>> getAnswers() {
+			return usersAnswers;
 		}
 	}
 
@@ -71,7 +75,7 @@ public class SurveyResults {
 		}
 	}
 
-	private final ResponsetTimeQuestionResults responseTimeResults = new ResponsetTimeQuestionResults();
+	private final ResponseTimeQuestionResults responseTimeResults = new ResponseTimeQuestionResults();
 
 	private final QuestionResults deadlineResults;
 	private final QuestionResults reactionResults;
@@ -106,12 +110,16 @@ public class SurveyResults {
 		commentsResults = new QuestionResults(
 				"If you have any additional comments or feedback, please type it in the box below.");
 	}
+	
+	public ResponseTimeQuestionResults getResponseTimeResults() {
+		return responseTimeResults;
+	}
 
 	private Integer getUserId(String surveyId) {
 
 		String userString = surveyId;
 		if (userString.contains("_")) {
-			userString = surveyId.substring(surveyId.indexOf('_'));
+			userString = surveyId.substring(0,surveyId.indexOf('_'));
 		}
 
 		if (surveyToUserId.containsKey(userString)) {
@@ -455,7 +463,7 @@ public class SurveyResults {
 	
 	private void addCommentsResults(Integer user, JSONObject surveyAnswers) {
 		commentsResults.addUser(user);
-		if (surveyAnswers.getString("comments").trim().length() > 0) {
+		if (surveyAnswers.has("comments") && surveyAnswers.getString("comments").trim().length() > 0) {
 			commentsResults.addAnswer(user, new SurveyElaborationAnswer(
 					surveyAnswers.getString("comments").trim()));
 		}
@@ -470,6 +478,10 @@ public class SurveyResults {
 			addResponseTimeResults(user, questionId, responseTime, surveyAnswers);
 		}
 
+		if (surveyAnswers.has("converted_times") && surveyAnswers.getBoolean("converted_times")) {
+			return;
+		}
+		
 		boolean foundDeadlineAnswer = addDeadlineResults(user, surveyAnswers);
 		if (foundDeadlineAnswer) {
 			addReactionResults(user, surveyAnswers);

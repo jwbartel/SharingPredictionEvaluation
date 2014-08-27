@@ -123,6 +123,7 @@ public class SurveyResultsTestbed {
 		printQuestionResults(outputFile, results.getReactionRemoveResults());
 		printQuestionResults(outputFile, results.getReactionKeepResults());
 		printQuestionResults(outputFile, results.getReactionFindResults());
+		printQuestionResults(outputFile, results.getOtherResults());
 		printQuestionResults(outputFile, results.getSelfResults());
 		printQuestionResults(outputFile, results.getHarmResults());
 	}
@@ -174,6 +175,7 @@ public class SurveyResultsTestbed {
 		printShortAnswerResults(outputFile, results.getReactionRemoveResults());
 		printShortAnswerResults(outputFile, results.getReactionKeepResults());
 		printShortAnswerResults(outputFile, results.getReactionFindResults());
+		printShortAnswerResults(outputFile, results.getOtherResults());
 		printShortAnswerResults(outputFile, results.getSelfResults());
 		printShortAnswerResults(outputFile, results.getHarmResults());
 		printShortAnswerResults(outputFile, results.getCommentsResults());

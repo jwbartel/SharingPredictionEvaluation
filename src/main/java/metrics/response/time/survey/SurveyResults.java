@@ -143,7 +143,7 @@ public class SurveyResults {
 		return reactionFindResults;
 	}
 	
-	public QuestionResults getReactionOtherResults() {
+	public QuestionResults getOtherResults() {
 		return otherResults;
 	}
 	

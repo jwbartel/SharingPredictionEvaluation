@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -94,6 +95,7 @@ public class ResponseTimeStudyDataSet
 				"email_threads/anonymous_data");
 
 		File[] accountFolders = anonymousDataFolder.listFiles();
+		Arrays.sort(accountFolders);
 		ArrayList<String> accounts = new ArrayList<>();
 		for (File accountFolder : accountFolders) {
 			if (accountFolder.isDirectory()

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import metrics.Metric;
 import metrics.MetricResult;
@@ -164,7 +165,10 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 		if (oldGraph == null || newGraph == null) {
 			return oldGraph != null || newGraph != null;
 		}
-		if (!(oldGraph.vertexSet().containsAll(newGraph.vertexSet()))) {
+		
+		Set<Collaborator> oldCollaborators = oldGraph.vertexSet();
+		Set<Collaborator> newCollaborators = newGraph.vertexSet();
+		if (!(oldCollaborators.containsAll(newCollaborators))) {
 			return true;
 		}
 
@@ -227,6 +231,37 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 		}
 		
 	}
+	
+	private Collection<Set<Collaborator>> filterOldSeedlessRecommendations(Collection<Set<Collaborator>> oldSeedlessRecommendations,
+			Collection<Action> testAction) {
+		
+		Collection<Set<Collaborator>> filteredResults = new ArrayList<Set<Collaborator>>();
+		for (Set<Collaborator> group : oldSeedlessRecommendations) {
+			
+			boolean shouldAdd = false;
+			
+			for (Action action : testAction) {
+
+				Set<Collaborator> collaborators = new HashSet<>(action.getCollaborators());
+				
+ 				Set<Collaborator> deletions = new HashSet<>(group);
+				deletions.removeAll(collaborators);
+				
+				Set<Collaborator> additions = new HashSet<>(collaborators);
+				additions.removeAll(group);
+				
+				if (deletions.size() < group.size() && additions.size() < group.size()) {
+					shouldAdd = true;
+					break;
+				}
+			}
+			if (shouldAdd) {
+				filteredResults.add(group);
+			}
+		}
+		return filteredResults;
+		
+	}
 
 	private Collection<MetricResult> collectResults(
 			Collection<Action> testActions,
@@ -238,15 +273,21 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 
 		Collection<Set<Collaborator>> oldSeedlessRecommendations = seedlessRecommenderFactory
 				.create(oldGraph).getRecommendations();
+		Collection<Set<Collaborator>> filteredOldGroups = filterOldSeedlessRecommendations(oldSeedlessRecommendations, testActions);
 		GroupEvolutionRecommender<Collaborator> evolutionRecommender = evolutionRecommendationFactory
 				.create(seedlessRecommenderFactory, newSeedlessRecommendations);
 		Collection<RecommendedEvolution<Collaborator>> recommendations = evolutionRecommender
 				.generateRecommendations(oldGraph, newGraph,
-						oldSeedlessRecommendations);
+						filteredOldGroups);
+
+		Collection<Set<Collaborator>> oldGroups = new ArrayList<>();
+		if (!(evolutionRecommendationFactory instanceof FullRecommendationGroupEvolutionRecommenderFactory)) {
+			oldGroups.addAll(filteredOldGroups);
+		}
 
 		ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborator, Action> modeler =
-				new ActionBasedEvolutionGroupRecommendationAcceptanceModeler<>(
-						oldGraph, newGraph, recommendations, testActions, metrics);
+				new ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborator, Action>(
+						oldGraph, newGraph, oldGroups, recommendations, testActions, metrics);
 		
 		return modeler.modelRecommendationAcceptance();
 	}
@@ -281,8 +322,12 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 			ActionBasedGraphBuilderFactory<Collaborator, Action> graphBuilderFactory,
 			GroupEvolutionRecommenderFactory<Collaborator> evolutionRecommendationFactory) throws IOException {
 
+		System.out.println(account + ","+ graphBuilderFactory.getClass().getName());
+		
 		UndirectedGraph<Collaborator, DefaultEdge> newGraph = buildGraph(
 				constants, trainActions, graphBuilderFactory);
+		
+		System.out.println("graph with "+newGraph.vertexSet().size() + " vertices and "+newGraph.edgeSet().size()+" edges.");
 		SeedlessGroupRecommender<Collaborator> seedlessRecommender = seedlessRecommenderFactory.create(newGraph);
 		Collection<Set<Collaborator>> newSeedlessRecommendations = seedlessRecommender.getRecommendations();
 
@@ -290,19 +335,24 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 		Collections.sort(trainActionsList);
 
 		UndirectedGraph<Collaborator, DefaultEdge> oldGraph = null;
-		for (int i = trainActionsList.size() - 1; i >= 0; i--) {
+		for (int i = trainActionsList.size() - 1; i > 0; i--) {
 			trainActionsList.remove(i);
 
 			UndirectedGraph<Collaborator, DefaultEdge> candidateOldGraph = buildGraph(
 					constants, trainActionsList, graphBuilderFactory);
+			System.out.println("candidate old graph has "+candidateOldGraph.vertexSet().size()+" vertices and "+candidateOldGraph.edgeSet().size()+" edges");
 			if (graphsAreDifferent(candidateOldGraph, oldGraph)
-					&& graphsAreDifferent(oldGraph, newGraph)) {
+					&& graphsAreDifferent(candidateOldGraph, newGraph)) {
 				
 				oldGraph = candidateOldGraph;
 				
 				Set<Collaborator> oldCollaborators = new HashSet<>(oldGraph.vertexSet());
 				Set<Collaborator> newCollaborators = new HashSet<>(newGraph.vertexSet());
 				newCollaborators.removeAll(oldCollaborators);
+				if (newCollaborators.size() == 0) {
+					continue;
+				}
+				
 				double vertexGrowthRate = ((double) newCollaborators.size())
 						/ oldCollaborators.size();
 				if (vertexGrowthRate > MAX_VERTEX_GROWTH_RATE) {

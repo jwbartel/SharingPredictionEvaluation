@@ -24,7 +24,7 @@ public class VertexGrowthRateMetric<Collaborator, Action extends CollaborativeAc
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 		
 		Set<Collaborator> newVertices = new HashSet<>(newGraph.vertexSet());
 		newVertices.removeAll(oldGraph.vertexSet());

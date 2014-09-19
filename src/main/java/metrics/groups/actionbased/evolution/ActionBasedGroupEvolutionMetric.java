@@ -2,6 +2,7 @@ package metrics.groups.actionbased.evolution;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import metrics.Metric;
 import metrics.MetricResult;
@@ -21,5 +22,5 @@ public interface ActionBasedGroupEvolutionMetric<Collaborator, Action extends Co
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations);
+			Map<Action, Set<Collaborator>> testActionsToGroups);
 }

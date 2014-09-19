@@ -2,6 +2,7 @@ package metrics.groups.actionbased.evolution;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import metrics.DoubleResult;
 import metrics.MetricResult;
@@ -22,7 +23,7 @@ public class EdgeGrowthRateMetric<Collaborator, Action extends CollaborativeActi
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 		
 		int numNewEdges = 0;
 		for (DefaultEdge edge : newGraph.edgeSet()) {

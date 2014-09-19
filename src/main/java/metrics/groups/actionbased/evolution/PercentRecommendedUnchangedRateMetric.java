@@ -24,7 +24,7 @@ public class PercentRecommendedUnchangedRateMetric<Collaborator, Action extends 
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 		
 		int numUnchanged = 0;
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {

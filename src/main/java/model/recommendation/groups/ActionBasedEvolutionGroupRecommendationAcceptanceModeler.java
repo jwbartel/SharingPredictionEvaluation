@@ -23,6 +23,7 @@ public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborat
 
 	UndirectedGraph<Collaborator, DefaultEdge> oldGraph;
 	UndirectedGraph<Collaborator, DefaultEdge> newGraph;
+	Collection<Set<Collaborator>> oldGroups;
 	Collection<RecommendedEvolution<Collaborator>> recommendations;
 	Collection<Action> testActions;
 	Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics;
@@ -30,14 +31,36 @@ public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborat
 	public ActionBasedEvolutionGroupRecommendationAcceptanceModeler(
 			UndirectedGraph<Collaborator, DefaultEdge> oldGraph,
 			UndirectedGraph<Collaborator, DefaultEdge> newGraph,
+			Collection<Set<Collaborator>> oldGroups,
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Collection<ActionBasedGroupEvolutionMetric<Collaborator, Action>> metrics) {
 		this.oldGraph = oldGraph;
 		this.newGraph = newGraph;
+		this.oldGroups = oldGroups;
 		this.recommendations = recommendations;
 		this.testActions = testActions;
 		this.metrics = metrics;
+	}
+	
+	public double relativeDeletions(Set<Collaborator> recommendation,
+			Set<Collaborator> intendedGroup) {
+		
+		Set<Collaborator> deletes = new HashSet<Collaborator>(
+				recommendation);
+		deletes.removeAll(intendedGroup);
+		
+		return ((double) deletes.size())/recommendation.size();
+	}
+	
+	public double relativeAdditions(Set<Collaborator> recommendation,
+			Set<Collaborator> intendedGroup) {
+		
+		Set<Collaborator> adds = new HashSet<Collaborator>(
+				intendedGroup);
+		adds.removeAll(recommendation);
+		
+		return ((double) adds.size())/intendedGroup.size();
 	}
 
 	public Double distance(Set<Collaborator> recommendation,
@@ -57,13 +80,13 @@ public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborat
 		}
 
 		double distance = ((double) adds.size() + deletes.size());
-		if (distance >= intendedGroup.size()) {
-			return null;
-		}
+//		if (distance >= intendedGroup.size()) {
+//			return null;
+//		}
 		return distance;
 	}
 	
-	protected Action matchRecommendationToAction(
+	protected Action matchGroupToAction(
 			Set<Collaborator> recommendation,
 			Collection<Action> futureActions) {
 
@@ -82,23 +105,28 @@ public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborat
 		return bestAction;
 	}
 	
-	protected RecommendedEvolution<Collaborator> matchActionToRecommendation(
+	protected Set<Collaborator> matchActionToGroup(
 			Action action,
-			RecommendedEvolution<Collaborator> bestRecommendation,
-			RecommendedEvolution<Collaborator> recommendation) {
+			Set<Collaborator> bestGroup,
+			Set<Collaborator> group) {
 		
-		double minDistanceToRecommendation = Double.MAX_VALUE;
-		if (bestRecommendation != null) {
-			minDistanceToRecommendation = distance(getRecommendedGroup(bestRecommendation), new HashSet<>(
+		double minAdds = Double.MAX_VALUE;
+		double minDeletes = Double.MAX_VALUE;
+		if (bestGroup != null) {
+			minAdds = relativeAdditions(bestGroup, new HashSet<>(
 				action.getCollaborators()));
+			minDeletes = relativeDeletions(bestGroup, new HashSet<>(
+					action.getCollaborators()));
 		}
-		Double distance = distance(getRecommendedGroup(recommendation), new HashSet<>(
+		double adds = relativeAdditions(group, new HashSet<>(
 				action.getCollaborators()));
-		if (distance != null && distance < minDistanceToRecommendation) {
-			minDistanceToRecommendation = distance;
-			bestRecommendation = recommendation;
+		double deletes = relativeDeletions(group, new HashSet<>(
+				action.getCollaborators()));
+		if ((adds < 1.0 && deletes < 1.0) &&
+				(adds < minAdds) || (adds == minAdds && deletes < minDeletes)) {
+			bestGroup = group;
 		}
-		return bestRecommendation;
+		return bestGroup;
 	}
 	
 	private Set<Collaborator> getRecommendedGroup(RecommendedEvolution<Collaborator> recommendation) {
@@ -114,37 +142,48 @@ public class ActionBasedEvolutionGroupRecommendationAcceptanceModeler<Collaborat
 	public Collection<MetricResult> modelRecommendationAcceptance() {
 
 		Collection<RecommendedEvolution<Collaborator>> unusedRecommendations = new HashSet<RecommendedEvolution<Collaborator>>(recommendations);
-		Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations = new HashMap<>();
+		Map<Action, Set<Collaborator>> testActionsToGroups = new HashMap<>();
 		Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestAction = new HashMap<>();
 		
 		
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
 
 			// Find best action to match with recommendation
-			Action bestAction = matchRecommendationToAction(getRecommendedGroup(recommendation), testActions);
+			Action bestAction = matchGroupToAction(getRecommendedGroup(recommendation), testActions);
 			if (bestAction != null) {
 				recommendationsToTestAction.put(recommendation, bestAction);
 			}
 		}
 
 		for (Action testAction : testActions) {
-
-			RecommendedEvolution<Collaborator> bestRecommendation = null;
-
-			for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
-				bestRecommendation = matchActionToRecommendation(testAction,
-						bestRecommendation, recommendation);
+			
+			Collection<Set<Collaborator>> allGroups = new ArrayList<>(oldGroups);
+			for (RecommendedEvolution<Collaborator> usedRecommendation : recommendationsToTestAction.keySet()) {
+				if(usedRecommendation instanceof RecommendedGroupChangeEvolution) {
+					allGroups.remove(((RecommendedGroupChangeEvolution) usedRecommendation).getOldGroup());
+				}
+				Set<Collaborator> group = getRecommendedGroup(usedRecommendation);
+				if (group != null) {
+					allGroups.add(group);
+				}
 			}
 
-			if (bestRecommendation != null) {
-				testActionsToRecommendations
-						.put(testAction, bestRecommendation);
+			Set<Collaborator> bestGroup = null;
+
+			for (Set<Collaborator> group : allGroups) {
+				bestGroup = matchActionToGroup(testAction,
+						bestGroup, group);
+			}
+
+			if (bestGroup != null) {
+				testActionsToGroups
+						.put(testAction, bestGroup);
 			}
 		}
 
 		Collection<MetricResult> results = new ArrayList<MetricResult>();
 		for (ActionBasedGroupEvolutionMetric<Collaborator, Action> metric : metrics) {
-			results.add(metric.evaluate(oldGraph, newGraph, unusedRecommendations, testActions, recommendationsToTestAction, testActionsToRecommendations));
+			results.add(metric.evaluate(oldGraph, newGraph, unusedRecommendations, testActions, recommendationsToTestAction, testActionsToGroups));
 		}
 
 		return results;

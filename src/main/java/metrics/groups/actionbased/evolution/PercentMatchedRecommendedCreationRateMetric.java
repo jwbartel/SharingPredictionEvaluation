@@ -25,7 +25,7 @@ public class PercentMatchedRecommendedCreationRateMetric<Collaborator, Action ex
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 
 		Set<RecommendedEvolution<Collaborator>> creationRecommendations = new HashSet<>();
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {

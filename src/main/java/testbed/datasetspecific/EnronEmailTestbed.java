@@ -10,6 +10,7 @@ import prediction.response.time.InverseGaussianDistribution;
 import prediction.response.time.LogNormalDistribution;
 import testbed.ConstantValues;
 import testbed.dataset.actions.messages.MessageDataset;
+import testbed.dataset.actions.messages.email.EnronEmailDataSet;
 import testbed.dataset.actions.messages.email.ResponseTimeStudyDataSet;
 import data.preprocess.graphbuilder.InteractionRankWeightedActionBasedGraphBuilder;
 import data.preprocess.graphbuilder.SimpleActionBasedGraphBuilder;
@@ -37,8 +38,8 @@ public class EnronEmailTestbed
 	public Collection<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> getMessageDatasets() {
 	
 		Collection<MessageDataset<String, String, EmailMessage<String>, EmailThread<String, EmailMessage<String>>>> datasets = new ArrayList<>();
-		datasets.add(new ResponseTimeStudyDataSet("response time", new File(
-				"data/Email Response Study")));
+		datasets.add(new EnronEmailDataSet("enron",
+				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron")));
 		return datasets;
 	}
 
@@ -95,9 +96,12 @@ public class EnronEmailTestbed
 
 	public static void main(String[] args) throws Exception {
 
-		EnronEmailTestbed testbed = new EnronEmailTestbed();
-		testbed.runTestbed();
+//		EnronEmailTestbed testbed = new EnronEmailTestbed();
+//		testbed.runTestbed();
 
+		EnronEmailDataSet dataset = new EnronEmailDataSet("enron",
+				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron"));
+		dataset.printStats();
 	}
 
 }

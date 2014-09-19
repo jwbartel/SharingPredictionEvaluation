@@ -25,7 +25,7 @@ public class PercentMatchedRecommendedUnchangedRateMetric<Collaborator, Action e
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 		
 		Set<RecommendedEvolution<Collaborator>> unchangedRecommendations = new HashSet<>();
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {

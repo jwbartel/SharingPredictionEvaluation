@@ -44,7 +44,7 @@ public class EvolutionRepurposedActionBasedGroupMetric<Collaborator, Action exte
 			Collection<RecommendedEvolution<Collaborator>> recommendations,
 			Collection<Action> testActions,
 			Map<RecommendedEvolution<Collaborator>, Action> recommendationsToTestActions,
-			Map<Action, RecommendedEvolution<Collaborator>> testActionsToRecommendations) {
+			Map<Action, Set<Collaborator>> testActionsToGroups) {
 
 		Collection<Set<Collaborator>> finalRecommendedGroups = new ArrayList<>();
 		for (RecommendedEvolution<Collaborator> recommendation : recommendations) {
@@ -69,16 +69,15 @@ public class EvolutionRepurposedActionBasedGroupMetric<Collaborator, Action exte
 			recommendedGroupsToTestActions.put(recommendedGroup, entry.getValue());
 		}
 		
-		Map<Action, Set<Collaborator>> testActionsToRecommendedGroup = new HashMap<>();
-		for (Entry<Action, RecommendedEvolution<Collaborator>> entry : testActionsToRecommendations.entrySet()) {
-			RecommendedEvolution<Collaborator> recommendation = entry.getValue();
-			Set<Collaborator> recommendedGroup = getRecommendedGroup(recommendation);
-			testActionsToRecommendedGroup.put(entry.getKey(), recommendedGroup);
+		Map<Action, Set<Collaborator>> testActionsToGroup = new HashMap<>();
+		for (Entry<Action, Set<Collaborator>> entry : testActionsToGroups.entrySet()) {
+			Set<Collaborator> group = entry.getValue();
+			testActionsToGroup.put(entry.getKey(), group);
 		}
 
 		return actionBasedMetric.evaluate(finalRecommendedGroups, new ArrayList<Set<Collaborator>>(), testActions,
 				new HashMap<Set<Collaborator>, Set<Collaborator>>(), recommendedGroupsToTestActions,
-				testActionsToRecommendedGroup);
+				testActionsToGroup);
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import javax.mail.MessagingException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import testbed.dataset.actions.ActionsDataSet;
 import data.representation.actionbased.messages.MessageThread;
@@ -304,6 +305,91 @@ public abstract class MessageDataset<IdType, RecipientType, MessageType extends 
 		
 		File outputFile = getResponseTimesAnalysisFile();
 		FileUtils.write(outputFile, outputStr);
+	}
+	
+	public void printStats() {
+		double percentTrain = 0.8;
+		
+		Collection<MessageType> messages;
+		Collection<MessageType> trainMessages;
+		Collection<MessageType> testMessages;
+		Collection<ThreadType> threads;
+		Collection<ThreadType> trainThreads;
+		Collection<ThreadType> testThreads;
+		
+		if (getAccountIds().length <= 1) {
+			IdType account = null;
+			messages = new ArrayList<MessageType>(getAllMessages(account));
+			trainMessages = new ArrayList<MessageType>(getTrainMessages(account, percentTrain));
+			testMessages = new ArrayList<MessageType>(getTestMessages(account, percentTrain));
+			
+			threads = new ArrayList<ThreadType>(getAllThreads(account));
+			trainThreads = new ArrayList<ThreadType>(getTrainThreads(account, percentTrain));
+			testThreads = new ArrayList<ThreadType>(getTestThreads(account, percentTrain));
+		} else {
+			messages = new ArrayList<MessageType>();
+			trainMessages = new ArrayList<MessageType>();
+			testMessages = new ArrayList<MessageType>();
+			
+			threads = new ArrayList<ThreadType>();
+			trainThreads = new ArrayList<ThreadType>();
+			testThreads = new ArrayList<ThreadType>();
+			
+			for (IdType account : getAccountIds()) {
+				messages.addAll(getAllMessages(account));
+				trainMessages.addAll(getTrainMessages(messages, percentTrain));
+				testMessages.addAll(getTestMessages(messages, percentTrain));
+				
+				Collection<ThreadType> accountThreads = getAllThreads(account);
+				if (accountThreads != null) {
+					threads.addAll(getAllThreads(account));
+					trainThreads.addAll(getTrainThreads(account, percentTrain));
+					testThreads.addAll(getTestThreads(account, percentTrain));
+				}
+			}
+		}
+
+		System.out.println("=============================");
+		System.out.println(getName().toUpperCase());
+		System.out.println("=============================");
+		System.out.println("Total messages:"+messages.size());
+		System.out.println("Total train messages:"+trainMessages.size());
+		System.out.println("Total test messages:"+testMessages.size());
+		System.out.println();
+		System.out.println("Total threads:"+threads.size());
+		System.out.println("Total train threads:"+trainThreads.size());
+		System.out.println("Total test threads:"+testThreads.size());
+		
+		DescriptiveStatistics collaboratorsStats = new DescriptiveStatistics();
+		int moreThanOneCollaborator = 0;
+		for (MessageType message : messages) {
+			int numCollaborators = message.getCollaborators().size();
+			if (numCollaborators > 1) {
+				moreThanOneCollaborator++;
+			}
+			collaboratorsStats.addValue(numCollaborators);
+		}
+
+		System.out.println("=============================");
+		System.out.println("Num collaborators stats".toUpperCase());
+		System.out.println("More than one collaborator: "+((double) moreThanOneCollaborator/messages.size()));
+		System.out.println(collaboratorsStats);
+		
+		DescriptiveStatistics threadSizeStats = new DescriptiveStatistics();
+		int moreThanOneMessage = 0;
+		for (ThreadType thread : threads) {
+			int threadSize = thread.getThreadedActions().size();
+			if (threadSize > 1) {
+				moreThanOneMessage++;
+			}
+			threadSizeStats.addValue(threadSize);
+		}
+
+		System.out.println("=============================");
+		System.out.println("Num Msgs in thread stats".toUpperCase());
+		System.out.println("More than one message: "+((double) moreThanOneMessage/messages.size()));
+		System.out.println(threadSizeStats);
+		System.out.println("=============================");
 	}
 
 }

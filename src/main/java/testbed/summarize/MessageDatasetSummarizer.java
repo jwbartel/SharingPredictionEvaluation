@@ -33,6 +33,10 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 		}
 		return new GroupedRowSummarizer(resultsFile, "account", "account");
 	}
+	
+	public GroupedRowSummarizer getGroupRowByAccountSummarizer(File resultsFile) {
+		return new GroupedRowSummarizer(resultsFile, "account", "account", 1);
+	}
 
 	@Override
 	public BestColumnsSummarizer getBestColumnsSummarizer(File resultsFile) {
@@ -72,9 +76,32 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 	
 	@Override
 	public void summarizeMetricResults(File resultsFile, IdType[] accounts) throws IOException {
-		if (resultsFile.getName().endsWith(dataset.getResponseTimeMetricsFile().getName())) {
-			File summarizedFile = new File(resultsFile.getParent(), "summarized - " + resultsFile.getName());
-			getGroupRowSummarizer(resultsFile).summarize(summarizedFile);
+		if (resultsFile.getName().endsWith(dataset.getEvolutionMetricsFile().getName())) {
+
+			File vertexGrowthRateFile = new File(resultsFile.getParentFile(),
+					"vertex growth rate - " + resultsFile.getName());
+			File summarizedVertexGrowthRateFile = new File(vertexGrowthRateFile.getParent(), "summarized - " + vertexGrowthRateFile.getName());
+			getGroupRowSummarizer(vertexGrowthRateFile).summarize(summarizedVertexGrowthRateFile);
+			
+			File edgeGrowthRateFile = new File(resultsFile.getParentFile(),
+					"edge growth rate - " + resultsFile.getName());
+			File summarizedEdgeGrowthRateFile = new File(edgeGrowthRateFile.getParent(), "summarized - " + edgeGrowthRateFile.getName());
+			getGroupRowSummarizer(edgeGrowthRateFile).summarize(summarizedEdgeGrowthRateFile);
+			
+			
+		} else if (resultsFile.getName().endsWith(dataset.getResponseTimeMetricsFile().getName())) {
+			if (accounts.length > 1) {
+				File summarizedByFold = new File(resultsFile.getParent(), "summarized by fold - " + resultsFile.getName());
+				getGroupRowSummarizer(resultsFile).summarize(summarizedByFold);
+				
+
+				File summarizedFile = new File(resultsFile.getParent(), "summarized - " + resultsFile.getName());
+				getGroupRowByAccountSummarizer(summarizedByFold).summarize(summarizedFile);
+				
+			} else {
+				File summarizedFile = new File(resultsFile.getParent(), "summarized - " + resultsFile.getName());
+				getGroupRowSummarizer(resultsFile).summarize(summarizedFile);
+			}
 		} else {
 			super.summarizeMetricResults(resultsFile, accounts);
 		}
@@ -90,6 +117,12 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 		}
 		if (dataset.getActionBasedSeedlessGroupsMetricsFile().exists()) {
 			summarizeMetricResults(dataset.getActionBasedSeedlessGroupsMetricsFile(), dataset.getAccountIds());
+		}
+		if (dataset.getBurstyGroupsMetricsFile().exists()) {
+			summarizeMetricResults(dataset.getBurstyGroupsMetricsFile(), dataset.getAccountIds());
+		}
+		if (dataset.getEvolutionMetricsFile().exists()) {
+			summarizeMetricResults(dataset.getEvolutionMetricsFile(), dataset.getAccountIds());
 		}
 		if (dataset.getResponseTimeMetricsFile().exists()) {
 			summarizeMetricResults(dataset.getResponseTimeMetricsFile(), dataset.getAccountIds());

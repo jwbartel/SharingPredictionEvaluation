@@ -96,6 +96,9 @@ public class NewsgroupTestbed
 		NewsgroupTestbed testbed = new NewsgroupTestbed();
 		testbed.runTestbed();
 
+//		Newsgroups20Dataset dataset =  new Newsgroups20Dataset("20Newsgroups", new File(
+//				"data/20 Newsgroups"));
+//		dataset.printStats();
 	}
 
 }

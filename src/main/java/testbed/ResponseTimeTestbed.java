@@ -113,7 +113,9 @@ public class ResponseTimeTestbed <Id, Collaborator extends Comparable<Collaborat
 		
 		// Add prediction generators
 		predictorFactories = new ArrayList<>();
-		
+
+		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(collaboratorClass, messageClass, threadClass, "mean", 98838.195));
+		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(collaboratorClass, messageClass, threadClass, "median", 4286.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(collaboratorClass, messageClass, threadClass, "1 minute", 60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(collaboratorClass, messageClass, threadClass, "3 minutes", 3*60.0));
 		predictorFactories.add(ConstantMessageResponseTimePredictor.factory(collaboratorClass, messageClass, threadClass, "5 minutes", 5*60.0));

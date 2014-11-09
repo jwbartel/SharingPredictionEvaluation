@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import metrics.DoubleResult;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
@@ -334,9 +335,20 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 		List<Action> trainActionsList = new ArrayList<>(trainActions);
 		Collections.sort(trainActionsList);
 
+		int stepSize = 30;
+		
+		int currStep = 1;
+		
 		UndirectedGraph<Collaborator, DefaultEdge> oldGraph = null;
 		for (int i = trainActionsList.size() - 1; i > 0; i--) {
 			trainActionsList.remove(i);
+			
+			if(currStep == stepSize) {
+				currStep = 1;
+			} else {
+				currStep++;
+				continue;
+			}
 
 			UndirectedGraph<Collaborator, DefaultEdge> candidateOldGraph = buildGraph(
 					constants, trainActionsList, graphBuilderFactory);
@@ -353,8 +365,12 @@ public class ActionBasedEvolutionTestbed<Id, Collaborator, Action extends Collab
 					continue;
 				}
 				
-				double vertexGrowthRate = ((double) newCollaborators.size())
-						/ oldCollaborators.size();
+				Set<Collaborator> newVertices = new HashSet<>(newGraph.vertexSet());
+				newVertices.removeAll(oldGraph.vertexSet());
+				
+				double vertexGrowthRate = ((double) newVertices.size())/((double) oldGraph.vertexSet().size());
+				//if (vertexGrowthRate < 0.704666) continue;
+				
 				if (vertexGrowthRate > MAX_VERTEX_GROWTH_RATE) {
 					break;
 				}

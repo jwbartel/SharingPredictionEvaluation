@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -389,6 +390,34 @@ public abstract class MessageDataset<IdType, RecipientType, MessageType extends 
 		System.out.println("Num Msgs in thread stats".toUpperCase());
 		System.out.println("More than one message: "+((double) moreThanOneMessage/messages.size()));
 		System.out.println(threadSizeStats);
+		System.out.println("=============================");
+		
+
+		
+		DescriptiveStatistics responseTimeStats = new DescriptiveStatistics();
+		for (ThreadType thread : threads) {
+
+			try {
+				Date[] responseDates = thread.getFirstAndResponseDates();
+				
+				if(responseDates != null && responseDates[0] != null && responseDates[1] != null) {
+					
+					
+					long responseTime = responseDates[1].getTime() - responseDates[0].getTime();
+					double responseTimeSeconds = responseTime/1000.0;
+					
+					responseTimeStats.addValue(responseTimeSeconds);
+					System.out.println(responseTime);
+				}
+			} catch (MessagingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("=============================");
+		System.out.println("Response Time stats".toUpperCase());
+		System.out.println(responseTimeStats);
 		System.out.println("=============================");
 	}
 

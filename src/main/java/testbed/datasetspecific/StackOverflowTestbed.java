@@ -87,6 +87,10 @@ public class StackOverflowTestbed
 
 		StackOverflowTestbed testbed = new StackOverflowTestbed();
 		testbed.runTestbed();
+		
+//		SampledStackOverflowDataset dataset = new SampledStackOverflowDataset("Sampled StackOverflow", new File(
+//				"data/Stack Overflow/10000 Random Questions"));
+//		dataset.printStats();
 
 	}
 

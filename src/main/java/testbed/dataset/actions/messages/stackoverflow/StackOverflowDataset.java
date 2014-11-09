@@ -24,7 +24,15 @@ public abstract class StackOverflowDataset<Recipient, MessageType extends StackO
 
 	@Override
 	public Collection<MessageType> getAllMessages(Long account) {
-		return new TreeSet<>(messages);
+		TreeSet<MessageType> allMessages = new TreeSet<>();
+		for (MessageType message : messages) {
+			if(message.getType().toString().equals("Question")) {
+				allMessages.add(message);
+			}
+		}
+		return allMessages;
+		
+//		return new TreeSet<>(messages);
 	}
 
 	@Override

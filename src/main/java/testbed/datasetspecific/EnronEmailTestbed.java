@@ -96,12 +96,12 @@ public class EnronEmailTestbed
 
 	public static void main(String[] args) throws Exception {
 
-//		EnronEmailTestbed testbed = new EnronEmailTestbed();
-//		testbed.runTestbed();
+		EnronEmailTestbed testbed = new EnronEmailTestbed();
+		testbed.runTestbed();
 
-		EnronEmailDataSet dataset = new EnronEmailDataSet("enron",
-				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron"));
-		dataset.printStats();
+//		EnronEmailDataSet dataset = new EnronEmailDataSet("enron",
+//				EnronEmailDataSet.DEFAULT_ACCOUNTS, new File("data/Enron"));
+//		dataset.printStats();
 	}
 
 }

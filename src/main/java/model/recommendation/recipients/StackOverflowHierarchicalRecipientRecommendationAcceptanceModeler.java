@@ -1,7 +1,9 @@
 package model.recommendation.recipients;
 
+import java.io.File;
 import java.util.Collection;
 
+import metrics.permessage.PerMessageMetric;
 import metrics.recipients.RecipientMetric;
 import recommendation.recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
@@ -14,7 +16,9 @@ public class StackOverflowHierarchicalRecipientRecommendationAcceptanceModeler<R
 			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
-			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
-		super(listSize, recommender, trainingMessages, testMessages, metrics);
+			Collection<RecipientMetric<RecipientType, MessageType>> metrics,
+			Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics,
+			File outputFolder) {
+		super(listSize, recommender, trainingMessages, testMessages, metrics, perMessageMetrics, outputFolder);
 	}
 }

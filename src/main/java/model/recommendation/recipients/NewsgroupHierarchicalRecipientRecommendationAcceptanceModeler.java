@@ -1,9 +1,11 @@
 package model.recommendation.recipients;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import metrics.MetricResult;
+import metrics.permessage.PerMessageMetric;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
 import recommendation.recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
@@ -17,8 +19,10 @@ public class NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<Recip
 			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
-			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
-		super(listSize, recommender, trainingMessages, testMessages, metrics);
+			Collection<RecipientMetric<RecipientType, MessageType>> metrics,
+			Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics,
+			File outputFolder) {
+		super(listSize, recommender, trainingMessages, testMessages, metrics, perMessageMetrics, outputFolder);
 	}
 	
 	@Override

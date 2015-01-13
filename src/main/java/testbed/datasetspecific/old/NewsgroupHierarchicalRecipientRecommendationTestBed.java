@@ -8,6 +8,8 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.permessage.PerMessageMetric;
+import metrics.permessage.RecipientPerMessageMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -58,6 +60,7 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 	static Collection<Double> halfLives = new ArrayList<>();
 
 	static Collection<RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost>> metricFactories = new ArrayList<>();
+	static Collection<PerMessageMetric.Factory<ComparableAddress, JavaMailNewsgroupPost>> perMessageMetricFactories = new ArrayList<>();
 
 	static {
 
@@ -108,6 +111,17 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 		metricFactories.add(RelativeSwitchesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(TrainWithMultipleFromMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class));
+		
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalRecipientsToAddressMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RequestsForListsMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(PrecisionMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalSelectedPerClickMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeScansMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeClicksMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeManualEntriesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeSwitchesMetric.factory(ComparableAddress.class, JavaMailNewsgroupPost.class)));
 	}
 	
 	private static String getHalfLifeName(double halfLife) {
@@ -212,10 +226,18 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 		for (RecipientMetricFactory<ComparableAddress, JavaMailNewsgroupPost> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
+		
+		Collection<PerMessageMetric<ComparableAddress, JavaMailNewsgroupPost>> perMessageMetrics = new ArrayList<>();
+		for (PerMessageMetric.Factory<ComparableAddress, JavaMailNewsgroupPost> factory : perMessageMetricFactories) {
+			perMessageMetrics.add(factory.create());
+		}
+		
+		//TODO: fix to not be temp
+		File tempFolder = new File("temp");
 
 		HierarchicalRecipientRecommendationAcceptanceModeler<ComparableAddress, JavaMailNewsgroupPost> modeler = new NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<>(
 				listSize, hierarchicalRecommender, trainingMessages,
-				testMessages, metrics);
+				testMessages, metrics, perMessageMetrics, tempFolder);
 		Collection<MetricResult> results = modeler
 				.modelRecommendationAcceptance();
 		return results;
@@ -233,9 +255,10 @@ public class NewsgroupHierarchicalRecipientRecommendationTestBed {
 			MetricResultCollection<Integer> resultCollection = new MetricResultCollection<Integer>(
 					headerPrefix, unusedMetrics,
 					dataset.getHierarchicalRecipientRecommendationMetricsFile());
+			
+			File perMessageFolder = dataset.getPerMessageMetricsFolder();
 
 			for (Integer account : dataset.getAccountIds()) {
-				System.out.println(account);
 
 				Collection<JavaMailNewsgroupPost> trainingMessages = dataset
 						.getTrainMessages(account, percentTraining);

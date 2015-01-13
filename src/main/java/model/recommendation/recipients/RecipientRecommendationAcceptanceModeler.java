@@ -1,11 +1,16 @@
 package model.recommendation.recipients;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TreeSet;
 
 import metrics.MetricResult;
+import metrics.permessage.PerMessageMetric;
 import metrics.recipients.RecipientAddressingEvent;
 import recommendation.recipients.RecipientRecommendation;
 import recommendation.recipients.RecipientRecommender;
@@ -16,6 +21,8 @@ import data.representation.actionbased.messages.SingleMessage;
 public abstract class RecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>> {
 
 	protected int seedSize = 2;
+	protected final Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics;
+	protected final File outputFolder;
 	
 	public abstract Collection<MetricResult> modelRecommendationAcceptance();
 
@@ -27,6 +34,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		Collection<V> collaborators;
 		boolean wasSent;
 		String title;
+		String id;
 
 		public ReplayedMessage(SingleMessage<V> message) {
 			this.creators = message.getCreators();
@@ -35,6 +43,7 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			this.collaborators = new ArrayList<V>();
 			this.wasSent = message.wasSent();
 			this.title = message.getTitle();
+			this.id = message.getId();
 		}
 
 		@Override
@@ -78,6 +87,19 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 			}
 			return toString().compareTo(action.toString());
 		}
+
+		@Override
+		public String getId() {
+			return id;
+		}
+	}
+	
+	public RecipientRecommendationAcceptanceModeler(
+			Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics,
+			File outputFolder) {
+		this.perMessageMetrics = perMessageMetrics;
+		this.outputFolder = outputFolder;
+		
 	}
 
 	protected ReplayedMessage<RecipientType> createReplayMessage(
@@ -229,7 +251,95 @@ public abstract class RecipientRecommendationAcceptanceModeler<RecipientType ext
 		}
 
 		events.add(RecipientAddressingEvent.AddressingCompleted);
+		
+		try {
+			printPerMessageMetrics(message, events, seedSize);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return events;
 
+	}
+	
+	boolean outputFileWrittenBefore = false;
+	int messageCount = 1;
+	private void printPerMessageMetrics(MessageType message,
+			Collection<RecipientAddressingEvent> events, int seedSize) throws IOException{
+		File outputFile = getPerMessageOutputFile(); 
+		BufferedWriter out;
+		if (!outputFileWrittenBefore) {
+			if (!outputFile.exists()) {
+				outputFile.getParentFile().mkdirs();
+			}
+			out = new BufferedWriter(new FileWriter(outputFile, false));
+			writeHeader(out);
+			outputFileWrittenBefore = true;
+		} else {
+			out = new BufferedWriter(new FileWriter(outputFile, true));
+		}
+
+		out.write(message.getId().replaceAll(",","-"));
+		for(PerMessageMetric<RecipientType, MessageType> metric : perMessageMetrics) {
+			MetricResult result = metric.evaluate(message, events, seedSize);
+			out.write("," + result.toString());
+		}
+		out.newLine();
+		out.flush();
+		out.close();
+	}
+	
+	private File getPerMessageOutputFile() {
+		String suffix = ".csv";
+		
+		File outputFile = new File(outputFolder, getGroupingType());
+		outputFile = new File(outputFile, getPredictorType());
+		String weightsLabel = getWeightsLabel();
+		if (weightsLabel != null) {
+			outputFile = new File(outputFile, getWeightsLabel() + suffix);
+		} else {
+			outputFile = new File(outputFile.getAbsolutePath() + suffix);
+		}
+		
+		return outputFile;
+	}
+	
+	private void writeHeader(BufferedWriter out) throws IOException {
+		out.write("message id");
+		for (PerMessageMetric<RecipientType, MessageType> metric : perMessageMetrics) {
+			out.write(","+metric.getHeader());
+		}
+		out.newLine();
+		
+	}
+	
+	protected abstract String getGroupingType();
+	protected abstract String getPredictorType();
+	protected abstract String getWeightsLabel();
+	
+	protected static String getHalfLifeName(double halfLife) {
+		if (halfLife < 1000) {
+			return halfLife + " ms";
+		}
+		halfLife /= 1000;
+		if (halfLife < 60) {
+			return halfLife + " seconds";
+		}
+		halfLife /= 60;
+		if (halfLife < 60){
+			return halfLife + " minutes";
+		}
+		halfLife /= 60;
+		if (halfLife < 24){
+			return halfLife + " hours";
+		}
+		halfLife /= 24;
+		if (halfLife < 7) {
+			return halfLife + " days";
+		}
+		if (halfLife <= 28) {
+			return halfLife/7 + " weeks";
+		}
+		halfLife /= 365;
+		return halfLife + " years";
 	}
 }

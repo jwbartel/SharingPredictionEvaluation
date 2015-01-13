@@ -9,6 +9,8 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.permessage.PerMessageMetric;
+import metrics.permessage.RecipientPerMessageMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -40,6 +42,8 @@ import recommendation.recipients.groupbased.interactionrank.scoring.SubsetGroupS
 import recommendation.recipients.groupbased.interactionrank.scoring.SubsetWeightedScore;
 import testbed.dataset.actions.messages.stackoverflow.SampledStackOverflowDataset;
 import testbed.dataset.actions.messages.stackoverflow.StackOverflowDataset;
+import data.representation.actionbased.messages.ComparableAddress;
+import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowMessage;
 import data.representation.actionbased.messages.stackoverflow.StackOverflowThread;
 
@@ -55,6 +59,7 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 	static Collection<Double> halfLives = new ArrayList<>();
 
 	static Collection<RecipientMetricFactory<String, StackOverflowMessage<String>>> metricFactories = new ArrayList<>();
+	static Collection<PerMessageMetric.Factory<String, StackOverflowMessage<String>>> perMessageMetricFactories = new ArrayList<>();
 
 	static {
 
@@ -111,6 +116,17 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 		metricFactories.add(RelativeSwitchesMetric.factory(String.class, StackOverflowMessage.class));
 		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, StackOverflowMessage.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, StackOverflowMessage.class));
+		
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalRecipientsToAddressMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RequestsForListsMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(PrecisionMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalSelectedPerClickMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeScansMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeClicksMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeManualEntriesMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeSwitchesMetric.factory(String.class, StackOverflowMessage.class)));
 	}
 	
 	private static String getHalfLifeName(double halfLife) {
@@ -215,10 +231,18 @@ public class StackOverflowHierarchicalRecipientRecommendationTestBed {
 		for (RecipientMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
+		
+		Collection<PerMessageMetric<String, StackOverflowMessage<String>>> perMessageMetrics = new ArrayList<>();
+		for (PerMessageMetric.Factory<String, StackOverflowMessage<String>> factory : perMessageMetricFactories) {
+			perMessageMetrics.add(factory.create());
+		}
+		
+		//TODO: fix to not be temp
+		File tempFolder = new File("temp");
 
 		HierarchicalRecipientRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new NewsgroupHierarchicalRecipientRecommendationAcceptanceModeler<>(
 				listSize, hierarchicalRecommender, trainingMessages,
-				testMessages, metrics);
+				testMessages, metrics, perMessageMetrics, tempFolder);
 		Collection<MetricResult> results = modeler
 				.modelRecommendationAcceptance();
 		return results;

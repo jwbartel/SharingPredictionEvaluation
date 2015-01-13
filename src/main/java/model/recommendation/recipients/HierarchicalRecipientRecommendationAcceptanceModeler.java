@@ -1,12 +1,13 @@
 package model.recommendation.recipients;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import data.representation.actionbased.messages.SingleMessage;
 import metrics.MetricResult;
+import metrics.permessage.PerMessageMetric;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
 import recommendation.recipients.RecipientRecommendation;
@@ -16,6 +17,8 @@ import recommendation.recipients.groupbased.hierarchical.HierarchicalGroupRecomm
 import recommendation.recipients.groupbased.hierarchical.HierarchicalIndividualRecommendation;
 import recommendation.recipients.groupbased.hierarchical.HierarchicalRecipientRecommender;
 import recommendation.recipients.groupbased.hierarchical.HierarchicalRecommendation;
+import recommendation.recipients.groupbased.interactionrank.InteractionRankGroupBasedRecipientRecommender;
+import data.representation.actionbased.messages.SingleMessage;
 
 public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>>
 		extends
@@ -31,7 +34,10 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 			HierarchicalRecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
-			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
+			Collection<RecipientMetric<RecipientType, MessageType>> metrics,
+			Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics,
+			File outputFolder) {
+		super(perMessageMetrics, outputFolder);
 		this.listSize = listSize;
 		this.recommender = recommender;
 		this.trainingMessages = trainingMessages;
@@ -174,5 +180,41 @@ public class HierarchicalRecipientRecommendationAcceptanceModeler<RecipientType 
 				replayMessage, remainingCollaborators, lastActiveUserEvent,
 				events);
 		
+	}
+
+	@Override
+	protected String getGroupingType() {
+		return "hierarchical";
+	}
+
+	@Override
+	protected String getPredictorType() {
+		RecipientRecommender<RecipientType, MessageType> baseRecommender = recommender;
+		if (baseRecommender instanceof HierarchicalRecipientRecommender) {
+			baseRecommender = ((HierarchicalRecipientRecommender) baseRecommender).getBaseRecommender();
+		}
+		
+		if (baseRecommender instanceof InteractionRankGroupBasedRecipientRecommender) {
+			return ((InteractionRankGroupBasedRecipientRecommender) baseRecommender).getGroupScorer()
+					.getName();
+		}
+		return baseRecommender.getTypeOfRecommender(); 
+	}
+	
+	@Override
+	protected String getWeightsLabel() {
+		RecipientRecommender<RecipientType, MessageType> baseRecommender = recommender;
+		if (baseRecommender instanceof HierarchicalRecipientRecommender) {
+			baseRecommender = ((HierarchicalRecipientRecommender) baseRecommender).getBaseRecommender();
+		}
+		
+		if (baseRecommender instanceof InteractionRankGroupBasedRecipientRecommender) {
+			String halfLifeLabel = getHalfLifeName(((InteractionRankGroupBasedRecipientRecommender) baseRecommender)
+					.getGroupScorer().getHalfLife());
+			double wOut = ((InteractionRankGroupBasedRecipientRecommender) baseRecommender)
+					.getGroupScorer().getWOut();
+			return "half life - " + halfLifeLabel + "/ wout - " + wOut;
+		}
+		return null;
 	}
 }

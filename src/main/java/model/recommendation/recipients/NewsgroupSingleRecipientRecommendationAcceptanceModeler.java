@@ -1,14 +1,15 @@
 package model.recommendation.recipients;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
 
-import data.representation.actionbased.messages.SingleMessage;
 import metrics.MetricResult;
+import metrics.permessage.PerMessageMetric;
 import metrics.recipients.RecipientAddressingEvent;
 import metrics.recipients.RecipientMetric;
 import recommendation.recipients.RecipientRecommender;
+import data.representation.actionbased.messages.SingleMessage;
 
 public class NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientType extends Comparable<RecipientType>, MessageType extends SingleMessage<RecipientType>>
 	extends SingleRecipientRecommendationAcceptanceModeler<RecipientType,MessageType> {
@@ -17,8 +18,11 @@ public class NewsgroupSingleRecipientRecommendationAcceptanceModeler<RecipientTy
 			RecipientRecommender<RecipientType, MessageType> recommender,
 			Collection<MessageType> trainingMessages,
 			Collection<MessageType> testMessages,
-			Collection<RecipientMetric<RecipientType, MessageType>> metrics) {
-		super(listSize, recommender, trainingMessages, testMessages, metrics);
+			Collection<RecipientMetric<RecipientType, MessageType>> metrics,
+			Collection<PerMessageMetric<RecipientType, MessageType>> perMessageMetrics,
+			File outputFolder) {
+		super(listSize, recommender, trainingMessages, testMessages, metrics, perMessageMetrics,
+				outputFolder);
 	}
 	
 	@Override

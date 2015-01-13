@@ -79,6 +79,10 @@ public abstract class MessageDataset<IdType, RecipientType, MessageType extends 
 		return new File(getMetricsFolder(),
 				"previous results response time prediction results.csv");
 	}
+	
+	public File getPerMessageMetricsFolder() {
+		return new File(getRootFolder(), "per message metrics");
+	}
 
 	public File getRecipientRecommendationMetricsFile() {
 		return new File(getMetricsFolder(),

@@ -1,5 +1,6 @@
 package testbed;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +8,8 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.permessage.PerMessageMetric;
+import metrics.permessage.RecipientPerMessageMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -54,6 +57,7 @@ public class RecipientRecommendationTestbed <Id, Collaborator extends Comparable
 	Collection<Double> halfLives = new ArrayList<>();
 
 	Collection<RecipientMetricFactory<Collaborator, Message>> metricFactories = new ArrayList<>();
+	Collection<PerMessageMetric.Factory<Collaborator, Message>> perMessageMetricFactories = new ArrayList<>();
 	
 	public RecipientRecommendationTestbed(
 			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets,
@@ -108,6 +112,16 @@ public class RecipientRecommendationTestbed <Id, Collaborator extends Comparable
 		metricFactories.add(RelativeSwitchesMetric.factory(collaboratorClass, messageClass));
 		metricFactories.add(TrainWithMultipleFromMetric.factory(collaboratorClass, messageClass));
 		metricFactories.add(TestWithMultipleFromMetric.factory(collaboratorClass, messageClass));
+		
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalRecipientsToAddressMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RequestsForListsMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(PrecisionMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(collaboratorClass, messageClass)));perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalSelectedPerClickMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeScansMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeClicksMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeManualEntriesMetric.factory(collaboratorClass, messageClass)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeSwitchesMetric.factory(collaboratorClass, messageClass)));
 	}
 	
 	private static String getHalfLifeName(double halfLife) {
@@ -149,9 +163,13 @@ public class RecipientRecommendationTestbed <Id, Collaborator extends Comparable
 			MetricResultCollection<Id> resultCollection = new MetricResultCollection<Id>(
 					headerPrefix, unusedMetrics,
 					dataset.getRecipientRecommendationMetricsFile());
+			
+			File perMessageFolder = dataset.getPerMessageMetricsFolder();
 
 			for (Id account : dataset.getAccountIds()) {
 				System.out.println(account);
+				
+				File accountPerMessageFolder = new File(perMessageFolder, ""+account);
 
 				Collection<Message> trainingMessages = dataset
 						.getTrainMessages(account, percentTraining);
@@ -179,10 +197,15 @@ public class RecipientRecommendationTestbed <Id, Collaborator extends Comparable
 								for (RecipientMetricFactory<Collaborator, Message> metricFactory : metricFactories) {
 									metrics.add(metricFactory.create());
 								}
+								
+								Collection<PerMessageMetric<Collaborator, Message>> perMessageMetrics = new ArrayList<>();
+								for (PerMessageMetric.Factory<Collaborator, Message> factory : perMessageMetricFactories) {
+									perMessageMetrics.add(factory.create());
+								}
 
 								SingleRecipientRecommendationAcceptanceModeler<Collaborator, Message> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
 										listSize, recommender, trainingMessages,
-										testMessages, metrics);
+										testMessages, metrics, perMessageMetrics, accountPerMessageFolder);
 								Collection<MetricResult> results = modeler
 										.modelRecommendationAcceptance();
 

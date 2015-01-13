@@ -70,7 +70,7 @@ public class Newsgroups20Dataset extends NewsgroupDataset<Integer, ComparableAdd
 	private void loadPosts(File folder) throws MessagingException, IOException {
 		if (folder.isFile()) {
 			Message message = loadPost(folder);
-			posts.add(new JavaMailNewsgroupPost(message, false));
+			posts.add(new JavaMailNewsgroupPost(message, true));
 		} else {
 			for (File subFolder : folder.listFiles()) {
 				loadPosts(subFolder);

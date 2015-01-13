@@ -35,7 +35,7 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 		for (MessageDataset<Id, Collaborator, Message, MsgThread> dataset : datasets) {
 			actionDatasets.add(dataset);
 		}
-		runActionTests(actionDatasets);
+//		runActionTests(actionDatasets);
 		
 		runMessageTests(datasets);
 		
@@ -48,11 +48,11 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 		runRecipientRecommendationTests(datasets);
 		runHierarchicalRecipientRecommendationTests(datasets);
 		
-		runPreviousResultsLivenessEvaluation(datasets);
-		runPreviousResultsResponseTimeEvaluation(datasets);
-		
-		runLivenessTests(datasets);
-		runResponseTimeTests(datasets);
+//		runPreviousResultsLivenessEvaluation(datasets);
+//		runPreviousResultsResponseTimeEvaluation(datasets);
+//		
+//		runLivenessTests(datasets);
+//		runResponseTimeTests(datasets);
 	}
 	
 	public abstract Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> getMessageDatasets();

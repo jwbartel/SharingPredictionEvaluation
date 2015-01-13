@@ -92,7 +92,7 @@ public class SampledStackOverflowDataset extends
 			}
 
 			StackOverflowMessage<String> message = new StackOverflowMessage<String>(
-					messageId, owner, date, threadId, type, tags, title, false);
+					messageId, owner, date, threadId, type, tags, title, true);
 			this.messages.add(message);
 			addToThread(message);
 		}

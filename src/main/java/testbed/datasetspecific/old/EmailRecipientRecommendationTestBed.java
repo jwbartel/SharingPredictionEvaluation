@@ -11,6 +11,8 @@ import data.representation.actionbased.messages.newsgroup.JavaMailNewsgroupPost;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.permessage.PerMessageMetric;
+import metrics.permessage.RecipientPerMessageMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -58,6 +60,7 @@ public class EmailRecipientRecommendationTestBed {
 	static Collection<Double> halfLives = new ArrayList<>();
 
 	static Collection<RecipientMetricFactory<String, EmailMessage<String>>> metricFactories = new ArrayList<>();
+	static Collection<PerMessageMetric.Factory<String, EmailMessage<String>>> perMessageMetricFactories = new ArrayList<>();
 
 	static {
 
@@ -113,6 +116,16 @@ public class EmailRecipientRecommendationTestBed {
 		metricFactories.add(RelativeSwitchesMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TrainWithMultipleFromMetric.factory(String.class, EmailMessage.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(String.class, EmailMessage.class));
+		
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalRecipientsToAddressMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RequestsForListsMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(PrecisionMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, EmailMessage.class)));perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalSelectedPerClickMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeScansMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeClicksMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeManualEntriesMetric.factory(String.class, EmailMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeSwitchesMetric.factory(String.class, EmailMessage.class)));
 	}
 	
 	private static boolean underTestableThreshold(Collection<EmailMessage<String>> testMessages) {
@@ -171,9 +184,13 @@ public class EmailRecipientRecommendationTestBed {
 			MetricResultCollection<String> resultCollection = new MetricResultCollection<String>(
 					headerPrefix, unusedMetrics,
 					dataset.getRecipientRecommendationMetricsFile());
+			
+			File perMessageFolder = dataset.getPerMessageMetricsFolder();
 
 			for (String account : dataset.getAccountIds()) {
 				System.out.println(account);
+				
+				File accountPerMessageFolder = new File(perMessageFolder, ""+account);
 
 				Collection<EmailMessage<String>> trainingMessages = dataset
 						.getTrainMessages(account, percentTraining);
@@ -201,10 +218,15 @@ public class EmailRecipientRecommendationTestBed {
 								for (RecipientMetricFactory<String, EmailMessage<String>> metricFactory : metricFactories) {
 									metrics.add(metricFactory.create());
 								}
+								
+								Collection<PerMessageMetric<String, EmailMessage<String>>> perMessageMetrics = new ArrayList<>();
+								for (PerMessageMetric.Factory<String, EmailMessage<String>> factory : perMessageMetricFactories) {
+									perMessageMetrics.add(factory.create());
+								}
 
 								SingleRecipientRecommendationAcceptanceModeler<String, EmailMessage<String>> modeler = new SingleRecipientRecommendationAcceptanceModeler<>(
 										listSize, recommender, trainingMessages,
-										testMessages, metrics);
+										testMessages, metrics, perMessageMetrics, accountPerMessageFolder);
 								Collection<MetricResult> results = modeler
 										.modelRecommendationAcceptance();
 

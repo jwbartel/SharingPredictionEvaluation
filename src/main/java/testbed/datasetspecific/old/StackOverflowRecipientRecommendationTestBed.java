@@ -9,6 +9,8 @@ import java.util.Collection;
 import metrics.Metric;
 import metrics.MetricResult;
 import metrics.MetricResultCollection;
+import metrics.permessage.PerMessageMetric;
+import metrics.permessage.RecipientPerMessageMetric;
 import metrics.recipients.PrecisionMetric;
 import metrics.recipients.RecallMetric;
 import metrics.recipients.RecipientMetric;
@@ -57,6 +59,7 @@ public class StackOverflowRecipientRecommendationTestBed {
 	static Collection<Double> halfLives = new ArrayList<>();
 
 	static Collection<RecipientMetricFactory<String, StackOverflowMessage<String>>> metricFactories = new ArrayList<>();
+	static Collection<PerMessageMetric.Factory<String, StackOverflowMessage<String>>> perMessageMetricFactories = new ArrayList<>();
 
 	static {
 
@@ -127,6 +130,17 @@ public class StackOverflowRecipientRecommendationTestBed {
 				StackOverflowMessage.class));
 		metricFactories.add(TestWithMultipleFromMetric.factory(String.class,
 				StackOverflowMessage.class));
+		
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalRecipientsToAddressMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RequestsForListsMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(PrecisionMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RecallMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(TotalSelectedPerClickMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeScansMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeClicksMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeManualEntriesMetric.factory(String.class, StackOverflowMessage.class)));
+		perMessageMetricFactories.add(RecipientPerMessageMetric.factory(RelativeSwitchesMetric.factory(String.class, StackOverflowMessage.class)));
 	}
 
 	private static String getHalfLifeName(double halfLife) {
@@ -221,9 +235,17 @@ public class StackOverflowRecipientRecommendationTestBed {
 		for (RecipientMetricFactory<String, StackOverflowMessage<String>> metricFactory : metricFactories) {
 			metrics.add(metricFactory.create());
 		}
+		
+		Collection<PerMessageMetric<String, StackOverflowMessage<String>>> perMessageMetrics = new ArrayList<>();
+		for (PerMessageMetric.Factory<String, StackOverflowMessage<String>> factory : perMessageMetricFactories) {
+			perMessageMetrics.add(factory.create());
+		}
+		
+		//TODO: fix to not be temp
+		File tempFolder = new File("temp");
 
 		SingleRecipientRecommendationAcceptanceModeler<String, StackOverflowMessage<String>> modeler = new StackOverflowSingleRecipientAcceptanceModeler<String, StackOverflowMessage<String>>(
-				listSize, recommender, trainingMessages, testMessages, metrics);
+				listSize, recommender, trainingMessages, testMessages, metrics, perMessageMetrics, tempFolder);
 		Collection<MetricResult> results = modeler
 				.modelRecommendationAcceptance();
 

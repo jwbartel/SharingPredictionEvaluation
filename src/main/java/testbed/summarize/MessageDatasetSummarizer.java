@@ -3,6 +3,7 @@ package testbed.summarize;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import testbed.dataset.actions.messages.MessageDataset;
@@ -106,28 +107,67 @@ public class MessageDatasetSummarizer<IdType, RecipientType, MessageType extends
 			super.summarizeMetricResults(resultsFile, accounts);
 		}
 	}
+	
+	private void summarizePerMessageMetrics(File perMessageMetricsFolder, IdType[] accounts) throws IOException {
+		for (IdType account : accounts) {
+			File accountPerMessageMetricsFolder = new File(perMessageMetricsFolder, ""+account);
+			File[] subFolders = accountPerMessageMetricsFolder.listFiles();
+			if (subFolders != null && subFolders.length > 0) {
+				File fileTraversedSoFar = subFolders[0];
+				String prefix = fileTraversedSoFar.getAbsolutePath();
+				traversePerMessageMetricFolders(account, prefix, fileTraversedSoFar, subFolders);
+			}
+		}
+		PerMessageMetricsCombiner<IdType> combiner = new PerMessageMetricsCombiner<>(
+				dataset.getSummarizedPerMessageMetricsByAccountFolder(), Arrays.asList(accounts));
+		combiner.combineFiles(dataset.getSummarizedPerMessageMetricsAcrossAccountFolder());
+	}
+	
+	private void traversePerMessageMetricFolders(IdType account, String folderPrefix, File traversedSoFar,
+			File[] subFolders) throws IOException {
+		if (traversedSoFar.isDirectory()) {
+			for(File toTraverse : traversedSoFar.listFiles()) {
+				traversePerMessageMetricFolders(account, folderPrefix, toTraverse, subFolders);
+			}
+		} else {
+			PerMessageMetricsMatcher matcher = new PerMessageMetricsMatcher();
+			
+			String subPath = traversedSoFar.getAbsolutePath().substring(folderPrefix.length());
+			for(File subFolder : subFolders) {
+				File inputFile = new File(subFolder, subPath);
+				if (inputFile.exists()) {
+					matcher.addInputFolder(inputFile);
+				}
+			}
+			
+			File outputFile = new File(new File(dataset.getSummarizedPerMessageMetricsByAccountFolder(), ""+account), subPath);
+			matcher.writeMatchedMetrics(outputFile);
+		}
+	}
 
 	@Override
 	public void summarize() throws IOException {
-		if (dataset.getRecipientRecommendationMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getRecipientRecommendationMetricsFile(), dataset.getAccountIds());
+//		if (dataset.getRecipientRecommendationMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getRecipientRecommendationMetricsFile(), dataset.getAccountIds());
+//		}
+//		if (dataset.getHierarchicalRecipientRecommendationMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getHierarchicalRecipientRecommendationMetricsFile(), dataset.getAccountIds());
+//		}
+//		if (dataset.getActionBasedSeedlessGroupsMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getActionBasedSeedlessGroupsMetricsFile(), dataset.getAccountIds());
+//		}
+//		if (dataset.getBurstyGroupsMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getBurstyGroupsMetricsFile(), dataset.getAccountIds());
+//		}
+//		if (dataset.getEvolutionMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getEvolutionMetricsFile(), dataset.getAccountIds());
+//		}
+//		if (dataset.getResponseTimeMetricsFile().exists()) {
+//			summarizeMetricResults(dataset.getResponseTimeMetricsFile(), dataset.getAccountIds());
+//		}
+		if (dataset.getPerMessageMetricsFolder().exists()) {
+			summarizePerMessageMetrics(dataset.getPerMessageMetricsFolder(), dataset.getAccountIds());
 		}
-		if (dataset.getHierarchicalRecipientRecommendationMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getHierarchicalRecipientRecommendationMetricsFile(), dataset.getAccountIds());
-		}
-		if (dataset.getActionBasedSeedlessGroupsMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getActionBasedSeedlessGroupsMetricsFile(), dataset.getAccountIds());
-		}
-		if (dataset.getBurstyGroupsMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getBurstyGroupsMetricsFile(), dataset.getAccountIds());
-		}
-		if (dataset.getEvolutionMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getEvolutionMetricsFile(), dataset.getAccountIds());
-		}
-		if (dataset.getResponseTimeMetricsFile().exists()) {
-			summarizeMetricResults(dataset.getResponseTimeMetricsFile(), dataset.getAccountIds());
-		}
-		
 	}
 
 }

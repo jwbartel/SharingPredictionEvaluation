@@ -83,6 +83,18 @@ public abstract class MessageDataset<IdType, RecipientType, MessageType extends 
 	public File getPerMessageMetricsFolder() {
 		return new File(getRootFolder(), "per message metrics");
 	}
+	
+	public File getSummarizedPerMessageMetricsFolder() {
+		return new File(getRootFolder(), "summarized per message metrics");
+	}
+	
+	public File getSummarizedPerMessageMetricsByAccountFolder() {
+		return new File(getSummarizedPerMessageMetricsFolder(), "by account");
+	}
+	
+	public File getSummarizedPerMessageMetricsAcrossAccountFolder() {
+		return new File(getSummarizedPerMessageMetricsFolder(), "combined");
+	}
 
 	public File getRecipientRecommendationMetricsFile() {
 		return new File(getMetricsFolder(),

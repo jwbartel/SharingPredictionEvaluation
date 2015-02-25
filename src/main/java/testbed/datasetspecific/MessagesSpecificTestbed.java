@@ -45,7 +45,7 @@ public abstract class MessagesSpecificTestbed<Id, Collaborator extends Comparabl
 			Collection<MessageDataset<Id, Collaborator, Message, MsgThread>> datasets)
 			throws Exception {
 		
-		runRecipientRecommendationTests(datasets);
+//		runRecipientRecommendationTests(datasets);
 		runHierarchicalRecipientRecommendationTests(datasets);
 		
 //		runPreviousResultsLivenessEvaluation(datasets);

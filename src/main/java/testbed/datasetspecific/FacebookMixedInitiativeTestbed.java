@@ -20,8 +20,12 @@ public class FacebookMixedInitiativeTestbed extends
 	}
 
 	public static void main(String[] args) throws Exception {
-		FacebookMixedInitiativeTestbed testbed = new FacebookMixedInitiativeTestbed();
-		testbed.runTestbed();
+//		FacebookMixedInitiativeTestbed testbed = new FacebookMixedInitiativeTestbed();
+//		testbed.runTestbed();
+		
+		MixedInitiativeDataSet dataset = new MixedInitiativeDataSet("mixed_initiative",
+				MixedInitiativeDataSet.DEFAULT_ACCOUNT_SET, new File("data/kelli"));
+		dataset.printStats();
 	}
 
 }

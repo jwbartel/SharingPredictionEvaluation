@@ -8,6 +8,7 @@ import java.util.Set;
 
 import model.tools.evolution.MembershipChangeFinder;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.BronKerboschCliqueFinder;
 import org.jgrapht.graph.DefaultEdge;
@@ -96,5 +97,59 @@ public abstract class GroupDataSet<Id, Collaborator> extends DataSet<Id> {
 	public abstract File getEvolutionMetricsFile();
 
 	public abstract File getMaximalCliquesFile(Id account);
+	
+	public void printStats() {
+		
+		DescriptiveStatistics graphVerticesStats = new DescriptiveStatistics();
+		DescriptiveStatistics graphEdgesStats = new DescriptiveStatistics();
+		DescriptiveStatistics degreeStats = new DescriptiveStatistics();
+		
+		DescriptiveStatistics numIdealGroupsStats = new DescriptiveStatistics();
+		DescriptiveStatistics sizeOfIdealGroupsStats = new DescriptiveStatistics();
+
+		System.out.println("=============================");
+		System.out.println(getName().toUpperCase());
+		System.out.println("=============================");
+		System.out.println("Total accounts:"+getAccountIds().length);
+		
+		for (Id account : getAccountIds()) {
+			UndirectedGraph<Collaborator, DefaultEdge> graph = getGraph(account);
+			graphVerticesStats.addValue(graph.vertexSet().size());
+			graphEdgesStats.addValue(graph.edgeSet().size());
+			
+			for (Collaborator vertex : graph.vertexSet()) {
+				degreeStats.addValue(graph.edgesOf(vertex).size());
+			}
+			
+			numIdealGroupsStats.addValue(getIdealGroups(account).size());
+			for (Set<Collaborator> idealGroup : getIdealGroups(account)) {
+				sizeOfIdealGroupsStats.addValue(idealGroup.size());
+			}
+		}
+
+		System.out.println("=============================");
+		System.out.println("Num vertices stats".toUpperCase());
+		System.out.println(graphVerticesStats);
+
+
+		System.out.println("=============================");
+		System.out.println("Num edges stats".toUpperCase());
+		System.out.println(graphEdgesStats);
+
+
+		System.out.println("=============================");
+		System.out.println("Vertex degree stats".toUpperCase());
+		System.out.println(degreeStats);
+
+
+		System.out.println("=============================");
+		System.out.println("Number of ideal groups stats".toUpperCase());
+		System.out.println(numIdealGroupsStats);
+
+
+		System.out.println("=============================");
+		System.out.println("Size of ideal groups stats".toUpperCase());
+		System.out.println(sizeOfIdealGroupsStats);
+	}
 
 }

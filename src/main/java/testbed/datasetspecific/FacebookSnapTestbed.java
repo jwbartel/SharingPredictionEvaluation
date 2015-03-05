@@ -19,8 +19,11 @@ public class FacebookSnapTestbed extends GraphsSpecificTestbed<Integer, Integer>
 	}
 
 	public static void main(String[] args) throws Exception {
-		FacebookSnapTestbed testbed = new FacebookSnapTestbed();
-		testbed.runTestbed();
+//		FacebookSnapTestbed testbed = new FacebookSnapTestbed();
+//		testbed.runTestbed();
+		
+		SnapGroupDataSet dataset = new SnapGroupDataSet("snap_facebook", SnapGroupDataSet.DEFAULT_ACCOUNT_SET,
+				new File("data/Stanford_snap/facebook"));
+		dataset.printStats();
 	}
-
 }
